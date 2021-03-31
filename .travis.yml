@@ -17,16 +17,16 @@ jobs:
   include:
     - stage: test
       script: bash ci/script.sh
-      env: TEST_DIR="liquid" RUNNER_ARGS="-t cli" RUNNER_CMD="pub run test -j 1 -r expanded"
+      env: TEST_DIR="liquidart" RUNNER_ARGS="-t cli" RUNNER_CMD="pub run test -j 1 -r expanded"
     - stage: test
       script: bash ci/script.sh
-      env: TEST_DIR="liquid" RUNNER_ARGS="-x cli" RUNNER_CMD="pub run test -j 1 -r expanded"
+      env: TEST_DIR="liquidart" RUNNER_ARGS="-x cli" RUNNER_CMD="pub run test -j 1 -r expanded"
     - stage: test
       script: bash ci/script.sh
-      env: TEST_DIR="liquid_test" RUNNER_CMD="pub run test -j 1 -r expanded"
+      env: TEST_DIR="liquidart_test" RUNNER_CMD="pub run test -j 1 -r expanded"
     - stage: test
       script: bash ci/script.sh
-      env: TEST_DIR="liquid" RUNNER_ARGS="" RUNNER_CMD="dart tool/generated_test_runner.dart"
+      env: TEST_DIR="liquidart" RUNNER_ARGS="" RUNNER_CMD="dart tool/generated_test_runner.dart"
 
 stages:
   - test

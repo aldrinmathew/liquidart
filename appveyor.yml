@@ -10,8 +10,8 @@ services:
 
 environment:
   matrix:
-  - TEST_DIR: liquid_test
-  - TEST_DIR: liquid
+  - TEST_DIR: liquidart_test
+  - TEST_DIR: liquidart
 
 install:
   - ps: wget https://storage.googleapis.com/dart-archive/channels/stable/release/latest/sdk/dartsdk-windows-x64-release.zip -OutFile dart-sdk.zip

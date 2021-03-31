@@ -5,14 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "liquid",
-            "cwd": "liquid",
+            "name": "liquidart",
+            "cwd": "liquidart",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "liquid_test",
-            "cwd": "liquid_test",
+            "name": "liquidart_test",
+            "cwd": "liquidart_test",
             "request": "launch",
             "type": "dart"
         }
