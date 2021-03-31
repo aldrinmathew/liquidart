@@ -1,0 +1,45 @@
+site_name: Liquidart Documentation
+site_description: Official Documentation of the Liquidart Project.
+site_author: Aldrin Mathew
+copyright: Original documentation of Liquidart (previously Aqueduct) written by the StableKernel Team
+repo_url: https://github.com/aldrinsartfactory/liquidart/
+theme:
+  name: material
+  logo: logo.png
+  font:
+    text: Roboto
+    code: Fira Code
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      accent: cyan
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+markdown_extensions:
+  - admonition
+nav:
+  - Welcome : index.md
+  - Core Concepts : core_concepts.md
+  - Getting Started : getting_started.md
+  - Tour : tour.md
+  - Best Practices : best_practices.md
+  - IntelliJ IDEA Templates : intellij.md
+  - Tutorial :
+    - 1. Getting Started : tutorial/getting_started.md
+    - 2. Reading from a Database: tutorial/executing_queries.md
