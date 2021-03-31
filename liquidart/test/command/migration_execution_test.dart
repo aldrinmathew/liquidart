@@ -12,13 +12,12 @@ import 'package:test/test.dart';
 import '../not_tests/cli_helpers.dart';
 
 CLIClient cli;
-DatabaseConfiguration connectInfo = DatabaseConfiguration.withConnectionInfo(
-  "dart", "dart", "localhost", 5432, "dart_test");
+DatabaseConfiguration connectInfo =
+    DatabaseConfiguration.withConnectionInfo("dart", "dart", "localhost", 5432, "dart_test");
 String connectString =
-  "postgres://${connectInfo.username}:${connectInfo.password}@${connectInfo.host}:${connectInfo.port}/${connectInfo.databaseName}";
+    "postgres://${connectInfo.username}:${connectInfo.password}@${connectInfo.host}:${connectInfo.port}/${connectInfo.databaseName}";
 
 void main() {
-
   PostgreSQLPersistentStore store;
 
   setUpAll(() async {
@@ -29,12 +28,8 @@ void main() {
 
   setUp(() async {
     // create a working directory to store migrations in, inside terminal temporary directory
-    store = PostgreSQLPersistentStore(
-        connectInfo.username,
-        connectInfo.password,
-        connectInfo.host,
-        connectInfo.port,
-        connectInfo.databaseName);
+    store = PostgreSQLPersistentStore(connectInfo.username, connectInfo.password, connectInfo.host,
+        connectInfo.port, connectInfo.databaseName);
 
     if (cli.defaultMigrationDirectory.existsSync()) {
       cli.defaultMigrationDirectory.deleteSync(recursive: true);
@@ -64,30 +59,26 @@ void main() {
 
   test("Generate and execute initial schema makes workable DB", () async {
     expect(await runMigrationCases(["Case1"]), 0);
-    var version = await store
-        .execute("SELECT versionNumber FROM _liquidart_version_pgsql");
+    var version = await store.execute("SELECT versionNumber FROM _liquidart_version_pgsql");
     expect(version, [
       [1]
     ]);
     expect(await columnsOfTable(store, "_testobject"), ["id", "foo"]);
   });
 
-  test(
-      "Database already up to date returns 0 status code, does not change version",
-      () async {
+  test("Database already up to date returns 0 status code, does not change version", () async {
     expect(await runMigrationCases(["Case2"]), 0);
 
-    var versionRow = await store.execute(
-            "SELECT versionNumber, dateOfUpgrade FROM _liquidart_version_pgsql")
-        as List<List<dynamic>>;
+    var versionRow =
+        await store.execute("SELECT versionNumber, dateOfUpgrade FROM _liquidart_version_pgsql")
+            as List<List<dynamic>>;
     expect(versionRow.first.first, 1);
     var updateDate = versionRow.first.last;
 
     cli.clearOutput();
     expect(await runMigrationCases(["Case2"]), 0);
-    versionRow = await store.execute(
-            "SELECT versionNumber, dateOfUpgrade FROM _liquidart_version_pgsql")
-        as List<List>;
+    versionRow = await store
+        .execute("SELECT versionNumber, dateOfUpgrade FROM _liquidart_version_pgsql") as List<List>;
     expect(versionRow.length, 1);
     expect(versionRow.first.last, equals(updateDate));
     expect(cli.output, contains("already current (version: 1)"));
@@ -96,8 +87,7 @@ void main() {
   test("Multiple migration files are ran", () async {
     expect(await runMigrationCases(["Case31", "Case32"]), 0);
 
-    var version = await store
-        .execute("SELECT versionNumber FROM _liquidart_version_pgsql");
+    var version = await store.execute("SELECT versionNumber FROM _liquidart_version_pgsql");
     expect(version, [
       [1],
       [2]
@@ -108,8 +98,7 @@ void main() {
 
   test("Only later migration files are ran if already at a version", () async {
     expect(await runMigrationCases(["Case41"]), 0);
-    var version = await store
-        .execute("SELECT versionNumber FROM _liquidart_version_pgsql");
+    var version = await store.execute("SELECT versionNumber FROM _liquidart_version_pgsql");
     expect(version, [
       [1]
     ]);
@@ -119,8 +108,7 @@ void main() {
     expect(await tableExists(store, "_foo"), false);
 
     expect(await runMigrationCases(["Case42"], fromVersion: 1), 0);
-    version = await store
-        .execute("SELECT versionNumber FROM _liquidart_version_pgsql");
+    version = await store.execute("SELECT versionNumber FROM _liquidart_version_pgsql");
     expect(version, [
       [1],
       [2]
@@ -137,21 +125,17 @@ void main() {
     expect(await tableExists(store, "_testobject"), false);
   });
 
-  test(
-      "Ensure that the following tests would succeed if the invalid migration were not applied",
+  test("Ensure that the following tests would succeed if the invalid migration were not applied",
       () async {
     expect(await runMigrationCases(["Case61", "Case63"]), 0);
   });
 
-  test(
-      "If migration fails and more migrations are pending, the pending migrations are cancelled",
+  test("If migration fails and more migrations are pending, the pending migrations are cancelled",
       () async {
     expect(await runMigrationCases(["Case61", "Case62", "Case63"]), isNot(0));
 
-    expect(cli.output.contains("Applied schema version 1 successfully"),
-        true);
-    expect(
-      cli.output, contains("relation \"_unknowntable\" does not exist"));
+    expect(cli.output.contains("Applied schema version 1 successfully"), true);
+    expect(cli.output, contains("relation \"_unknowntable\" does not exist"));
 
     expect(await tableExists(store, store.versionTable.name), false);
     expect(await tableExists(store, "_testobject"), false);
@@ -162,18 +146,14 @@ void main() {
       "If migrations have already been applied, and new migrations occur where the first fails, those pending migrations are cancelled",
       () async {
     expect(await runMigrationCases(["Case61"]), 0);
-    expect(cli.output.contains("Applied schema version 1 successfully"),
-        true);
+    expect(cli.output.contains("Applied schema version 1 successfully"), true);
     cli.clearOutput();
 
-    expect(await runMigrationCases(["Case62", "Case63"], fromVersion: 1),
-        isNot(0));
+    expect(await runMigrationCases(["Case62", "Case63"], fromVersion: 1), isNot(0));
 
-    expect(
-      cli.output, contains("relation \"_unknowntable\" does not exist"));
+    expect(cli.output, contains("relation \"_unknowntable\" does not exist"));
 
-    final version = await store
-        .execute("SELECT versionNumber FROM _liquidart_version_pgsql");
+    final version = await store.execute("SELECT versionNumber FROM _liquidart_version_pgsql");
     expect(version, [
       [1],
     ]);
@@ -201,10 +181,9 @@ void main() {
   });
 }
 
-Future<List<String>> columnsOfTable(
-    PersistentStore persistentStore, String tableName) async {
-  final results = await persistentStore
-      .execute("select column_name from information_schema.columns where "
+Future<List<String>> columnsOfTable(PersistentStore persistentStore, String tableName) async {
+  final results =
+      await persistentStore.execute("select column_name from information_schema.columns where "
           "table_name='$tableName'") as List<List<dynamic>>;
   return results.map((rows) => rows.first as String).toList();
 }
@@ -216,8 +195,7 @@ Future<bool> tableExists(PersistentStore store, String tableName) async {
   return exists.first.first != null;
 }
 
-List<MigrationSource> getOrderedTestMigrations(List<String> names,
-    {int fromVersion = 0}) {
+List<MigrationSource> getOrderedTestMigrations(List<String> names, {int fromVersion = 0}) {
   final uri = Directory.current.uri
       .resolve("test/")
       .resolve("command/")
@@ -232,8 +210,7 @@ List<MigrationSource> getOrderedTestMigrations(List<String> names,
     final offset = cu.name.offset - cu.offset;
 
     // uri is temporary
-    return MigrationSource(
-        code, Uri.parse("1.migration.dart"), offset, offset + cu.name.length);
+    return MigrationSource(code, Uri.parse("1.migration.dart"), offset, offset + cu.name.length);
   }).toList();
 
   migrations.forEach((ms) {
@@ -244,14 +221,12 @@ List<MigrationSource> getOrderedTestMigrations(List<String> names,
   return migrations;
 }
 
-Future runMigrationCases(List<String> migrationNames,
-    {int fromVersion = 0, StringSink log}) async {
-  final migs =
-      getOrderedTestMigrations(migrationNames, fromVersion: fromVersion);
+Future runMigrationCases(List<String> migrationNames, {int fromVersion = 0, StringSink log}) async {
+  final migs = getOrderedTestMigrations(migrationNames, fromVersion: fromVersion);
 
   for (var mig in migs) {
-    final file = File.fromUri(cli.defaultMigrationDirectory.uri
-        .resolve("${mig.versionNumber}_name.migration.dart"));
+    final file = File.fromUri(
+        cli.defaultMigrationDirectory.uri.resolve("${mig.versionNumber}_name.migration.dart"));
     file.writeAsStringSync(
         "import 'dart:async';\nimport 'package:liquidart/liquidart.dart';\n${mig.source}");
   }
@@ -573,8 +548,7 @@ class Case7 extends Migration {
 
   @override
   Future seed() async {
-    await database.store
-        .execute("INSERT INTO InvalidTable (foo) VALUES ('foo')");
+    await database.store.execute("INSERT INTO InvalidTable (foo) VALUES ('foo')");
   }
 }
 

@@ -49,7 +49,7 @@ void main() {
     expect(await task.exitCode, 0);
     expect(
         Directory.fromUri(
-          projectUnderTestCli.agent.workingDirectory.uri.resolve(".liquidart_spec/"))
+                projectUnderTestCli.agent.workingDirectory.uri.resolve(".liquidart_spec/"))
             .existsSync(),
         false);
   });

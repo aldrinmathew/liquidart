@@ -11,15 +11,11 @@ import 'package:pub_semver/pub_semver.dart';
 
 import '../not_tests/cli_helpers.dart';
 
-File get certificateFile => File.fromUri(Directory.current.uri
-    .resolve("../")
-    .resolve("ci/")
-    .resolve("liquidart.cert.pem"));
+File get certificateFile =>
+    File.fromUri(Directory.current.uri.resolve("../").resolve("ci/").resolve("liquidart.cert.pem"));
 
-File get keyFile => File.fromUri(Directory.current.uri
-    .resolve("../")
-    .resolve("ci/")
-    .resolve("liquidart.key.pem"));
+File get keyFile =>
+    File.fromUri(Directory.current.uri.resolve("../").resolve("ci/").resolve("liquidart.key.pem"));
 
 void main() {
   CLIClient templateCli;
@@ -48,9 +44,8 @@ void main() {
     expect(projectUnderTestCli.output, contains("Port: 8888"));
     expect(projectUnderTestCli.output, contains("config.yaml"));
 
-    var thisPubspec = yaml.loadYaml(
-        File.fromUri(Directory.current.uri.resolve("pubspec.yaml"))
-            .readAsStringSync());
+    var thisPubspec = yaml
+        .loadYaml(File.fromUri(Directory.current.uri.resolve("pubspec.yaml")).readAsStringSync());
     var thisVersion = Version.parse(thisPubspec["version"] as String);
     expect(projectUnderTestCli.output, contains("CLI Version: $thisVersion"));
     expect(projectUnderTestCli.output, contains("Liquidart project version: $thisVersion"));
@@ -64,8 +59,8 @@ void main() {
   });
 
   test("Ensure we don't find the base ApplicationChannel class", () async {
-    projectUnderTestCli.agent.addOrReplaceFile("lib/application_test.dart",
-        "import 'package:liquidart/liquidart.dart';");
+    projectUnderTestCli.agent.addOrReplaceFile(
+        "lib/application_test.dart", "import 'package:liquidart/liquidart.dart';");
 
     task = projectUnderTestCli.start("serve", ["-n", "1"]);
     // ignore: unawaited_futures
@@ -76,8 +71,7 @@ void main() {
 
   test("Exception throw during initializeApplication halts startup", () async {
     projectUnderTestCli.agent.modifyFile("lib/channel.dart", (contents) {
-      return contents.replaceFirst(
-          "extends ApplicationChannel {", """extends ApplicationChannel {
+      return contents.replaceFirst("extends ApplicationChannel {", """extends ApplicationChannel {
 static Future initializeApplication(ApplicationOptions x) async { throw new Exception("error"); }            
       """);
     });
@@ -89,8 +83,7 @@ static Future initializeApplication(ApplicationOptions x) async { throw new Exce
     expect(await task.exitCode, isNot(0));
     expect(projectUnderTestCli.output, contains("Application failed to start"));
     expect(projectUnderTestCli.output, contains("Exception: error")); // error generated
-    expect(projectUnderTestCli.output,
-        contains("TestChannel.initializeApplication")); // stacktrace
+    expect(projectUnderTestCli.output, contains("TestChannel.initializeApplication")); // stacktrace
   });
 
   test("Start with valid SSL args opens https server", () async {
@@ -101,21 +94,13 @@ static Future initializeApplication(ApplicationOptions x) async { throw new Exce
         .resolve("server.key")
         .toFilePath(windows: Platform.isWindows));
 
-    task = projectUnderTestCli.start("serve", [
-      "--ssl-key-path",
-      "server.key",
-      "--ssl-certificate-path",
-      "server.crt",
-      "-n",
-      "1"
-    ]);
+    task = projectUnderTestCli.start("serve",
+        ["--ssl-key-path", "server.key", "--ssl-certificate-path", "server.crt", "-n", "1"]);
     await task.hasStarted;
 
     var completer = Completer<List<int>>();
-    var socket = await SecureSocket.connect("localhost", 8888,
-        onBadCertificate: (_) => true);
-    var request =
-        "GET /example HTTP/1.1\r\nConnection: close\r\nHost: localhost\r\n\r\n";
+    var socket = await SecureSocket.connect("localhost", 8888, onBadCertificate: (_) => true);
+    var request = "GET /example HTTP/1.1\r\nConnection: close\r\nHost: localhost\r\n\r\n";
     socket.add(request.codeUnits);
 
     socket.listen((bytes) => completer.complete(bytes));
@@ -132,14 +117,12 @@ static Future initializeApplication(ApplicationOptions x) async { throw new Exce
         .resolve("server.key")
         .toFilePath(windows: Platform.isWindows));
 
-    task = projectUnderTestCli.start(
-        "serve", ["--ssl-key-path", "server.key", "-n", "1"]);
+    task = projectUnderTestCli.start("serve", ["--ssl-key-path", "server.key", "-n", "1"]);
     // ignore: unawaited_futures
     task.hasStarted.catchError((_) => null);
     expect(await task.exitCode, isNot(0));
 
-    task = projectUnderTestCli.start(
-        "serve", ["--ssl-certificate-path", "server.crt", "-n", "1"]);
+    task = projectUnderTestCli.start("serve", ["--ssl-certificate-path", "server.crt", "-n", "1"]);
     // ignore: unawaited_futures
     task.hasStarted.catchError((_) => null);
     expect(await task.exitCode, isNot(0));
@@ -154,14 +137,8 @@ static Future initializeApplication(ApplicationOptions x) async { throw new Exce
         File.fromUri(projectUnderTestCli.agent.workingDirectory.uri.resolve("server.crt"));
     badCertFile.writeAsStringSync("foobar");
 
-    task = projectUnderTestCli.start("serve", [
-      "--ssl-key-path",
-      "server.key",
-      "--ssl-certificate-path",
-      "server.crt",
-      "-n",
-      "1"
-    ]);
+    task = projectUnderTestCli.start("serve",
+        ["--ssl-key-path", "server.key", "--ssl-certificate-path", "server.crt", "-n", "1"]);
     // ignore: unawaited_futures
     task.hasStarted.catchError((_) => null);
     expect(await task.exitCode, isNot(0));
@@ -172,14 +149,8 @@ static Future initializeApplication(ApplicationOptions x) async { throw new Exce
         .resolve("server.key")
         .toFilePath(windows: Platform.isWindows));
 
-    task = projectUnderTestCli.start("serve", [
-      "--ssl-key-path",
-      "server.key",
-      "--ssl-certificate-path",
-      "server.crt",
-      "-n",
-      "1"
-    ]);
+    task = projectUnderTestCli.start("serve",
+        ["--ssl-key-path", "server.key", "--ssl-certificate-path", "server.crt", "-n", "1"]);
     // ignore: unawaited_futures
     task.hasStarted.catchError((_) => null);
     expect(await task.exitCode, isNot(0));
@@ -195,21 +166,18 @@ static Future initializeApplication(ApplicationOptions x) async { throw new Exce
     task.hasStarted.catchError((_) => null);
 
     expect(await task.exitCode, isNot(0));
-    expect(projectUnderTestCli.output,
-        contains("Variables must be declared using the keywords"));
+    expect(projectUnderTestCli.output, contains("Variables must be declared using the keywords"));
   });
 
   test("Use config-path, relative path", () async {
     projectUnderTestCli.agent.addOrReplaceFile("foobar.yaml", "key: value");
     projectUnderTestCli.agent.modifyFile("lib/channel.dart", (c) {
-      var newContents = c.replaceAll(
-          'return new Response.ok({"key": "value"});',
+      var newContents = c.replaceAll('return new Response.ok({"key": "value"});',
           "return new Response.ok(new File(options.configurationFilePath).readAsStringSync())..contentType = ContentType.TEXT;");
       return "import 'dart:io';\n$newContents";
     });
 
-    task = projectUnderTestCli.start(
-        "serve", ["--config-path", "foobar.yaml", "-n", "1"]);
+    task = projectUnderTestCli.start("serve", ["--config-path", "foobar.yaml", "-n", "1"]);
     await task.hasStarted;
 
     var result = await http.get("http://localhost:8888/example");
@@ -219,8 +187,7 @@ static Future initializeApplication(ApplicationOptions x) async { throw new Exce
   test("Use config-path, absolute path", () async {
     projectUnderTestCli.agent.addOrReplaceFile("foobar.yaml", "key: value");
     projectUnderTestCli.agent.modifyFile("lib/channel.dart", (c) {
-      var newContents = c.replaceAll(
-          'return new Response.ok({"key": "value"});',
+      var newContents = c.replaceAll('return new Response.ok({"key": "value"});',
           "return new Response.ok(new File(options.configurationFilePath).readAsStringSync())..contentType = ContentType.TEXT;");
       return "import 'dart:io';\n$newContents";
     });

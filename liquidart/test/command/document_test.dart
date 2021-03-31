@@ -35,8 +35,7 @@ void main() {
   });
 
   test("Can override title/version/etc.", () async {
-    await terminal.run("document",
-        ["--machine", "--title", "foobar", "--api-version", "2.0.0"]);
+    await terminal.run("document", ["--machine", "--title", "foobar", "--api-version", "2.0.0"]);
 
     final map = json.decode(terminal.output);
     expect(map["info"]["title"], "foobar");
@@ -71,8 +70,7 @@ void main() {
       """);
     });
 
-    final exitCode = await terminal
-        .run("document", ["--machine", "--stacktrace"]);
+    final exitCode = await terminal.run("document", ["--machine", "--stacktrace"]);
     expect(exitCode, isNot(0));
     expect(terminal.output, contains("IdentityController.documentComponents"));
     expect(terminal.output, contains("Exception: Hello!"));
