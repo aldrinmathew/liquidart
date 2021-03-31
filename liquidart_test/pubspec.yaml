@@ -1,9 +1,10 @@
 name: liquidart_test
 description: Utilities for writing automated tests for Liquidart applications
 version: 2.0.0-b1
-homepage: https://github.com/stablekernel/liquidart
-author: stable|kernel <jobs@stablekernel.com>
-documentation:
+homepage: https://liquidart.aldrinsartfactory.com
+repository: https://guthub.com/aldrinsartfactory/liquidart
+issue_tracker: https://guthub.com/aldrinsartfactory/liquidart/issues
+documentation: https://liquidart.aldrinsartfactory.com/documentation
 
 environment:
   sdk: ">=2.0.0 <3.0.0"
@@ -14,6 +15,6 @@ dependencies:
   liquidart: ^4.0.0-b1
 
 # This is removed before being published.
-dependency_overrides:
-  liquidart:
-    path: ../liquidart
+# dependency_overrides:
+#   liquidart:
+#     path: ../liquidart

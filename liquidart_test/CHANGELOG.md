@@ -1,3 +1,6 @@
+## 2.0.0-b1
+- Changed name and refactored to liquidart_test
+
 ## 1.0.1
 
 - Fixes analysis warnings for Dart 2.1.1
