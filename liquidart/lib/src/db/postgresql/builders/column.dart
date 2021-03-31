@@ -18,8 +18,7 @@ class ColumnBuilder extends Returnable {
     int primaryKeyIndex;
     for (var i = 0; i < keys.length; i++) {
       final firstElement = keys[i].path.first;
-      if (firstElement is ManagedAttributeDescription &&
-          firstElement.isPrimaryKey) {
+      if (firstElement is ManagedAttributeDescription && firstElement.isPrimaryKey) {
         primaryKeyIndex = i;
         break;
       }
@@ -38,8 +37,7 @@ class ColumnBuilder extends Returnable {
     }));
   }
 
-  static ManagedPropertyDescription propertyForName(
-      ManagedEntity entity, String propertyName) {
+  static ManagedPropertyDescription propertyForName(ManagedEntity entity, String propertyName) {
     var property = entity.properties[propertyName];
 
     if (property == null) {
@@ -125,8 +123,7 @@ class ColumnBuilder extends Returnable {
   }
 
   String get sqlTypeSuffix {
-    var type =
-        PostgreSQLFormat.dataTypeStringForDataType(typeMap[property.type.kind]);
+    var type = PostgreSQLFormat.dataTypeStringForDataType(typeMap[property.type.kind]);
     if (type != null) {
       return ":$type";
     }
@@ -135,19 +132,15 @@ class ColumnBuilder extends Returnable {
   }
 
   String sqlColumnName(
-      {bool withTypeSuffix = false,
-      bool withTableNamespace = false,
-      String withPrefix}) {
+      {bool withTypeSuffix = false, bool withTableNamespace = false, String withPrefix}) {
     var name = property.name;
 
     if (property is ManagedRelationshipDescription) {
-      var relatedPrimaryKey = (property as ManagedRelationshipDescription)
-          .destinationEntity
-          .primaryKey;
+      var relatedPrimaryKey =
+          (property as ManagedRelationshipDescription).destinationEntity.primaryKey;
       name = "${name}_$relatedPrimaryKey";
     } else if (documentKeyPath != null) {
-      final keys =
-          documentKeyPath.map((k) => k is String ? "'$k'" : k).join("->");
+      final keys = documentKeyPath.map((k) => k is String ? "'$k'" : k).join("->");
       name = "$name->$keys";
     }
 

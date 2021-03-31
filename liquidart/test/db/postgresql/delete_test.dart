@@ -22,22 +22,19 @@ void main() {
     var inserted = await req.insert();
     expect(inserted.id, greaterThan(0));
 
-    req = Query<TestModel>(context)
-      ..predicate = QueryPredicate("id = @id", {"id": inserted.id});
+    req = Query<TestModel>(context)..predicate = QueryPredicate("id = @id", {"id": inserted.id});
 
     var count = await req.delete();
     expect(count, 1);
 
-    req = Query<TestModel>(context)
-      ..predicate = QueryPredicate("id = @id", {"id": inserted.id});
+    req = Query<TestModel>(context)..predicate = QueryPredicate("id = @id", {"id": inserted.id});
 
     var result = await req.fetch();
 
     expect(result.length, 0);
   });
 
-  test("Deleting an object when there are many only deletes that object",
-      () async {
+  test("Deleting an object when there are many only deletes that object", () async {
     context = await contextWithModels([TestModel, RefModel]);
 
     for (int i = 0; i < 10; i++) {
@@ -54,8 +51,7 @@ void main() {
     var result = await req.fetch();
     expect(result.length, 10);
 
-    req = Query<TestModel>(context)
-      ..predicate = QueryPredicate("id = @id", {"id": 1});
+    req = Query<TestModel>(context)..predicate = QueryPredicate("id = @id", {"id": 1});
     var count = await req.delete();
     expect(count, 1);
 
@@ -64,8 +60,7 @@ void main() {
     expect(result.length, 9);
   });
 
-  test("Deleting all objects works, as long as you specify the magic",
-      () async {
+  test("Deleting all objects works, as long as you specify the magic", () async {
     context = await contextWithModels([TestModel, RefModel]);
 
     for (int i = 0; i < 10; i++) {
@@ -91,8 +86,7 @@ void main() {
     expect(result.length, 0);
   });
 
-  test("Trying to delete all objects without specifying the magic fails",
-      () async {
+  test("Trying to delete all objects without specifying the magic fails", () async {
     context = await contextWithModels([TestModel, RefModel]);
 
     for (int i = 0; i < 10; i++) {
@@ -136,8 +130,7 @@ void main() {
     var count = await testModelReq.delete();
     expect(count, 1);
 
-    refModelReq = Query<RefModel>(context)
-      ..returningProperties((r) => [r.id, r.test]);
+    refModelReq = Query<RefModel>(context)..returningProperties((r) => [r.id, r.test]);
     refObj = await refModelReq.fetchOne();
     expect(refObj.test, null);
   });
@@ -219,8 +212,7 @@ class _RefModel {
   TestModel test;
 }
 
-class GRestrictInverse extends ManagedObject<_GRestrictInverse>
-    implements _GRestrictInverse {}
+class GRestrictInverse extends ManagedObject<_GRestrictInverse> implements _GRestrictInverse {}
 
 class _GRestrictInverse {
   @primaryKey
@@ -241,8 +233,7 @@ class _GRestrict {
   GRestrictInverse test;
 }
 
-class GCascadeInverse extends ManagedObject<_GCascadeInverse>
-    implements _GCascadeInverse {}
+class GCascadeInverse extends ManagedObject<_GCascadeInverse> implements _GCascadeInverse {}
 
 class _GCascadeInverse {
   @primaryKey

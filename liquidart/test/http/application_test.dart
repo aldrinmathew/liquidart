@@ -13,9 +13,7 @@ void main() {
       await app?.stop();
     });
 
-    test(
-        "didFinishLaunching is false before launch, true after, false after stop",
-        () async {
+    test("didFinishLaunching is false before launch, true after, false after stop", () async {
       app = Application<TestChannel>();
       expect(app.isRunning, false);
 
@@ -58,8 +56,7 @@ void main() {
     });
 
     test("Application gzips content", () async {
-      var resp = await http
-          .get("http://localhost:8888/t", headers: {"Accept-Encoding": "gzip"});
+      var resp = await http.get("http://localhost:8888/t", headers: {"Accept-Encoding": "gzip"});
       expect(resp.headers["content-encoding"], "gzip");
     });
 
@@ -80,9 +77,7 @@ void main() {
       expect(resp.statusCode, 200);
     });
 
-    test(
-        "Application runs app startup function once, regardless of isolate count",
-        () async {
+    test("Application runs app startup function once, regardless of isolate count", () async {
       var sum = 0;
       for (var i = 0; i < 10; i++) {
         var result = await http.get("http://localhost:8888/startup");

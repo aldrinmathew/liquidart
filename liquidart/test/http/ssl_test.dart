@@ -16,20 +16,16 @@ void main() {
       var ciDirUri = getCIDirectoryUri();
 
       app = Application<TestChannel>()
-        ..options.certificateFilePath = ciDirUri
-            .resolve("liquidart.cert.pem")
-            .toFilePath(windows: Platform.isWindows)
-        ..options.privateKeyFilePath = ciDirUri
-            .resolve("liquidart.key.pem")
-            .toFilePath(windows: Platform.isWindows);
+        ..options.certificateFilePath =
+            ciDirUri.resolve("liquidart.cert.pem").toFilePath(windows: Platform.isWindows)
+        ..options.privateKeyFilePath =
+            ciDirUri.resolve("liquidart.key.pem").toFilePath(windows: Platform.isWindows);
 
       await app.start(numberOfInstances: 1);
 
       var completer = Completer<List<int>>();
-      var socket = await SecureSocket.connect("localhost", 8888,
-          onBadCertificate: (_) => true);
-      var request =
-          "GET /r HTTP/1.1\r\nConnection: close\r\nHost: localhost\r\n\r\n";
+      var socket = await SecureSocket.connect("localhost", 8888, onBadCertificate: (_) => true);
+      var request = "GET /r HTTP/1.1\r\nConnection: close\r\nHost: localhost\r\n\r\n";
       socket.add(request.codeUnits);
 
       socket.listen((bytes) => completer.complete(bytes));
@@ -42,9 +38,7 @@ void main() {
 
 Uri getCIDirectoryUri() {
   final env = Platform.environment['LIQUIDART_CI_DIR_LOCATION'];
-  return env != null
-      ? Uri.parse(env)
-      : Directory.current.uri.resolve("../").resolve("ci/");
+  return env != null ? Uri.parse(env) : Directory.current.uri.resolve("../").resolve("ci/");
 }
 
 class TestChannel extends ApplicationChannel {

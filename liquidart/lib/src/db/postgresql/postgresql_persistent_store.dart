@@ -15,11 +15,9 @@ import 'postgresql_schema_generator.dart';
 ///
 /// To interact with a PostgreSQL database, a [ManagedContext] must have an instance of this class.
 /// Instances of this class are configured to connect to a particular PostgreSQL database.
-class PostgreSQLPersistentStore extends PersistentStore
-    with PostgreSQLSchemaGenerator {
+class PostgreSQLPersistentStore extends PersistentStore with PostgreSQLSchemaGenerator {
   /// Creates an instance of this type from connection info.
-  PostgreSQLPersistentStore(
-      this.username, this.password, this.host, this.port, this.databaseName,
+  PostgreSQLPersistentStore(this.username, this.password, this.host, this.port, this.databaseName,
       {this.timeZone = "UTC", bool useSSL = false})
       : isSSLConnection = useSSL {
     ServiceRegistry.defaultInstance
@@ -95,7 +93,6 @@ class PostgreSQLPersistentStore extends PersistentStore
   PostgreSQLConnection _databaseConnection;
   Completer<PostgreSQLConnection> _pendingConnectionCompleter;
 
-
   /// Retrieves the query execution context of this store.
   ///
   /// Use this property to execute raw queries on the underlying database connection.
@@ -119,9 +116,8 @@ class PostgreSQLPersistentStore extends PersistentStore
           _pendingConnectionCompleter.complete(_databaseConnection);
           _pendingConnectionCompleter = null;
         }).catchError((e) {
-          _pendingConnectionCompleter.completeError(QueryException.transport(
-              "unable to connect to database",
-              underlyingException: e));
+          _pendingConnectionCompleter.completeError(
+              QueryException.transport("unable to connect to database", underlyingException: e));
           _pendingConnectionCompleter = null;
         });
       }
@@ -133,8 +129,7 @@ class PostgreSQLPersistentStore extends PersistentStore
   }
 
   @override
-  Query<T> newQuery<T extends ManagedObject>(
-      ManagedContext context, ManagedEntity entity,
+  Query<T> newQuery<T extends ManagedObject>(ManagedContext context, ManagedEntity entity,
       {T values}) {
     final query = PostgresQuery<T>.withEntity(context, entity);
     if (values != null) {
@@ -151,8 +146,7 @@ class PostgreSQLPersistentStore extends PersistentStore
     var dbConnection = await executionContext;
     try {
       var rows = await dbConnection.query(sql,
-          substitutionValues: substitutionValues,
-          timeoutInSeconds: timeout.inSeconds);
+          substitutionValues: substitutionValues, timeoutInSeconds: timeout.inSeconds);
 
       var mappedRows = rows.map((row) => row.toList()).toList();
       logger.finest(() =>
@@ -184,8 +178,7 @@ class PostgreSQLPersistentStore extends PersistentStore
     try {
       await dbConnection.transaction((dbTransactionContext) async {
         transactionContext.persistentStore =
-            PostgreSQLPersistentStore._transactionProxy(
-                this, dbTransactionContext);
+            PostgreSQLPersistentStore._transactionProxy(this, dbTransactionContext);
 
         try {
           output = await transactionBlock(transactionContext);
@@ -238,15 +231,13 @@ class PostgreSQLPersistentStore extends PersistentStore
     Schema schema = fromSchema;
 
     await connection.transaction((ctx) async {
-      final transactionStore =
-          PostgreSQLPersistentStore._transactionProxy(this, ctx);
+      final transactionStore = PostgreSQLPersistentStore._transactionProxy(this, ctx);
       await _createVersionTableIfNecessary(ctx, temporary);
 
       withMigrations.sort((m1, m2) => m1.version.compareTo(m2.version));
 
       for (var migration in withMigrations) {
-        migration.database =
-            SchemaBuilder(transactionStore, schema, isTemporary: temporary);
+        migration.database = SchemaBuilder(transactionStore, schema, isTemporary: temporary);
         migration.database.store = transactionStore;
 
         var existingVersionRows = await ctx.query(
@@ -266,15 +257,13 @@ class PostgreSQLPersistentStore extends PersistentStore
           await ctx.execute(cmd);
         }
 
-        logger.info(
-            "Seeding data from migration version ${migration.version}...");
+        logger.info("Seeding data from migration version ${migration.version}...");
         await migration.seed();
 
         await ctx.execute(
             "INSERT INTO $versionTableName (versionNumber, dateOfUpgrade) VALUES (${migration.version}, '${DateTime.now().toUtc().toIso8601String()}')");
 
-        logger
-            .info("Applied schema version ${migration.version} successfully.");
+        logger.info("Applied schema version ${migration.version} successfully.");
 
         schema = migration.currentSchema;
       }
@@ -286,8 +275,7 @@ class PostgreSQLPersistentStore extends PersistentStore
   @override
   Future<dynamic> executeQuery(
       String formatString, Map<String, dynamic> values, int timeoutInSeconds,
-      {PersistentStoreQueryReturnType returnType =
-          PersistentStoreQueryReturnType.rows}) async {
+      {PersistentStoreQueryReturnType returnType = PersistentStoreQueryReturnType.rows}) async {
     var now = DateTime.now().toUtc();
     try {
       var dbConnection = await executionContext;
@@ -306,8 +294,7 @@ class PostgreSQLPersistentStore extends PersistentStore
 
       return results;
     } on TimeoutException catch (e) {
-      throw QueryException.transport("timed out connection to database",
-          underlyingException: e);
+      throw QueryException.transport("timed out connection to database", underlyingException: e);
     } on PostgreSQLException catch (e) {
       logger.fine(() =>
           "Query (${DateTime.now().toUtc().difference(now).inMilliseconds}ms) $formatString $values");
@@ -321,28 +308,26 @@ class PostgreSQLPersistentStore extends PersistentStore
     }
   }
 
-  QueryException<PostgreSQLException> _interpretException(
-      PostgreSQLException exception) {
+  QueryException<PostgreSQLException> _interpretException(PostgreSQLException exception) {
     switch (exception.code) {
       case PostgreSQLErrorCode.uniqueViolation:
-        return QueryException.conflict("entity_already_exists",
-            ["${exception.tableName}.${exception.columnName}"],
+        return QueryException.conflict(
+            "entity_already_exists", ["${exception.tableName}.${exception.columnName}"],
             underlyingException: exception);
       case PostgreSQLErrorCode.notNullViolation:
-        return QueryException.input("non_null_violation",
-            ["${exception.tableName}.${exception.columnName}"],
+        return QueryException.input(
+            "non_null_violation", ["${exception.tableName}.${exception.columnName}"],
             underlyingException: exception);
       case PostgreSQLErrorCode.foreignKeyViolation:
-        return QueryException.input("foreign_key_violation",
-            ["${exception.tableName}.${exception.columnName}"],
+        return QueryException.input(
+            "foreign_key_violation", ["${exception.tableName}.${exception.columnName}"],
             underlyingException: exception);
     }
 
     return null;
   }
 
-  Future _createVersionTableIfNecessary(
-      PostgreSQLExecutionContext context, bool temporary) async {
+  Future _createVersionTableIfNecessary(PostgreSQLExecutionContext context, bool temporary) async {
     final table = versionTable;
     final commands = createTable(table, isTemporary: temporary);
     final exists = await context.query("SELECT to_regclass(@tableName:text)",
@@ -362,10 +347,7 @@ class PostgreSQLPersistentStore extends PersistentStore
   Future<PostgreSQLConnection> _connect() async {
     logger.info("PostgreSQL connecting, $username@$host:$port/$databaseName.");
     final connection = PostgreSQLConnection(host, port, databaseName,
-        username: username,
-        password: password,
-        timeZone: timeZone,
-        useSSL: isSSLConnection);
+        username: username, password: password, timeZone: timeZone, useSSL: isSSLConnection);
     try {
       await connection.open();
     } catch (e) {

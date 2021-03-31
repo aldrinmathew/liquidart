@@ -12,7 +12,7 @@ String sourcifyValue(dynamic v, {String onError}) {
 
     // todo: not urgent
     throw StateError("${onError ?? "A string literal contains both a single and double quote"}. "
-      "This is not yet implemented - please submit a pull request.");
+        "This is not yet implemented - please submit a pull request.");
   }
 
   return "$v";

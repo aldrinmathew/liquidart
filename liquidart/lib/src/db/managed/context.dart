@@ -48,8 +48,7 @@ class ManagedContext implements APIComponentDocumenter {
   /// on this context if its type is in [dataModel].
   ManagedContext(this.dataModel, this.persistentStore) {
     ManagedDataModelManager.add(dataModel);
-    ServiceRegistry.defaultInstance
-        .register<ManagedContext>(this, (o) => o.close());
+    ServiceRegistry.defaultInstance.register<ManagedContext>(this, (o) => o.close());
   }
 
   /// Creates a child context from [parentContext].
@@ -89,10 +88,8 @@ class ManagedContext implements APIComponentDocumenter {
   ///            await q.insert();
   ///            ...
   ///         });
-  Future<T> transaction<T>(
-      Future<T> transactionBlock(ManagedContext transaction)) {
-    return persistentStore.transaction(
-        ManagedContext.childOf(this), transactionBlock);
+  Future<T> transaction<T>(Future<T> transactionBlock(ManagedContext transaction)) {
+    return persistentStore.transaction(ManagedContext.childOf(this), transactionBlock);
   }
 
   /// Closes this context and release its underlying resources.
@@ -124,7 +121,8 @@ class ManagedContext implements APIComponentDocumenter {
   /// If any insertion fails, no objects will be inserted into the database and an exception
   /// is thrown.
   Future<List<T>> insertObjects<T extends ManagedObject>(List<T> objects) async {
-    return transaction((transitionCtx) => Future.wait(objects.map((o) => transitionCtx.insertObject(o))));
+    return transaction(
+        (transitionCtx) => Future.wait(objects.map((o) => transitionCtx.insertObject(o))));
   }
 
   /// Returns an object of type [T] from this context if it exists, otherwise returns null.
@@ -135,7 +133,7 @@ class ManagedContext implements APIComponentDocumenter {
     final entity = dataModel.entityForType(T);
     if (entity == null) {
       throw ArgumentError("Unknown entity '$T' in fetchObjectWithID. "
-        "Provide a type to this method and ensure it is in this context's data model.");
+          "Provide a type to this method and ensure it is in this context's data model.");
     }
 
     final primaryKey = entity.primaryKeyAttribute;
@@ -148,8 +146,7 @@ class ManagedContext implements APIComponentDocumenter {
   }
 
   @override
-  void documentComponents(APIDocumentContext context) =>
-      dataModel.documentComponents(context);
+  void documentComponents(APIDocumentContext context) => dataModel.documentComponents(context);
 }
 
 /// Throw this object to roll back a [ManagedContext.transaction].

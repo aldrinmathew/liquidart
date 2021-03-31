@@ -13,15 +13,13 @@ abstract class ResourceControllerRuntime {
 
   ResourceControllerDocumenter documenter;
 
-  ResourceControllerOperation getOperationRuntime(
-      String method, List<String> pathVariables) {
-    return operations.firstWhere(
-        (op) => op.isSuitableForRequest(method, pathVariables),
+  ResourceControllerOperation getOperationRuntime(String method, List<String> pathVariables) {
+    return operations.firstWhere((op) => op.isSuitableForRequest(method, pathVariables),
         orElse: () => null);
   }
 
-  void applyRequestProperties(ResourceController untypedController,
-      ResourceControllerOperationInvocationArgs args);
+  void applyRequestProperties(
+      ResourceController untypedController, ResourceControllerOperationInvocationArgs args);
 }
 
 abstract class ResourceControllerDocumenter {
@@ -33,8 +31,8 @@ abstract class ResourceControllerDocumenter {
   APIRequestBody documentOperationRequestBody(
       ResourceController rc, APIDocumentContext context, Operation operation);
 
-  Map<String, APIOperation> documentOperations(ResourceController rc,
-      APIDocumentContext context, String route, APIPath path);
+  Map<String, APIOperation> documentOperations(
+      ResourceController rc, APIDocumentContext context, String route, APIPath path);
 }
 
 class ResourceControllerOperation {
@@ -55,15 +53,15 @@ class ResourceControllerOperation {
   final List<ResourceControllerParameter> positionalParameters;
   final List<ResourceControllerParameter> namedParameters;
 
-  final Future<Response> Function(ResourceController resourceController,
-      ResourceControllerOperationInvocationArgs args) invoker;
+  final Future<Response> Function(
+          ResourceController resourceController, ResourceControllerOperationInvocationArgs args)
+      invoker;
 
   /// Checks if a request's method and path variables will select this binder.
   ///
   /// Note that [requestMethod] may be null; if this is the case, only
   /// path variables are compared.
-  bool isSuitableForRequest(
-      String requestMethod, List<String> requestPathVariables) {
+  bool isSuitableForRequest(String requestMethod, List<String> requestPathVariables) {
     if (requestMethod != null && requestMethod.toUpperCase() != httpMethod) {
       return false;
     }
@@ -93,7 +91,7 @@ class ResourceControllerParameter {
 
   // ignore: prefer_constructors_over_static_methods
   static ResourceControllerParameter make<T>(
-    {@required String symbolName,
+      {@required String symbolName,
       @required String name,
       @required BindingType location,
       @required bool isRequired,
@@ -103,13 +101,19 @@ class ResourceControllerParameter {
       @required List<String> ignoreFilter,
       @required List<String> requireFilter,
       @required List<String> rejectFilter}) {
-    return ResourceControllerParameter(symbolName: symbolName,
-      name: name, location: location, isRequired: isRequired,
-      decoder: decoder, type: T, defaultValue: defaultValue,
-      acceptFilter: acceptFilter, ignoreFilter: ignoreFilter,
-      requireFilter: requireFilter, rejectFilter: rejectFilter);
+    return ResourceControllerParameter(
+        symbolName: symbolName,
+        name: name,
+        location: location,
+        isRequired: isRequired,
+        decoder: decoder,
+        type: T,
+        defaultValue: defaultValue,
+        acceptFilter: acceptFilter,
+        ignoreFilter: ignoreFilter,
+        requireFilter: requireFilter,
+        rejectFilter: rejectFilter);
   }
-
 
   final String symbolName;
   final String name;

@@ -72,9 +72,7 @@ void main() {
       expect(t2.length, 0);
     });
 
-    test(
-        "Cannot create query on context whose data model doesn't contain query type",
-        () async {
+    test("Cannot create query on context whose data model doesn't contain query type", () async {
       try {
         Query<T>(ctx2);
         fail('unreachable');
@@ -110,8 +108,7 @@ class _U {
 class U extends ManagedObject<_U> implements _U {}
 
 Future<ManagedContext> contextWithDataModel(ManagedDataModel dataModel) async {
-  var persistentStore =
-      PostgreSQLPersistentStore("dart", "dart", "localhost", 5432, "dart_test");
+  var persistentStore = PostgreSQLPersistentStore("dart", "dart", "localhost", 5432, "dart_test");
 
   var commands = commandsFromDataModel(dataModel, temporary: true);
   var context = ManagedContext(dataModel, persistentStore);

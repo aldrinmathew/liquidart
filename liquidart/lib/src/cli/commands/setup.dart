@@ -19,9 +19,7 @@ class CLISetup extends CLICommand with CLIProject {
   bool get shouldSetupTests => decode("tests");
 
   @Flag("confirm",
-      abbr: "c",
-      negatable: false,
-      help: "Confirms that you wish to carry out this setup.")
+      abbr: "c", negatable: false, help: "Confirms that you wish to carry out this setup.")
   bool get confirm => decode("confirm");
 
   @Option("granting-user",
@@ -35,7 +33,8 @@ class CLISetup extends CLICommand with CLIProject {
   Future<int> handle() async {
     if (shouldSetupHeroku) {
       displayInfo("This option has been deprecated.");
-      displayProgress("Please see https://aldrinsartfactory.github.io/liquidart/deploy/deploy_heroku/ for instructions.");
+      displayProgress(
+          "Please see https://aldrinsartfactory.github.io/liquidart/deploy/deploy_heroku/ for instructions.");
       return 0;
     } else /*if (shouldSetupTests*/ {
       return setupTestEnvironment();
@@ -68,10 +67,8 @@ class CLISetup extends CLICommand with CLIProject {
 
     if (!confirm) {
       displayInfo("Confirmation Needed");
-      displayProgress(
-          "This command will execute SQL to create a test database.");
-      displayProgress(
-          "As a security measure, you must add --confirm (or -c) to this command.");
+      displayProgress("This command will execute SQL to create a test database.");
+      displayProgress("As a security measure, you must add --confirm (or -c) to this command.");
       displayProgress("The commands that will be run upon confirmation:");
       commands.forEach((cmd) {
         displayProgress("\t* psql -c '$cmd' -U $grantingUser");
@@ -88,8 +85,7 @@ class CLISetup extends CLICommand with CLIProject {
       if (output.contains("CREATE DATABASE")) {
         displayProgress("Successfully created database dart_test.");
       } else if (output.contains("CREATE ROLE")) {
-        displayProgress(
-            "Successfully created role 'dart' with createdb permissions.");
+        displayProgress("Successfully created role 'dart' with createdb permissions.");
       } else if (output.contains("ALTER ROLE")) {
         displayProgress("Successfully set user 'dart' password to 'dart'.");
       } else if (output.contains("GRANT")) {
@@ -112,8 +108,7 @@ class CLISetup extends CLICommand with CLIProject {
       }
     }
 
-    displayInfo(
-        "Congratulations! Liquidart applications can now be tested locally.");
+    displayInfo("Congratulations! Liquidart applications can now be tested locally.");
 
     return 0;
   }

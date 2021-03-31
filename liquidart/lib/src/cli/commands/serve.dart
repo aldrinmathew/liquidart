@@ -12,8 +12,7 @@ class CLIServer extends CLICommand with CLIProject {
   String derivedChannelType;
 
   @Option("timeout",
-      help: "Number of seconds to wait to ensure startup succeeded.",
-      defaultsTo: "45")
+      help: "Number of seconds to wait to ensure startup succeeded.", defaultsTo: "45")
   int get startupTimeout => decode("timeout");
 
   @Option("ssl-key-path",
@@ -30,15 +29,11 @@ class CLIServer extends CLICommand with CLIProject {
   bool get shouldRunObservatory => decode("observe");
 
   @Flag("ipv6-only",
-      help: "Limits listening to IPv6 connections only.",
-      negatable: false,
-      defaultsTo: false)
+      help: "Limits listening to IPv6 connections only.", negatable: false, defaultsTo: false)
   bool get ipv6Only => decode("ipv6-only");
 
   @Option("port",
-      abbr: "p",
-      help: "The port number to listen for HTTP requests on.",
-      defaultsTo: "8888")
+      abbr: "p", help: "The port number to listen for HTTP requests on.", defaultsTo: "8888")
   int get port => decode("port");
 
   @Option("isolates", abbr: "n", help: "Number of isolates processing requests")
@@ -53,15 +48,13 @@ class CLIServer extends CLICommand with CLIProject {
 
   @Option("channel",
       abbr: "s",
-      help:
-          "The name of the ApplicationChannel subclass to be instantiated to serve requests. "
+      help: "The name of the ApplicationChannel subclass to be instantiated to serve requests. "
           "By default, this subclass is determined by reflecting on the application library in the [directory] being served.")
   String get channelType => decode("channel") ?? derivedChannelType;
 
   @Option("config-path",
       abbr: "c",
-      help:
-          "The path to a configuration file. This File is available in the ApplicationOptions"
+      help: "The path to a configuration file. This File is available in the ApplicationOptions"
           "for a ApplicationChannel to use to read application-specific configuration values. Relative paths are relative to [directory].",
       defaultsTo: "config.yaml")
   File get configurationFile => File(decode("config-path")).absolute;
@@ -130,8 +123,7 @@ class CLIServer extends CLICommand with CLIProject {
 
     errorPort.listen((msg) {
       if (msg is List) {
-        startupCompleter.completeError(
-            msg.first, StackTrace.fromString(msg.last as String));
+        startupCompleter.completeError(msg.first, StackTrace.fromString(msg.last as String));
       }
     });
 
@@ -159,8 +151,7 @@ class CLIServer extends CLICommand with CLIProject {
       }
     }
 
-    final sendPort = await startupCompleter.future
-        .timeout(Duration(seconds: startupTimeout));
+    final sendPort = await startupCompleter.future.timeout(Duration(seconds: startupTimeout));
     final process = StoppableProcess((reason) async {
       displayInfo("Stopping application.");
       displayProgress("Reason: $reason");
@@ -189,13 +180,11 @@ class CLIServer extends CLICommand with CLIProject {
     if (values["ADDRESS"] == null) {
       addressString = "";
     }
-    var configString =
-        "..configurationFilePath = r\"___CONFIGURATION_FILE_PATH___\"";
+    var configString = "..configurationFilePath = r\"___CONFIGURATION_FILE_PATH___\"";
     if (values["CONFIGURATION_FILE_PATH"] == null) {
       configString = "";
     }
-    var certificateString =
-        "..certificateFilePath = r\"___SSL_CERTIFICATE_PATH___\"";
+    var certificateString = "..certificateFilePath = r\"___SSL_CERTIFICATE_PATH___\"";
     if (values["SSL_CERTIFICATE_PATH"] == null) {
       certificateString = "";
     }

@@ -22,9 +22,7 @@ class Router extends Controller {
   /// Creates a new [Router].
   Router({String basePath, Future notFoundHandler(Request request)})
       : _unmatchedController = notFoundHandler,
-        _basePathSegments =
-            basePath?.split("/")?.where((str) => str.isNotEmpty)?.toList() ??
-                [] {
+        _basePathSegments = basePath?.split("/")?.where((str) => str.isNotEmpty)?.toList() ?? [] {
     policy.allowCredentials = false;
   }
 
@@ -73,16 +71,15 @@ class Router extends Controller {
   ///         /files/*
   ///
   Linkable route(String pattern) {
-    var routeController = _RouteController(
-        RouteSpecification.specificationsForRoutePattern(pattern));
+    var routeController =
+        _RouteController(RouteSpecification.specificationsForRoutePattern(pattern));
     _routeControllers.add(routeController);
     return routeController;
   }
 
   @override
   void didAddToChannel() {
-    _root.node =
-        RouteNode(_routeControllers.expand((rh) => rh.specifications).toList());
+    _root.node = RouteNode(_routeControllers.expand((rh) => rh.specifications).toList());
 
     for (var c in _routeControllers) {
       c.didAddToChannel();
@@ -92,14 +89,12 @@ class Router extends Controller {
   /// Routers override this method to throw an exception. Use [route] instead.
   @override
   Linkable link(Controller generatorFunction()) {
-    throw ArgumentError(
-        "Invalid link. 'Router' cannot directly link to controllers. Use 'route'.");
+    throw ArgumentError("Invalid link. 'Router' cannot directly link to controllers. Use 'route'.");
   }
 
   @override
   Linkable linkFunction(FutureOr<RequestOrResponse> handle(Request request)) {
-    throw ArgumentError(
-        "Invalid link. 'Router' cannot directly link to functions. Use 'route'.");
+    throw ArgumentError("Invalid link. 'Router' cannot directly link to functions. Use 'route'.");
   }
 
   @override
@@ -120,14 +115,12 @@ class Router extends Controller {
         }
       }
 
-      final node =
-          _root.node.nodeForPathSegments(requestURISegmentIterator, req.path);
+      final node = _root.node.nodeForPathSegments(requestURISegmentIterator, req.path);
       if (node?.specification == null) {
         await _handleUnhandledRequest(req);
         return null;
       }
-      req.path.setSpecification(node.specification,
-          segmentOffset: _basePathSegments.length);
+      req.path.setSpecification(node.specification, segmentOffset: _basePathSegments.length);
 
       next = node.controller;
     } catch (any, stack) {
@@ -211,18 +204,14 @@ class _RouteController extends Controller {
       final pathKey = "/$elements";
 
       final path = APIPath()
-        ..parameters = spec.variableNames
-            .map((pathVar) => APIParameter.path(pathVar))
-            .toList();
+        ..parameters = spec.variableNames.map((pathVar) => APIParameter.path(pathVar)).toList();
 
       if (spec.segments.any((seg) => seg.isRemainingMatcher)) {
         path.parameters.add(APIParameter.path("path")
-          ..description =
-              "This path variable may contain slashes '/' and may be empty.");
+          ..description = "This path variable may contain slashes '/' and may be empty.");
       }
 
-      path.operations =
-          spec.controller.documentOperations(components, pathKey, path);
+      path.operations = spec.controller.documentOperations(components, pathKey, path);
 
       pathMap[pathKey] = path;
 

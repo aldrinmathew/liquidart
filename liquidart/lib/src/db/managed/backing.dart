@@ -4,12 +4,12 @@ import 'package:liquidart/src/db/managed/relationship_type.dart';
 import 'exception.dart';
 import 'managed.dart';
 
-final ArgumentError _invalidValueConstruction = ArgumentError(
-    "Invalid property access when building 'Query.values'. "
-    "May only assign values to properties backed by a column of the table being inserted into. "
-    "This prohibits 'ManagedObject' and 'ManagedSet' properties, except for 'ManagedObject' "
-    "properties with a 'Relate' annotation. For 'Relate' properties, you may only set their "
-    "primary key property.");
+final ArgumentError _invalidValueConstruction =
+    ArgumentError("Invalid property access when building 'Query.values'. "
+        "May only assign values to properties backed by a column of the table being inserted into. "
+        "This prohibits 'ManagedObject' and 'ManagedSet' properties, except for 'ManagedObject' "
+        "properties with a 'Relate' annotation. For 'Relate' properties, you may only set their "
+        "primary key property.");
 
 class ManagedValueBacking extends ManagedBacking {
   @override
@@ -24,8 +24,7 @@ class ManagedValueBacking extends ManagedBacking {
   void setValueForProperty(ManagedPropertyDescription property, dynamic value) {
     if (value != null) {
       if (!property.isAssignableWith(value)) {
-        throw ValidationException(
-            ["invalid input value for '${property.name}'"]);
+        throw ValidationException(["invalid input value for '${property.name}'"]);
       }
     }
 
@@ -35,8 +34,7 @@ class ManagedValueBacking extends ManagedBacking {
 
 class ManagedForeignKeyBuilderBacking extends ManagedBacking {
   ManagedForeignKeyBuilderBacking();
-  ManagedForeignKeyBuilderBacking.from(
-      ManagedEntity entity, ManagedBacking backing) {
+  ManagedForeignKeyBuilderBacking.from(ManagedEntity entity, ManagedBacking backing) {
     if (backing.contents.containsKey(entity.primaryKey)) {
       contents[entity.primaryKey] = backing.contents[entity.primaryKey];
     }
@@ -101,8 +99,8 @@ class ManagedBuilderBacking extends ManagedBacking {
       }
 
       if (!contents.containsKey(property.name)) {
-        contents[property.name] = property.inverse.entity
-            .instanceOf(backing: ManagedForeignKeyBuilderBacking());
+        contents[property.name] =
+            property.inverse.entity.instanceOf(backing: ManagedForeignKeyBuilderBacking());
       }
     }
 
@@ -120,10 +118,9 @@ class ManagedBuilderBacking extends ManagedBacking {
         contents[property.name] = null;
       } else {
         final original = value as ManagedObject;
-        final replacementBacking = ManagedForeignKeyBuilderBacking.from(
-            original.entity, original.backing);
-        final replacement =
-            original.entity.instanceOf(backing: replacementBacking);
+        final replacementBacking =
+            ManagedForeignKeyBuilderBacking.from(original.entity, original.backing);
+        final replacement = original.entity.instanceOf(backing: replacementBacking);
         contents[property.name] = replacement;
       }
     } else {

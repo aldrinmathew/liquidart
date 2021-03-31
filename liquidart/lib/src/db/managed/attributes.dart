@@ -31,8 +31,7 @@ class Table {
   /// must be unique for the combined properties in [properties]. [properties] must contain symbolic names of
   /// properties declared in the table definition, and those properties must be either attributes
   /// or belongs-to relationship properties. See [Table] for example.
-  const Table.unique(List<Symbol> properties)
-      : this(uniquePropertySet: properties);
+  const Table.unique(List<Symbol> properties) : this(uniquePropertySet: properties);
 
   /// Each instance of the associated table definition is unique for these properties.
   ///
@@ -139,7 +138,6 @@ class Column {
         autoincrement = autoincrement,
         validators = validators;
 
-
   /// When true, indicates that this property is the primary key.
   ///
   /// Only one property of a class may have primaryKey equal to true.
@@ -237,7 +235,7 @@ class Serialize {
 ///
 /// The validator [Validate.constant] is automatically applied to a property with this annotation.
 const Column primaryKey = Column(
-  primaryKey: true,
-  databaseType: ManagedPropertyType.bigInteger,
-  autoincrement: true,
-  validators: [Validate.constant()]);
+    primaryKey: true,
+    databaseType: ManagedPropertyType.bigInteger,
+    autoincrement: true,
+    validators: [Validate.constant()]);

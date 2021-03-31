@@ -50,8 +50,7 @@ void main() {
       print("succeeded in final request");
     });
 
-    test("Application with multiple isolates reports uncaught error, recovers",
-        () async {
+    test("Application with multiple isolates reports uncaught error, recovers", () async {
       var contents = <String>[];
       int counter = 0;
       var completer = Completer();
@@ -67,13 +66,12 @@ void main() {
       await app.start(numberOfInstances: 2);
 
       // Throw some deferred crashers then some success messages at the server
-      var failFutures = Iterable.generate(5)
-          .map((_) => http.get("http://localhost:8888/?crash=true"));
+      var failFutures =
+          Iterable.generate(5).map((_) => http.get("http://localhost:8888/?crash=true"));
 
       var successResponse = await http.get("http://localhost:8888/");
       expect(successResponse.statusCode, 200);
-      expect((await Future.wait(failFutures)).map((r) => r.statusCode),
-          everyElement(200));
+      expect((await Future.wait(failFutures)).map((r) => r.statusCode), everyElement(200));
 
       print("wait on completion");
       await completer.future;

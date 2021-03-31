@@ -5,8 +5,7 @@ import 'package:liquidart/src/openapi/openapi.dart';
 import 'package:path/path.dart' as path;
 import 'http.dart';
 
-typedef _OnFileNotFound = FutureOr<Response> Function(
-    FileController controller, Request req);
+typedef _OnFileNotFound = FutureOr<Response> Function(FileController controller, Request req);
 
 /// Serves files from a directory on the filesystem.
 ///
@@ -40,10 +39,9 @@ class FileController extends Controller {
   ///
   /// Note that the 'Last-Modified' header is always applied to a response served from this instance.
   FileController(String pathOfDirectoryToServe,
-    {FutureOr<Response> onFileNotFound(
-      FileController controller, Request req)})
-    : _servingDirectory = Uri.directory(pathOfDirectoryToServe),
-      _onFileNotFound = onFileNotFound;
+      {FutureOr<Response> onFileNotFound(FileController controller, Request req)})
+      : _servingDirectory = Uri.directory(pathOfDirectoryToServe),
+        _onFileNotFound = onFileNotFound;
 
   static Map<String, ContentType> _defaultExtensionMap = {
     /* Web content */
@@ -173,8 +171,7 @@ class FileController extends Controller {
     }
 
     var lastModifiedDate = file.lastModifiedSync();
-    var ifModifiedSince =
-        request.raw.headers.value(HttpHeaders.ifModifiedSinceHeader);
+    var ifModifiedSince = request.raw.headers.value(HttpHeaders.ifModifiedSinceHeader);
     if (ifModifiedSince != null) {
       var date = HttpDate.parse(ifModifiedSince);
       if (!lastModifiedDate.isAfter(date)) {

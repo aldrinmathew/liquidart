@@ -54,7 +54,8 @@ class Runner {
       throw "--name is required.";
     }
 
-    print("Preparing release: '$name'... ${isDryRun ? "(dry-run)":""} ${docsOnly ? "(docs-only)":""}");
+    print(
+        "Preparing release: '$name'... ${isDryRun ? "(dry-run)" : ""} ${docsOnly ? "(docs-only)" : ""}");
 
     var master = await directoryWithBranch("master");
     String upcomingVersion;
@@ -84,10 +85,7 @@ class Runner {
 
   Future publishDocs(Directory docSource, Directory code) async {
     var symbolMap = await generateSymbolMap(code);
-    var blacklist = [
-      "tools",
-      "build"
-    ];
+    var blacklist = ["tools", "build"];
     var transformers = [
       BlacklistTransformer(blacklist),
       APIReferenceTransformer(symbolMap, baseReferenceURL)
@@ -95,20 +93,17 @@ class Runner {
 
     var docsLive = await directoryWithBranch("gh-pages");
     print("Cleaning ${docsLive.path}...");
-    docsLive
-      .listSync()
-      .where((fse) {
-        if (fse is Directory) {
-          var lastPathComponent = fse.uri.pathSegments[fse.uri.pathSegments.length - 2];
-          return lastPathComponent != ".git";
-        } else if (fse is File) {
-          return fse.uri.pathSegments.last != ".nojekyll";
-        }
-        return false;
-      })
-      .forEach((fse) {
-        fse.deleteSync(recursive: true);
-      });
+    docsLive.listSync().where((fse) {
+      if (fse is Directory) {
+        var lastPathComponent = fse.uri.pathSegments[fse.uri.pathSegments.length - 2];
+        return lastPathComponent != ".git";
+      } else if (fse is File) {
+        return fse.uri.pathSegments.last != ".nojekyll";
+      }
+      return false;
+    }).forEach((fse) {
+      fse.deleteSync(recursive: true);
+    });
 
     print("Transforming docs from ${docSource.path} into ${docsLive.path}...");
     await transformDirectory(transformers, docSource, docsLive);
@@ -138,7 +133,8 @@ class Runner {
       throw "git add in ${docsLive.path} failed with exit code $exitCode.";
     }
 
-    process = await Process.start("git", ["commit", "-m", "commit by release tool"], workingDirectory: docsLive.path);
+    process = await Process.start("git", ["commit", "-m", "commit by release tool"],
+        workingDirectory: docsLive.path);
     // ignore: unawaited_futures
     stderr.addStream(process.stderr);
     // ignore: unawaited_futures
@@ -169,8 +165,7 @@ class Runner {
 
     print("Cloning '$branchName' into ${dir.path}...");
     var process = await Process.start(
-        "git",
-        ["clone", "-b", branchName, "git@github.com:stablekernel/liquidart.git", dir.path]);
+        "git", ["clone", "-b", branchName, "git@github.com:stablekernel/liquidart.git", dir.path]);
     // ignore: unawaited_futures
     stderr.addStream(process.stderr);
     // ignore: unawaited_futures
@@ -219,13 +214,15 @@ class Runner {
     var changelogFile = File.fromUri(directory.uri.resolve("CHANGELOG.md"));
     var changelogContents = await changelogFile.readAsString();
     var versionContentsList = regex.allMatches(changelogContents).toList();
-    var latestChangelogVersion = versionContentsList.firstWhere((m) => m.group(1) == version, orElse: () {
+    var latestChangelogVersion =
+        versionContentsList.firstWhere((m) => m.group(1) == version, orElse: () {
       throw "Release failed. No entry in CHANGELOG.md for $version.";
     });
 
-    var changeset = changelogContents.substring(
-        latestChangelogVersion.end,
-        versionContentsList[versionContentsList.indexOf(latestChangelogVersion) + 1].start).trim();
+    var changeset = changelogContents
+        .substring(latestChangelogVersion.end,
+            versionContentsList[versionContentsList.indexOf(latestChangelogVersion) + 1].start)
+        .trim();
 
     print("Changeset for $prefixedVersion:");
     print("$changeset");
@@ -234,21 +231,18 @@ class Runner {
   }
 
   Future postGithubRelease(String version, String name, String description) async {
-    var body = json.encode({
-      "tag_name": version,
-      "name": name,
-      "body": description
-    });
+    var body = json.encode({"tag_name": version, "name": name, "body": description});
 
     print("Tagging GitHub release $version");
     print("- $name");
 
     if (!isDryRun) {
       var response = await http.post("https://api.github.com/repos/stablekernel/liquidart/releases",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer ${configuration.githubToken}"
-        }, body: body);
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer ${configuration.githubToken}"
+          },
+          body: body);
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
         throw "GitHub release tag failed with status code ${response.statusCode}. Reason: ${response.body}.";
@@ -283,7 +277,8 @@ class Runner {
     }
   }
 
-  Future<Map<String, Map<String, List<SymbolResolution>>>> generateSymbolMap(Directory codeBranchDir) async {
+  Future<Map<String, Map<String, List<SymbolResolution>>>> generateSymbolMap(
+      Directory codeBranchDir) async {
     print("Generating API reference...");
     var process = await Process.start("dartdoc", [], workingDirectory: codeBranchDir.path);
     // ignore: unawaited_futures
@@ -297,12 +292,11 @@ class Runner {
     }
 
     print("Building symbol map...");
-    var indexFile = File.fromUri(codeBranchDir.uri.resolve("doc/").resolve("api/").resolve("index.json"));
+    var indexFile =
+        File.fromUri(codeBranchDir.uri.resolve("doc/").resolve("api/").resolve("index.json"));
     final indexJSON = json.decode(await indexFile.readAsString()) as List<Map<String, dynamic>>;
-    var libraries = indexJSON
-        .where((m) => m["type"] == "library")
-        .map((lib) => lib["qualifiedName"])
-        .toList();
+    var libraries =
+        indexJSON.where((m) => m["type"] == "library").map((lib) => lib["qualifiedName"]).toList();
 
     List<SymbolResolution> resolutions = indexJSON
         .where((m) => m["type"] != "library")
@@ -318,8 +312,7 @@ class Runner {
         nameMap[resolution.name].add(resolution);
       }
 
-      var qualifiedKey = libraries
-          .fold(resolution.qualifiedName, (String p, e) {
+      var qualifiedKey = libraries.fold(resolution.qualifiedName, (String p, e) {
         return p.replaceFirst("$e.", "");
       });
       if (!qualifiedMap.containsKey(qualifiedKey)) {
@@ -329,16 +322,13 @@ class Runner {
       }
     });
 
-    return {
-      "qualified": qualifiedMap,
-      "name": nameMap
-    };
+    return {"qualified": qualifiedMap, "name": nameMap};
   }
 
-  Future transformDirectory(List<Transformer> transformers, Directory source, Directory destination) async {
+  Future transformDirectory(
+      List<Transformer> transformers, Directory source, Directory destination) async {
     var contents = source.listSync(recursive: false);
-    var files = contents
-        .whereType<File>();
+    var files = contents.whereType<File>();
     for (var f in files) {
       var filename = f.uri.pathSegments.last;
 
@@ -363,8 +353,7 @@ class Runner {
       }
     }
 
-    Iterable<Directory> subdirectories = contents
-        .whereType<Directory>();
+    Iterable<Directory> subdirectories = contents.whereType<Directory>();
     for (var subdirectory in subdirectories) {
       var dirName = subdirectory.uri.pathSegments[subdirectory.uri.pathSegments.length - 2];
       var destinationDir = Directory.fromUri(destination.uri.resolve("$dirName"));
@@ -467,7 +456,8 @@ class APIReferenceTransformer extends Transformer {
       if (resolution != null) {
         symbol = symbol.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
         var replacement = constructedReferenceURLFrom(baseReferenceURL, resolution.link.split("/"));
-        contents = contents.replaceRange(match.start, match.end, "<a href=\"$replacement\">$symbol</a>");
+        contents =
+            contents.replaceRange(match.start, match.end, "<a href=\"$replacement\">$symbol</a>");
       } else {
 //        missingSymbols.add(symbol);
       }
@@ -494,8 +484,7 @@ class APIReferenceTransformer extends Transformer {
       return possible.first;
     }
 
-    return possible.firstWhere((r) => r.type == "class",
-        orElse: () => possible.first);
+    return possible.firstWhere((r) => r.type == "class", orElse: () => possible.first);
   }
 }
 

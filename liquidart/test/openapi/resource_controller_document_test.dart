@@ -13,35 +13,27 @@ void main() {
     document = await c.documentAPI({"name": "x", "version": "1.0.0"});
   });
 
-  test("Bound properties are part of every operation and carry documentation",
-      () {
+  test("Bound properties are part of every operation and carry documentation", () {
     final collectionOperations = document.paths["/a"].operations.values;
     final idOperations = document.paths["/a/{id}"].operations.values;
     expect(collectionOperations.length, 3);
     expect(idOperations.length, 2);
     for (var op in [collectionOperations, idOperations].expand((i) => i)) {
-      expect(op.parameterNamed("optionalQueryProperty").schema.type,
-          APIType.integer);
+      expect(op.parameterNamed("optionalQueryProperty").schema.type, APIType.integer);
       expect(op.parameterNamed("optionalQueryProperty").isRequired, false);
-      expect(op.parameterNamed("optionalQueryProperty").location,
-          APIParameterLocation.query);
+      expect(op.parameterNamed("optionalQueryProperty").location, APIParameterLocation.query);
 
-      expect(op.parameterNamed("requiredHeaderProperty").schema.type,
-          APIType.string);
+      expect(op.parameterNamed("requiredHeaderProperty").schema.type, APIType.string);
       expect(op.parameterNamed("requiredHeaderProperty").isRequired, true);
-      expect(op.parameterNamed("requiredHeaderProperty").location,
-          APIParameterLocation.header);
+      expect(op.parameterNamed("requiredHeaderProperty").location, APIParameterLocation.header);
     }
   });
 
-  test(
-      "Each operation is accounted for and documented if documentation comment exists",
-      () {
+  test("Each operation is accounted for and documented if documentation comment exists", () {
     final collectionOperations = document.paths["/a"].operations;
     final idOperations = document.paths["/a/{id}"].operations;
 
-    expect(collectionOperations,
-        {"get": isNotNull, "post": isNotNull, "put": isNotNull});
+    expect(collectionOperations, {"get": isNotNull, "post": isNotNull, "put": isNotNull});
     expect(idOperations, {"get": isNotNull, "put": isNotNull});
 
     expect(collectionOperations["get"].id, "getAllAs");
@@ -58,81 +50,34 @@ void main() {
 
     expect(collectionOperations["get"].parameters.length, 4);
 
-    expect(
-        collectionOperations["get"]
-            .parameterNamed("requiredHeaderParameter")
-            .location,
+    expect(collectionOperations["get"].parameterNamed("requiredHeaderParameter").location,
         APIParameterLocation.header);
-    expect(
-        collectionOperations["get"]
-            .parameterNamed("requiredHeaderParameter")
-            .isRequired,
-        true);
-    expect(
-        collectionOperations["get"]
-            .parameterNamed("requiredHeaderParameter")
-            .schema
-            .type,
+    expect(collectionOperations["get"].parameterNamed("requiredHeaderParameter").isRequired, true);
+    expect(collectionOperations["get"].parameterNamed("requiredHeaderParameter").schema.type,
         APIType.string);
-    expect(
-        collectionOperations["get"]
-            .parameterNamed("requiredHeaderParameter")
-            .schema
-            .format,
+    expect(collectionOperations["get"].parameterNamed("requiredHeaderParameter").schema.format,
         "date-time");
 
-    expect(
-        collectionOperations["get"]
-            .parameterNamed("optionalQueryParameter")
-            .location,
+    expect(collectionOperations["get"].parameterNamed("optionalQueryParameter").location,
         APIParameterLocation.query);
-    expect(
-        collectionOperations["get"]
-            .parameterNamed("optionalQueryParameter")
-            .isRequired,
-        false);
-    expect(
-        collectionOperations["get"]
-            .parameterNamed("optionalQueryParameter")
-            .schema
-            .type,
+    expect(collectionOperations["get"].parameterNamed("optionalQueryParameter").isRequired, false);
+    expect(collectionOperations["get"].parameterNamed("optionalQueryParameter").schema.type,
         APIType.string);
     expect(
-        collectionOperations["get"]
-            .parameterNamed("optionalQueryParameter")
-            .schema
-            .format,
-        isNull);
+        collectionOperations["get"].parameterNamed("optionalQueryParameter").schema.format, isNull);
 
     expect(collectionOperations["post"].parameters.length, 3);
 
-    expect(
-        collectionOperations["post"]
-            .parameterNamed("requiredQueryParameter")
-            .location,
+    expect(collectionOperations["post"].parameterNamed("requiredQueryParameter").location,
         APIParameterLocation.query);
-    expect(
-        collectionOperations["post"]
-            .parameterNamed("requiredQueryParameter")
-            .isRequired,
-        true);
-    expect(
-        collectionOperations["post"]
-            .parameterNamed("requiredQueryParameter")
-            .schema
-            .type,
+    expect(collectionOperations["post"].parameterNamed("requiredQueryParameter").isRequired, true);
+    expect(collectionOperations["post"].parameterNamed("requiredQueryParameter").schema.type,
         APIType.integer);
-    expect(
-        collectionOperations["post"]
-            .parameterNamed("requiredQueryParameter")
-            .schema
-            .format,
+    expect(collectionOperations["post"].parameterNamed("requiredQueryParameter").schema.format,
         isNull);
   });
 
-  test(
-      "If request body is bound, shows up in documentation for operation with valid ref",
-      () {
+  test("If request body is bound, shows up in documentation for operation with valid ref", () {
     final collectionOperations = document.paths["/a"].operations;
 
     final comps = document.components.schemas;
@@ -147,14 +92,10 @@ void main() {
         "/components/schemas/AModel");
   });
 
-  test(
-      "Binding request body to a list of serializable generates a request body of array[schema]",
+  test("Binding request body to a list of serializable generates a request body of array[schema]",
       () {
     final collectionOperations = document.paths["/a"].operations;
-    final putSchema = collectionOperations["put"]
-        .requestBody
-        .content["application/json"]
-        .schema;
+    final putSchema = collectionOperations["put"].requestBody.content["application/json"].schema;
 
     expect(putSchema.type, APIType.array);
     expect(putSchema.items.referenceURI.path, "/components/schemas/AModel");
@@ -208,21 +149,19 @@ class A extends ResourceController {
   String propH;
 
   @Operation.get()
-  Future<Response> getAllAs(
-      @Bind.header("requiredHeaderParameter") DateTime paramH,
+  Future<Response> getAllAs(@Bind.header("requiredHeaderParameter") DateTime paramH,
       {@Bind.query("optionalQueryParameter") String paramQ}) async {
     return Response.ok(null);
   }
 
   @Operation.get('id')
-  Future<Response> getOneA(
-      {@Bind.query("optionalQueryParameter") String paramQ}) async {
+  Future<Response> getOneA({@Bind.query("optionalQueryParameter") String paramQ}) async {
     return Response.ok(null);
   }
 
   @Operation.post()
-  Future<Response> createA(@Bind.body() AModel model,
-      @Bind.query("requiredQueryParameter") int q) async {
+  Future<Response> createA(
+      @Bind.body() AModel model, @Bind.query("requiredQueryParameter") int q) async {
     return Response.ok(null);
   }
 
@@ -234,8 +173,7 @@ class A extends ResourceController {
   }
 
   @Operation.put()
-  Future<Response> replace(@Bind.body() List<AModel> model) async =>
-      Response.ok(null);
+  Future<Response> replace(@Bind.body() List<AModel> model) async => Response.ok(null);
 }
 
 class AModel extends Serializable {
@@ -262,8 +200,7 @@ class B extends ResourceController {
   @override
   void documentComponents(APIDocumentContext context) {
     super.documentComponents(context);
-    context.schema.register(
-        "Override", APISchemaObject.object({"k": APISchemaObject.boolean()}),
+    context.schema.register("Override", APISchemaObject.object({"k": APISchemaObject.boolean()}),
         representation: OverrideGeneration);
   }
 }
@@ -292,4 +229,3 @@ class OverrideGeneration extends Serializable {
 }
 
 class PODO {}
-

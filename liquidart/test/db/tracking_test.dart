@@ -15,12 +15,7 @@ void main() {
 
   group("Attribute identification", () {
     test("Identify top-level", () {
-      expect(
-          context
-              .entityForType(Parent)
-              .identifyAttribute((Parent x) => x.field)
-              .name,
-          "field");
+      expect(context.entityForType(Parent).identifyAttribute((Parent x) => x.field).name, "field");
     });
 
     test("Cannot select relationship", () {
@@ -34,9 +29,7 @@ void main() {
 
     test("Cannot nest attribute selection", () {
       try {
-        context
-            .entityForType(Child)
-            .identifyAttribute((Child p) => p.parent.field);
+        context.entityForType(Child).identifyAttribute((Child p) => p.parent.field);
         fail("unreachable");
       } on ArgumentError catch (e) {
         expect(e.toString(), contains("Cannot use relationships"));
@@ -52,59 +45,39 @@ void main() {
         });
         fail("unreachable");
       } on ArgumentError catch (e) {
-        expect(
-            e.toString(),
-            contains(
-                "Cannot access more than one property for this operation"));
+        expect(e.toString(), contains("Cannot access more than one property for this operation"));
       }
     });
 
     test("Can select document directly", () {
-      expect(
-          context
-              .entityForType(Parent)
-              .identifyAttribute((Parent x) => x.document)
-              .name,
+      expect(context.entityForType(Parent).identifyAttribute((Parent x) => x.document).name,
           "document");
     });
 
     test("Cannot select sub-document", () {
       try {
-        context
-            .entityForType(Child)
-            .identifyAttribute((Child p) => p.document["foo"]);
+        context.entityForType(Child).identifyAttribute((Child p) => p.document["foo"]);
         fail("unreachable");
       } on ArgumentError catch (e) {
-        expect(e.toString(),
-            contains("Cannot access subdocuments for this operation"));
+        expect(e.toString(), contains("Cannot access subdocuments for this operation"));
       }
     });
   });
 
   group("Relationship identification", () {
     test("Identify top-level relationship", () {
-      expect(
-          context
-              .entityForType(Parent)
-              .identifyRelationship((Parent x) => x.children)
-              .name,
+      expect(context.entityForType(Parent).identifyRelationship((Parent x) => x.children).name,
           "children");
     });
 
     test("Identify top-level relationship to-one", () {
       expect(
-          context
-              .entityForType(Child)
-              .identifyRelationship((Child x) => x.parent)
-              .name,
-          "parent");
+          context.entityForType(Child).identifyRelationship((Child x) => x.parent).name, "parent");
     });
 
     test("Cannot select attribute", () {
       try {
-        context
-            .entityForType(Parent)
-            .identifyRelationship((Parent p) => p.document);
+        context.entityForType(Parent).identifyRelationship((Parent p) => p.document);
         fail("unreachable");
       } on ArgumentError catch (e) {
         expect(e.toString(), contains("Invalid property selection"));
@@ -113,9 +86,7 @@ void main() {
 
     test("Cannot nest attribute selection", () {
       try {
-        context
-            .entityForType(Grandchild)
-            .identifyRelationship((Grandchild p) => p.parent.parent);
+        context.entityForType(Grandchild).identifyRelationship((Grandchild p) => p.parent.parent);
         fail("unreachable");
       } on ArgumentError catch (e) {
         expect(e.toString(), contains("Cannot identify a nested relationship"));
@@ -131,10 +102,7 @@ void main() {
         });
         fail("unreachable");
       } on ArgumentError catch (e) {
-        expect(
-            e.toString(),
-            contains(
-                "Cannot access more than one property for this operation"));
+        expect(e.toString(), contains("Cannot access more than one property for this operation"));
       }
     });
   });
@@ -151,9 +119,8 @@ void main() {
     });
 
     test("Identify top-level property with subdoc", () {
-      final props = context
-          .entityForType(Parent)
-          .identifyProperties((Parent x) => [x.document["k"]]);
+      final props =
+          context.entityForType(Parent).identifyProperties((Parent x) => [x.document["k"]]);
       expect(props.length, 1);
       expect(props.first.path.length, 1);
       expect(props.first.path.first.name, "document");
@@ -161,9 +128,8 @@ void main() {
     });
 
     test("Identify top-level property with subdoc", () {
-      final props = context
-          .entityForType(Parent)
-          .identifyProperties((Parent x) => [x.document["k"][1]]);
+      final props =
+          context.entityForType(Parent).identifyProperties((Parent x) => [x.document["k"][1]]);
       expect(props.length, 1);
       expect(props.first.path.length, 1);
       expect(props.first.path.first.name, "document");
@@ -186,9 +152,7 @@ void main() {
     });
 
     test("Can select nested properties", () {
-      final props = context
-          .entityForType(Child)
-          .identifyProperties((Child x) => [x.parent.field]);
+      final props = context.entityForType(Child).identifyProperties((Child x) => [x.parent.field]);
       expect(props.length, 1);
       expect(props.first.path.length, 2);
       expect(props.first.path.first.name, "parent");

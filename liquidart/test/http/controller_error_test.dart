@@ -41,8 +41,7 @@ void main() {
     expect(r.statusCode, 200);
   });
 
-  test("Throw exception when sending HandlerException response sends 500",
-      () async {
+  test("Throw exception when sending HandlerException response sends 500", () async {
     server = await enableController(ClosureController((req) {
       throw CrashingTestHandlerException();
     }));

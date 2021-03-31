@@ -104,20 +104,18 @@ abstract class APIOperationDocumenter {
 class APIDocumentContext {
   /// Creates a new context.
   APIDocumentContext(this.document)
-      : schema = APIComponentCollection<APISchemaObject>._(
-            "schemas", document.components.schemas),
-        responses = APIComponentCollection<APIResponse>._(
-            "responses", document.components.responses),
-        parameters = APIComponentCollection<APIParameter>._(
-            "parameters", document.components.parameters),
+      : schema = APIComponentCollection<APISchemaObject>._("schemas", document.components.schemas),
+        responses =
+            APIComponentCollection<APIResponse>._("responses", document.components.responses),
+        parameters =
+            APIComponentCollection<APIParameter>._("parameters", document.components.parameters),
         requestBodies = APIComponentCollection<APIRequestBody>._(
             "requestBodies", document.components.requestBodies),
-        headers = APIComponentCollection<APIHeader>._(
-            "headers", document.components.headers),
+        headers = APIComponentCollection<APIHeader>._("headers", document.components.headers),
         securitySchemes = APIComponentCollection<APISecurityScheme>._(
             "securitySchemes", document.components.securitySchemes),
-        callbacks = APIComponentCollection<APICallback>._(
-            "callbacks", document.components.callbacks);
+        callbacks =
+            APIComponentCollection<APICallback>._("callbacks", document.components.callbacks);
 
   /// The document being created.
   final APIDocument document;
@@ -208,8 +206,7 @@ class APIComponentCollection<T extends APIObject> {
       return;
     }
 
-    if (representation != null &&
-        _typeReferenceMap.containsKey(representation)) {
+    if (representation != null && _typeReferenceMap.containsKey(representation)) {
       return;
     }
 
@@ -255,15 +252,12 @@ class APIComponentCollection<T extends APIObject> {
   /// has been registered for [type], an error is thrown.
   T getObjectWithType(Type type) {
     final obj = _getInstanceOf();
-    obj.referenceURI = Uri(
-        path:
-            "/components/$_typeName/liquidart-typeref:$type");
+    obj.referenceURI = Uri(path: "/components/$_typeName/liquidart-typeref:$type");
 
     if (_typeReferenceMap.containsKey(type)) {
       obj.referenceURI = _typeReferenceMap[type].referenceURI;
     } else {
-      final completer =
-          _resolutionMap.putIfAbsent(type, () => Completer<T>.sync());
+      final completer = _resolutionMap.putIfAbsent(type, () => Completer<T>.sync());
 
       completer.future.then((refObject) {
         obj.referenceURI = refObject.referenceURI;
@@ -275,13 +269,20 @@ class APIComponentCollection<T extends APIObject> {
 
   T _getInstanceOf() {
     switch (T) {
-      case APISchemaObject: return APISchemaObject.empty() as T;
-      case APIResponse: return APIResponse.empty() as T;
-      case APIParameter: return APIParameter.empty() as T;
-      case APIRequestBody: return APIRequestBody.empty() as T;
-      case APIHeader: return APIHeader.empty() as T;
-      case APISecurityScheme: return APISecurityScheme.empty() as T;
-      case APICallback: return APICallback.empty() as T;
+      case APISchemaObject:
+        return APISchemaObject.empty() as T;
+      case APIResponse:
+        return APIResponse.empty() as T;
+      case APIParameter:
+        return APIParameter.empty() as T;
+      case APIRequestBody:
+        return APIRequestBody.empty() as T;
+      case APIHeader:
+        return APIHeader.empty() as T;
+      case APISecurityScheme:
+        return APISecurityScheme.empty() as T;
+      case APICallback:
+        return APICallback.empty() as T;
     }
 
     throw StateError("cannot reference API object of type $T");

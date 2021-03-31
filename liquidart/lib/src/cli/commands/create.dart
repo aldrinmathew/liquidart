@@ -15,17 +15,14 @@ class CLITemplateCreator extends CLICommand with CLILiquidartGlobal {
     registerCommand(CLITemplateList());
   }
 
-  @Option("template",
-      abbr: "t", help: "Name of the template to use", defaultsTo: "default")
+  @Option("template", abbr: "t", help: "Name of the template to use", defaultsTo: "default")
   String get templateName => decode("template");
 
   @Flag("offline",
-      negatable: false,
-      help: "Will fetch dependencies from a local cache if they exist.")
+      negatable: false, help: "Will fetch dependencies from a local cache if they exist.")
   bool get offline => decode("offline");
 
-  String get projectName =>
-      remainingArguments.isNotEmpty ? remainingArguments.first : null;
+  String get projectName => remainingArguments.isNotEmpty ? remainingArguments.first : null;
 
   @override
   Future<int> handle() async {
@@ -47,8 +44,7 @@ class CLITemplateCreator extends CLICommand with CLILiquidartGlobal {
 
     destDirectory.createSync();
 
-    final templateSourceDirectory =
-        Directory.fromUri(getTemplateLocation(templateName));
+    final templateSourceDirectory = Directory.fromUri(getTemplateLocation(templateName));
     if (!templateSourceDirectory.existsSync()) {
       displayError("No template at ${templateSourceDirectory.path}.");
       return 1;
@@ -68,14 +64,12 @@ class CLITemplateCreator extends CLICommand with CLILiquidartGlobal {
       });
     }
 
-    displayInfo(
-        "Fetching project dependencies (pub get ${offline ? "--offline" : ""})...");
+    displayInfo("Fetching project dependencies (pub get ${offline ? "--offline" : ""})...");
     displayInfo("Please wait...");
     try {
       await fetchProjectDependencies(destDirectory, offline: offline);
     } on TimeoutException {
-      displayInfo(
-          "Fetching dependencies timed out. Run 'pub get' in your project directory.");
+      displayInfo("Fetching dependencies timed out. Run 'pub get' in your project directory.");
     }
 
     displayProgress("Success.");
@@ -98,20 +92,14 @@ class CLITemplateCreator extends CLICommand with CLILiquidartGlobal {
       "vcs.xml",
     ];
 
-    var hiddenFilesToKeep = [
-      ".gitignore",
-      ".travis.yml",
-      "analysis_options.yaml"
-    ];
+    var hiddenFilesToKeep = [".gitignore", ".travis.yml", "analysis_options.yaml"];
 
     var lastComponent = entity.uri.pathSegments.last;
     if (lastComponent.isEmpty) {
-      lastComponent =
-          entity.uri.pathSegments[entity.uri.pathSegments.length - 2];
+      lastComponent = entity.uri.pathSegments[entity.uri.pathSegments.length - 2];
     }
 
-    if (lastComponent.startsWith(".") &&
-        !hiddenFilesToKeep.contains(lastComponent)) {
+    if (lastComponent.startsWith(".") && !hiddenFilesToKeep.contains(lastComponent)) {
       return false;
     }
 
@@ -122,8 +110,8 @@ class CLITemplateCreator extends CLICommand with CLILiquidartGlobal {
     return true;
   }
 
-  void interpretContentFile(String projectName, Directory destinationDirectory,
-      FileSystemEntity sourceFileEntity) {
+  void interpretContentFile(
+      String projectName, Directory destinationDirectory, FileSystemEntity sourceFileEntity) {
     if (shouldIncludeItem(sourceFileEntity)) {
       if (sourceFileEntity is Directory) {
         copyDirectory(projectName, destinationDirectory, sourceFileEntity);
@@ -133,12 +121,11 @@ class CLITemplateCreator extends CLICommand with CLILiquidartGlobal {
     }
   }
 
-  void copyDirectory(String projectName, Directory destinationParentDirectory,
-      Directory sourceDirectory) {
-    var sourceDirectoryName = sourceDirectory
-        .uri.pathSegments[sourceDirectory.uri.pathSegments.length - 2];
-    var destDir = Directory(
-        path_lib.join(destinationParentDirectory.path, sourceDirectoryName));
+  void copyDirectory(
+      String projectName, Directory destinationParentDirectory, Directory sourceDirectory) {
+    var sourceDirectoryName =
+        sourceDirectory.uri.pathSegments[sourceDirectory.uri.pathSegments.length - 2];
+    var destDir = Directory(path_lib.join(destinationParentDirectory.path, sourceDirectoryName));
 
     destDir.createSync();
 
@@ -147,15 +134,12 @@ class CLITemplateCreator extends CLICommand with CLILiquidartGlobal {
     });
   }
 
-  void copyFile(
-      String projectName, Directory destinationDirectory, File sourceFile) {
-    var path = path_lib.join(
-        destinationDirectory.path, fileNameForFile(projectName, sourceFile));
+  void copyFile(String projectName, Directory destinationDirectory, File sourceFile) {
+    var path = path_lib.join(destinationDirectory.path, fileNameForFile(projectName, sourceFile));
     var contents = sourceFile.readAsStringSync();
 
     contents = contents.replaceAll("wildfire", projectName);
-    contents =
-        contents.replaceAll("Wildfire", camelCaseFromSnakeCase(projectName));
+    contents = contents.replaceAll("Wildfire", camelCaseFromSnakeCase(projectName));
 
     var outputFile = File(path);
     outputFile.createSync();
@@ -163,8 +147,7 @@ class CLITemplateCreator extends CLICommand with CLILiquidartGlobal {
   }
 
   String fileNameForFile(String projectName, File sourceFile) {
-    return sourceFile.uri.pathSegments.last
-        .replaceFirst("wildfire", projectName);
+    return sourceFile.uri.pathSegments.last.replaceFirst("wildfire", projectName);
   }
 
   Directory destinationDirectoryFromPath(String pathString) {
@@ -183,12 +166,10 @@ class CLITemplateCreator extends CLICommand with CLILiquidartGlobal {
   void createProjectSpecificFiles(String directoryPath) {
     displayProgress("Generating config.yaml from config.src.yaml.");
     var configSrcPath = File(path_lib.join(directoryPath, "config.src.yaml"));
-    configSrcPath
-        .copySync(File(path_lib.join(directoryPath, "config.yaml")).path);
+    configSrcPath.copySync(File(path_lib.join(directoryPath, "config.yaml")).path);
   }
 
-  void addDependencyOverridesToPackage(
-      String packageDirectoryPath, Map<String, Uri> overrides) {
+  void addDependencyOverridesToPackage(String packageDirectoryPath, Map<String, Uri> overrides) {
     var pubspecFile = File(path_lib.join(packageDirectoryPath, "pubspec.yaml"));
     var contents = pubspecFile.readAsStringSync();
 
@@ -196,15 +177,14 @@ class CLITemplateCreator extends CLICommand with CLILiquidartGlobal {
     overrideBuffer.writeln("dependency_overrides:");
     overrides.forEach((packageName, location) {
       overrideBuffer.writeln("  $packageName:");
-      overrideBuffer.writeln(
-          "    path:  ${location.toFilePath(windows: Platform.isWindows)}");
+      overrideBuffer.writeln("    path:  ${location.toFilePath(windows: Platform.isWindows)}");
     });
 
     pubspecFile.writeAsStringSync("$contents\n$overrideBuffer");
   }
 
-  void copyProjectFiles(Directory destinationDirectory,
-      Directory sourceDirectory, String projectName) {
+  void copyProjectFiles(
+      Directory destinationDirectory, Directory sourceDirectory, String projectName) {
     displayInfo(
         "Copying template files to new project directory (${destinationDirectory.path})...");
     try {
@@ -234,8 +214,7 @@ class CLITemplateCreator extends CLICommand with CLILiquidartGlobal {
     }).join("");
   }
 
-  Future<int> fetchProjectDependencies(Directory workingDirectory,
-      {bool offline = false}) async {
+  Future<int> fetchProjectDependencies(Directory workingDirectory, {bool offline = false}) async {
     var args = ["get"];
     if (offline) {
       args.add("--offline");
@@ -244,21 +223,15 @@ class CLITemplateCreator extends CLICommand with CLILiquidartGlobal {
     try {
       final cmd = Platform.isWindows ? "pub.bat" : "pub";
       var process = await Process.start(cmd, args,
-              workingDirectory: workingDirectory.absolute.path,
-              runInShell: true)
+              workingDirectory: workingDirectory.absolute.path, runInShell: true)
           .timeout(const Duration(seconds: 60));
-      process.stdout
-          .transform(utf8.decoder)
-          .listen((output) => outputSink?.write(output));
-      process.stderr
-          .transform(utf8.decoder)
-          .listen((output) => outputSink?.write(output));
+      process.stdout.transform(utf8.decoder).listen((output) => outputSink?.write(output));
+      process.stderr.transform(utf8.decoder).listen((output) => outputSink?.write(output));
 
       final exitCode = await process.exitCode;
 
       if (exitCode != 0) {
-        throw CLIException(
-            "If you are offline, try using `pub get --offline`.");
+        throw CLIException("If you are offline, try using `pub get --offline`.");
       }
 
       return exitCode;
@@ -301,8 +274,7 @@ class CLITemplateList extends CLICommand with CLILiquidartGlobal {
         .where((fse) => fse is Directory)
         .map((fse) => fse as Directory)
         .toList();
-    final templateDescriptions =
-        await Future.wait(templateDirectories.map(_templateDescription));
+    final templateDescriptions = await Future.wait(templateDirectories.map(_templateDescription));
     displayInfo("Available templates:");
     displayProgress("");
 
@@ -322,11 +294,9 @@ class CLITemplateList extends CLICommand with CLILiquidartGlobal {
   }
 
   Future<String> _templateDescription(Directory templateDirectory) async {
-    final name = templateDirectory
-        .uri.pathSegments[templateDirectory.uri.pathSegments.length - 2];
+    final name = templateDirectory.uri.pathSegments[templateDirectory.uri.pathSegments.length - 2];
     final pubspecContents =
-        await File.fromUri(templateDirectory.uri.resolve("pubspec.yaml"))
-            .readAsString();
+        await File.fromUri(templateDirectory.uri.resolve("pubspec.yaml")).readAsString();
     final pubspecDefinition = loadYaml(pubspecContents);
 
     return "$name | ${pubspecDefinition["description"]}";

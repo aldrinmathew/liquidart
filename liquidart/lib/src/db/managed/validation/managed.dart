@@ -15,8 +15,7 @@ class ManagedValidator {
   ///
   /// This method does not invoke [ManagedObject.validate] - any customization provided
   /// by a [ManagedObject] subclass that overrides this method will not be invoked.
-  static ValidationContext run(ManagedObject object,
-      {Validating event = Validating.insert}) {
+  static ValidationContext run(ManagedObject object, {Validating event = Validating.insert}) {
     final context = ValidationContext();
 
     object.entity.validators.forEach((validator) {
@@ -38,26 +37,22 @@ class ManagedValidator {
         if (validator.property is ManagedRelationshipDescription) {
           final inner = object[validator.property.name] as ManagedObject;
           if (inner == null || !inner.backing.contents.containsKey(inner.entity.primaryKey)) {
-            context.addError(
-              "key '${validator.property.name}' is required"
+            context.addError("key '${validator.property.name}' is required"
                 "for ${_getEventName(event)}s.");
           }
         } else if (!contents.containsKey(key)) {
-          context.addError(
-              "key '${validator.property.name}' is required"
+          context.addError("key '${validator.property.name}' is required"
               "for ${_getEventName(event)}s.");
         }
       } else if (validator.definition.type == ValidateType.absent) {
         if (validator.property is ManagedRelationshipDescription) {
           final inner = object[validator.property.name] as ManagedObject;
           if (inner != null) {
-            context.addError(
-              "key '${validator.property.name}' is not allowed "
+            context.addError("key '${validator.property.name}' is not allowed "
                 "for ${_getEventName(event)}s.");
           }
         } else if (contents.containsKey(key)) {
-          context.addError(
-            "key '${validator.property.name}' is not allowed "
+          context.addError("key '${validator.property.name}' is not allowed "
               "for ${_getEventName(event)}s.");
         }
       } else {

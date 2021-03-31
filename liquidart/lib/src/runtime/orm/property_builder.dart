@@ -16,23 +16,19 @@ class PropertyBuilder {
     name = _getName();
     type = _getType();
 
-
     /* this collection of validators via 1. Validate metadata 2. Column metadata 3. implicit enum
     * is replicated in the generated code. if more implicit validators are created, a more general
     * purpose solution should be created
     * */
-    _validators = validatorsFromDeclaration(declaration)
-        .map((v) => ValidatorBuilder(this, v))
-        .toList();
+    _validators =
+        validatorsFromDeclaration(declaration).map((v) => ValidatorBuilder(this, v)).toList();
 
     if (column?.validators?.isNotEmpty ?? false) {
-      _validators
-          .addAll(column.validators.map((v) => ValidatorBuilder(this, v)));
+      _validators.addAll(column.validators.map((v) => ValidatorBuilder(this, v)));
     }
 
     if (type?.isEnumerated ?? false) {
-      _validators.add(ValidatorBuilder(
-          this, Validate.oneOf(type.enumerationMap.values.toList())));
+      _validators.add(ValidatorBuilder(this, Validate.oneOf(type.enumerationMap.values.toList())));
     }
   }
 
@@ -67,16 +63,14 @@ class PropertyBuilder {
   void compile(List<EntityBuilder> entityBuilders) {
     if (type == null) {
       if (relate != null) {
-        relatedProperty =
-            _getRelatedEntityBuilderFrom(entityBuilders).getInverseOf(this);
+        relatedProperty = _getRelatedEntityBuilderFrom(entityBuilders).getInverseOf(this);
         type = relatedProperty.parent.primaryKeyProperty.type;
         relationshipType = ManagedRelationshipType.belongsTo;
         includeInDefaultResultSet = true;
         deleteRule = relate.onDelete;
         nullable = !relate.isRequired;
         relatedProperty.setInverse(this);
-        unique =
-            relatedProperty?.relationshipType == ManagedRelationshipType.hasOne;
+        unique = relatedProperty?.relationshipType == ManagedRelationshipType.hasOne;
       }
     } else {
       primaryKey = column?.isPrimaryKey ?? false;
@@ -93,8 +87,7 @@ class PropertyBuilder {
 
   void validate(List<EntityBuilder> entityBuilders) {
     if (type == null) {
-      if (!isRelationship ||
-          relationshipType == ManagedRelationshipType.belongsTo) {
+      if (!isRelationship || relationshipType == ManagedRelationshipType.belongsTo) {
         throw ManagedDataModelErrorImpl.invalidType(
             declaration.owner.simpleName, declaration.simpleName);
       }
@@ -114,14 +107,12 @@ class PropertyBuilder {
       }
     } else {
       if (defaultValue != null && autoincrement) {
-        throw ManagedDataModelError(
-            "Property '${parent.name}.$name' is invalid. "
+        throw ManagedDataModelError("Property '${parent.name}.$name' is invalid. "
             "A property cannot have a default value and be autoincrementing. ");
       }
     }
 
-    if (relate?.onDelete == DeleteRule.nullify &&
-        (relate?.isRequired ?? false)) {
+    if (relate?.onDelete == DeleteRule.nullify && (relate?.isRequired ?? false)) {
       throw ManagedDataModelErrorImpl.incompatibleDeleteRule(
           parent.tableDefinitionTypeName, declaration.simpleName);
     }
@@ -132,20 +123,11 @@ class PropertyBuilder {
   void link(List<ManagedEntity> others) {
     validators.forEach((v) => v.link(others));
     if (isRelationship) {
-      var destinationEntity =
-          others.firstWhere((e) => e == relatedProperty.parent.entity);
+      var destinationEntity = others.firstWhere((e) => e == relatedProperty.parent.entity);
 
-      final dartType =
-          ((declaration as VariableMirror).type as ClassMirror).reflectedType;
-      relationship = ManagedRelationshipDescription(
-          parent.entity,
-          name,
-          type,
-          dartType,
-          destinationEntity,
-          deleteRule,
-          relationshipType,
-          relatedProperty.name,
+      final dartType = ((declaration as VariableMirror).type as ClassMirror).reflectedType;
+      relationship = ManagedRelationshipDescription(parent.entity, name, type, dartType,
+          destinationEntity, deleteRule, relationshipType, relatedProperty.name,
           unique: unique,
           indexed: true,
           nullable: nullable,
@@ -153,8 +135,7 @@ class PropertyBuilder {
           validators: validators.map((v) => v.managedValidator).toList());
     } else {
       final dartType = getDeclarationType().reflectedType;
-      attribute = ManagedAttributeDescription(parent.entity, name, type,
-          dartType,
+      attribute = ManagedAttributeDescription(parent.entity, name, type, dartType,
           primaryKey: primaryKey,
           transientStatus: serialize,
           defaultValue: defaultValue,
@@ -204,8 +185,7 @@ class PropertyBuilder {
     final declType = getDeclarationType();
     try {
       if (column?.databaseType != null) {
-        return ManagedType(
-            declType.reflectedType, column.databaseType, null, null);
+        return ManagedType(declType.reflectedType, column.databaseType, null, null);
       }
 
       return getManagedTypeFromType(declType);
@@ -234,12 +214,9 @@ class PropertyBuilder {
   EntityBuilder _getRelatedEntityBuilderFrom(List<EntityBuilder> builders) {
     final expectedInstanceType = getDeclarationType();
     if (!relate.isDeferred) {
-      return builders.firstWhere((b) => b.instanceType == expectedInstanceType,
-          orElse: () {
-        throw ManagedDataModelErrorImpl.noDestinationEntity(
-            parent.tableDefinitionTypeName,
-            declaration.simpleName,
-            expectedInstanceType.simpleName);
+      return builders.firstWhere((b) => b.instanceType == expectedInstanceType, orElse: () {
+        throw ManagedDataModelErrorImpl.noDestinationEntity(parent.tableDefinitionTypeName,
+            declaration.simpleName, expectedInstanceType.simpleName);
       });
     }
 
@@ -258,9 +235,7 @@ class PropertyBuilder {
     }
 
     throw ManagedDataModelErrorImpl.noDestinationEntity(
-        parent.tableDefinitionTypeName,
-        declaration.simpleName,
-        expectedInstanceType.simpleName);
+        parent.tableDefinitionTypeName, declaration.simpleName, expectedInstanceType.simpleName);
   }
 
   static Serialize _getTransienceForProperty(DeclarationMirror declaration) {

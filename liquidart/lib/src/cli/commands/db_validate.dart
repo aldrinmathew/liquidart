@@ -5,8 +5,7 @@ import 'package:liquidart/src/cli/mixins/database_managing.dart';
 import 'package:liquidart/src/cli/mixins/project.dart';
 import 'package:liquidart/src/cli/scripts/get_schema.dart';
 
-class CLIDatabaseValidate extends CLICommand
-    with CLIDatabaseManagingCommand, CLIProject {
+class CLIDatabaseValidate extends CLICommand with CLIDatabaseManagingCommand, CLIProject {
   @override
   Future<int> handle() async {
     var migrations = projectMigrations;
@@ -16,8 +15,7 @@ class CLIDatabaseValidate extends CLICommand
     }
 
     final currentSchema = await getProjectSchema(this);
-    var schemaFromMigrationFiles =
-        await schemaByApplyingMigrationSources(migrations);
+    var schemaFromMigrationFiles = await schemaByApplyingMigrationSources(migrations);
 
     var differences = currentSchema.differenceFrom(schemaFromMigrationFiles);
 

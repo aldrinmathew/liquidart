@@ -8,9 +8,8 @@ class DataModelCompiler {
   Map<String, dynamic> compile(MirrorContext context) {
     final m = <String, dynamic>{};
 
-    final instanceTypes = context.types
-      .where(_isTypeManagedObjectSubclass)
-      .map((c) => c.reflectedType);
+    final instanceTypes =
+        context.types.where(_isTypeManagedObjectSubclass).map((c) => c.reflectedType);
 
     _builders = instanceTypes.map((t) => EntityBuilder(t)).toList();
     _builders.forEach((b) {
@@ -36,8 +35,7 @@ class DataModelCompiler {
           .map((eb) => eb.instanceTypeName)
           .toList();
       if (withSameName.length > 1) {
-        throw ManagedDataModelErrorImpl.duplicateTables(
-            builder.name, withSameName);
+        throw ManagedDataModelErrorImpl.duplicateTables(builder.name, withSameName);
       }
     });
 
@@ -73,8 +71,7 @@ class ManagedDataModelErrorImpl extends ManagedDataModelError {
   ManagedDataModelErrorImpl(String message) : super(message);
 
   factory ManagedDataModelErrorImpl.noPrimaryKey(ManagedEntity entity) {
-    return ManagedDataModelErrorImpl(
-        "Class '${_getPersistentClassName(entity)}'"
+    return ManagedDataModelErrorImpl("Class '${_getPersistentClassName(entity)}'"
         " doesn't declare a primary key property or declares more than one primary key. All 'ManagedObject' subclasses "
         "must have a primary key. Usually, this means you want to add '@primaryKey int id;' "
         "to ${_getPersistentClassName(entity)}, but if you want more control over "
@@ -83,10 +80,8 @@ class ManagedDataModelErrorImpl extends ManagedDataModelError {
         "add '@Column(primaryKey: true)' above it.");
   }
 
-  factory ManagedDataModelErrorImpl.invalidType(
-      Symbol tableSymbol, Symbol propertySymbol) {
-    return ManagedDataModelErrorImpl(
-        "Property '${_getName(propertySymbol)}' on "
+  factory ManagedDataModelErrorImpl.invalidType(Symbol tableSymbol, Symbol propertySymbol) {
+    return ManagedDataModelErrorImpl("Property '${_getName(propertySymbol)}' on "
         "'${_getName(tableSymbol)}'"
         " has an unsupported type. This can occur when the type cannot be stored in a database, or when"
         " a relationship does not have a valid inverse. If this property is supposed to be a relationship, "
@@ -94,8 +89,7 @@ class ManagedDataModelErrorImpl extends ManagedDataModelError {
         " If this is not supposed to be a relationship property, its type must be one of: ${ManagedType.supportedDartTypes.join(", ")}.");
   }
 
-  factory ManagedDataModelErrorImpl.invalidMetadata(
-      String tableName, Symbol property) {
+  factory ManagedDataModelErrorImpl.invalidMetadata(String tableName, Symbol property) {
     return ManagedDataModelErrorImpl("Relationship '${_getName(property)}' on "
         "'$tableName' "
         "cannot both have 'Column' and 'Relate' metadata. "
@@ -103,12 +97,8 @@ class ManagedDataModelErrorImpl extends ManagedDataModelError {
         "for 'Relate'.");
   }
 
-  factory ManagedDataModelErrorImpl.missingInverse(
-      String tableName,
-      String instanceName,
-      Symbol property,
-      String destinationTableName,
-      Symbol expectedProperty) {
+  factory ManagedDataModelErrorImpl.missingInverse(String tableName, String instanceName,
+      Symbol property, String destinationTableName, Symbol expectedProperty) {
     var expectedString = "Some property";
     if (expectedProperty != null) {
       expectedString = "'${_getName(expectedProperty)}'";
@@ -123,8 +113,7 @@ class ManagedDataModelErrorImpl extends ManagedDataModelError {
         "'ManagedSet<${instanceName}>'.");
   }
 
-  factory ManagedDataModelErrorImpl.incompatibleDeleteRule(
-      String tableName, Symbol property) {
+  factory ManagedDataModelErrorImpl.incompatibleDeleteRule(String tableName, Symbol property) {
     return ManagedDataModelErrorImpl("Relationship '${_getName(property)}' on "
         "'$tableName' "
         "has both 'RelationshipDeleteRule.nullify' and 'isRequired' equal to true, which "
@@ -132,8 +121,8 @@ class ManagedDataModelErrorImpl extends ManagedDataModelError {
         "can't be null and 'nullify' means the column has to be null.");
   }
 
-  factory ManagedDataModelErrorImpl.dualMetadata(String tableName,
-      Symbol property, String destinationTableName, String inverseProperty) {
+  factory ManagedDataModelErrorImpl.dualMetadata(
+      String tableName, Symbol property, String destinationTableName, String inverseProperty) {
     return ManagedDataModelErrorImpl("Relationship '${_getName(property)}' "
         "on '${tableName}' "
         "and '${inverseProperty}' "
@@ -145,8 +134,7 @@ class ManagedDataModelErrorImpl extends ManagedDataModelError {
 
   factory ManagedDataModelErrorImpl.duplicateInverse(
       String tableName, String inverseName, List<String> conflictingNames) {
-    return ManagedDataModelErrorImpl(
-        "Entity '${tableName}' has multiple relationship "
+    return ManagedDataModelErrorImpl("Entity '${tableName}' has multiple relationship "
         "properties that claim to be the inverse of '$inverseName'. A property may "
         "only have one inverse. The claiming properties are: ${conflictingNames.join(", ")}.");
   }
@@ -161,10 +149,7 @@ class ManagedDataModelErrorImpl extends ManagedDataModelError {
   }
 
   factory ManagedDataModelErrorImpl.multipleDestinationEntities(
-      String tableName,
-      Symbol property,
-      List<String> possibleEntities,
-      Symbol expected) {
+      String tableName, Symbol property, List<String> possibleEntities, Symbol expected) {
     return ManagedDataModelErrorImpl("Relationship '${_getName(property)}' on "
         "'${tableName}' expects that just one "
         "'ManagedObject' subclass uses a table definition that extends "
@@ -173,10 +158,8 @@ class ManagedDataModelErrorImpl extends ManagedDataModelError {
         "how it is for now.");
   }
 
-  factory ManagedDataModelErrorImpl.invalidTransient(
-      ManagedEntity entity, Symbol property) {
-    return ManagedDataModelErrorImpl(
-        "Transient property '${_getName(property)}' on "
+  factory ManagedDataModelErrorImpl.invalidTransient(ManagedEntity entity, Symbol property) {
+    return ManagedDataModelErrorImpl("Transient property '${_getName(property)}' on "
         "'${_getInstanceClassName(entity)}' declares that"
         "it is transient, but it it has a mismatch. A transient "
         "getter method must have 'isAvailableAsOutput' and a transient "
@@ -190,16 +173,13 @@ class ManagedDataModelErrorImpl extends ManagedDataModelError {
         "Add '$name();' to the class declaration.");
   }
 
-  factory ManagedDataModelErrorImpl.duplicateTables(
-      String tableName, List<String> instanceTypes) {
-    return ManagedDataModelErrorImpl(
-        "Entities ${instanceTypes.map((i) => "'$i'").join(",")} "
+  factory ManagedDataModelErrorImpl.duplicateTables(String tableName, List<String> instanceTypes) {
+    return ManagedDataModelErrorImpl("Entities ${instanceTypes.map((i) => "'$i'").join(",")} "
         "have the same table name: '$tableName'. Rename these "
         "the table definitions, or add a '@Table(name: ...)' annotation to the table definition.");
   }
 
-  factory ManagedDataModelErrorImpl.conflictingTypes(
-      ManagedEntity entity, String propertyName) {
+  factory ManagedDataModelErrorImpl.conflictingTypes(ManagedEntity entity, String propertyName) {
     return ManagedDataModelErrorImpl(
         "The entity '${_getInstanceClassName(entity)}' declares two accessors named "
         "'$propertyName', but they have conflicting types.");
@@ -207,28 +187,24 @@ class ManagedDataModelErrorImpl extends ManagedDataModelError {
 
   factory ManagedDataModelErrorImpl.invalidValidator(
       ManagedEntity entity, String property, String reason) {
-    return ManagedDataModelErrorImpl(
-        "Type '${_getPersistentClassName(entity)}' "
+    return ManagedDataModelErrorImpl("Type '${_getPersistentClassName(entity)}' "
         "has invalid validator for property '$property'. Reason: $reason");
   }
 
-  factory ManagedDataModelErrorImpl.emptyEntityUniqueProperties(
-      String tableName) {
+  factory ManagedDataModelErrorImpl.emptyEntityUniqueProperties(String tableName) {
     return ManagedDataModelErrorImpl("Type '$tableName' "
         "has empty set for unique 'Table'. Must contain two or "
         "more attributes (or belongs-to relationship properties).");
   }
 
-  factory ManagedDataModelErrorImpl.singleEntityUniqueProperty(
-      String tableName, Symbol property) {
+  factory ManagedDataModelErrorImpl.singleEntityUniqueProperty(String tableName, Symbol property) {
     return ManagedDataModelErrorImpl("Type '$tableName' "
         "has only one attribute for unique 'Table'. Must contain two or "
         "more attributes (or belongs-to relationship properties). To make this property unique, "
         "add 'Column(unique: true)' to declaration of '${_getName(property)}'.");
   }
 
-  factory ManagedDataModelErrorImpl.invalidEntityUniqueProperty(
-      String tableName, Symbol property) {
+  factory ManagedDataModelErrorImpl.invalidEntityUniqueProperty(String tableName, Symbol property) {
     return ManagedDataModelErrorImpl("Type '${tableName}' "
         "declares '${MirrorSystem.getName(property)}' as unique in 'Table', "
         "but '${MirrorSystem.getName(property)}' is not a property of this type.");
@@ -266,6 +242,5 @@ class ManagedDataModelErrorImpl extends ManagedDataModelError {
     return _getName(reflectType(entity.instanceType).simpleName);
   }
 
-  static String _getName(Symbol s) =>
-      s != null ? MirrorSystem.getName(s) : null;
+  static String _getName(Symbol s) => s != null ? MirrorSystem.getName(s) : null;
 }

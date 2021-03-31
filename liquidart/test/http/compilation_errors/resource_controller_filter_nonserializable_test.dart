@@ -11,7 +11,7 @@ void main() {
       fail('unreachable');
     } on StateError catch (e) {
       expect(e.toString(),
-        "Bad state: Invalid binding 'a' on 'FilterNonSerializable.get1': Filters can only be used on Serializable or List<Serializable>.");
+          "Bad state: Invalid binding 'a' on 'FilterNonSerializable.get1': Filters can only be used on Serializable or List<Serializable>.");
     }
   });
 }

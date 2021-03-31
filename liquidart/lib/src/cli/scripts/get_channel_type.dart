@@ -13,7 +13,7 @@ class GetChannelExecutable extends Executable<String> {
     final channels = RuntimeContext.current.runtimes.iterable.whereType<ChannelRuntime>();
     if (channels.length != 1) {
       throw StateError("No ApplicationChannel subclass was found for this project. "
-        "Make sure it is imported in your application library file.");
+          "Make sure it is imported in your application library file.");
     }
     var runtime = channels.first;
 

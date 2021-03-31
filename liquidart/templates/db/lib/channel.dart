@@ -16,8 +16,7 @@ class WildfireChannel extends ApplicationChannel {
   /// This method is invoked prior to [entryPoint] being accessed.
   @override
   Future prepare() async {
-    logger.onRecord.listen(
-        (rec) => print("$rec ${rec.error ?? ""} ${rec.stackTrace ?? ""}"));
+    logger.onRecord.listen((rec) => print("$rec ${rec.error ?? ""} ${rec.stackTrace ?? ""}"));
 
     final config = WildfireConfiguration(options.configurationFilePath);
     context = contextWithConnectionInfo(config.database);
@@ -33,9 +32,7 @@ class WildfireChannel extends ApplicationChannel {
   Controller get entryPoint {
     final router = Router();
 
-    router
-        .route("/model/[:id]")
-        .link(() => ManagedObjectController<Model>(context));
+    router.route("/model/[:id]").link(() => ManagedObjectController<Model>(context));
 
     return router;
   }
@@ -44,15 +41,10 @@ class WildfireChannel extends ApplicationChannel {
    * Helper methods
    */
 
-  ManagedContext contextWithConnectionInfo(
-      DatabaseConfiguration connectionInfo) {
+  ManagedContext contextWithConnectionInfo(DatabaseConfiguration connectionInfo) {
     final dataModel = ManagedDataModel.fromCurrentMirrorSystem();
-    final psc = PostgreSQLPersistentStore(
-        connectionInfo.username,
-        connectionInfo.password,
-        connectionInfo.host,
-        connectionInfo.port,
-        connectionInfo.databaseName);
+    final psc = PostgreSQLPersistentStore(connectionInfo.username, connectionInfo.password,
+        connectionInfo.host, connectionInfo.port, connectionInfo.databaseName);
 
     return ManagedContext(dataModel, psc);
   }

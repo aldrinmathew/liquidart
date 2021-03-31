@@ -20,7 +20,8 @@ export 'package:liquidart/liquidart.dart';
 ///           });
 ///         }
 ///
-class Harness extends TestHarness<WildfireChannel> with TestHarnessAuthMixin<WildfireChannel>, TestHarnessORMMixin {
+class Harness extends TestHarness<WildfireChannel>
+    with TestHarnessAuthMixin<WildfireChannel>, TestHarnessORMMixin {
   @override
   ManagedContext get context => channel.context;
 

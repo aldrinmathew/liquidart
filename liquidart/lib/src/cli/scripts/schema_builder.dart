@@ -25,8 +25,7 @@ class SchemaBuilderExecutable extends Executable<Map<String, dynamic>> {
   Future<Map<String, dynamic>> execute() async {
     hierarchicalLoggingEnabled = true;
     PostgreSQLPersistentStore.logger.level = Level.ALL;
-    PostgreSQLPersistentStore.logger.onRecord
-        .listen((r) => log("${r.message}"));
+    PostgreSQLPersistentStore.logger.onRecord.listen((r) => log("${r.message}"));
     try {
       var outputSchema = inputSchema;
       for (var source in sources) {

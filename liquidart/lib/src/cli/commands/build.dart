@@ -26,10 +26,7 @@ class CLIBuild extends CLICommand with CLIProject {
   Future<int> handle() async {
     final root = projectDirectory.uri;
     final libraryUri = root.resolve("lib/").resolve("$libraryName.dart");
-    final ctx = BuildContext(
-        libraryUri,
-        buildDirectory.uri,
-        root.resolve("$packageName.aot"),
+    final ctx = BuildContext(libraryUri, buildDirectory.uri, root.resolve("$packageName.aot"),
         getScriptSource(await getChannelName()),
         forTests: false);
 
@@ -82,20 +79,14 @@ Future _runnerFunc(List<String> args, dynamic sendPort) async {
             " Using the default will listen on any address.")
     ..addOption("config-path",
         abbr: "c",
-        help:
-            "The path to a configuration file. This File is available in the ApplicationOptions"
+        help: "The path to a configuration file. This File is available in the ApplicationOptions"
             "for a ApplicationChannel to use to read application-specific configuration values. Relative paths are relative to [directory].",
         defaultsTo: "config.yaml")
-    ..addOption("isolates",
-        abbr: "n", help: "Number of isolates handling requests.")
+    ..addOption("isolates", abbr: "n", help: "Number of isolates handling requests.")
     ..addOption("port",
-        abbr: "p",
-        help: "The port number to listen for HTTP requests on.",
-        defaultsTo: "8888")
+        abbr: "p", help: "The port number to listen for HTTP requests on.", defaultsTo: "8888")
     ..addFlag("ipv6-only",
-        help: "Limits listening to IPv6 connections only.",
-        negatable: false,
-        defaultsTo: false)
+        help: "Limits listening to IPv6 connections only.", negatable: false, defaultsTo: false)
     ..addOption("ssl-certificate-path",
         help:
             "The path to an SSL certicate file. If provided along with --ssl-certificate-path, the application will be HTTPS-enabled.")
@@ -103,8 +94,7 @@ Future _runnerFunc(List<String> args, dynamic sendPort) async {
         help:
             "The path to an SSL private key file. If provided along with --ssl-certificate-path, the application will be HTTPS-enabled.")
     ..addOption("timeout",
-        help: "Number of seconds to wait to ensure startup succeeded.",
-        defaultsTo: "45")
+        help: "Number of seconds to wait to ensure startup succeeded.", defaultsTo: "45")
     ..addFlag("help");
 
   final values = argParser.parse(args);
@@ -122,7 +112,6 @@ Future _runnerFunc(List<String> args, dynamic sendPort) async {
     ..configurationFilePath = values['config-path'] as String
     ..certificateFilePath = values['ssl-certificate-path'] as String
     ..privateKeyFilePath = values['ssl-key-path'] as String;
-
 
   final isolateCountString = values['isolates'];
   if (isolateCountString == null) {

@@ -42,13 +42,12 @@ class CLIAuthScopeClient extends CLICommand
     var dataModel = ManagedDataModel.fromCurrentMirrorSystem();
     context = ManagedContext(dataModel, persistentStore);
 
-    var scopingClient = AuthClient.public(clientID,
-        allowedScopes: scopes?.map((s) => AuthScope(s))?.toList());
+    var scopingClient =
+        AuthClient.public(clientID, allowedScopes: scopes?.map((s) => AuthScope(s))?.toList());
 
     var query = Query<ManagedAuthClient>(context)
       ..where((o) => o.id).equalTo(clientID)
-      ..values.allowedScope =
-          scopingClient.allowedScopes?.map((s) => s.toString())?.join(" ");
+      ..values.allowedScope = scopingClient.allowedScopes?.map((s) => s.toString())?.join(" ");
 
     var result = await query.updateOne();
     if (result == null) {

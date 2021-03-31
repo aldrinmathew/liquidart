@@ -37,8 +37,7 @@ void main() {
 
     test("Can get all objects", () async {
       var resp = await client.request("/controller").get();
-      expect(resp,
-          hasResponse(200, body: allObjects.map((m) => m.asMap()).toList()));
+      expect(resp, hasResponse(200, body: allObjects.map((m) => m.asMap()).toList()));
     });
 
     test("Can update an object", () async {
@@ -51,8 +50,7 @@ void main() {
       var resp = await client.put("/controller/1", body: {"name": "Fred"});
       expect(resp, hasResponse(200, body: expectedMap));
 
-      expect(await client.request("/controller/1").get(),
-          hasResponse(200, body: expectedMap));
+      expect(await client.request("/controller/1").get(), hasResponse(200, body: expectedMap));
       expect(await client.request("/controller/2").get(),
           hasResponse(200, body: allObjects[1].asMap()));
     });
@@ -95,21 +93,16 @@ void main() {
       await app.stop();
     });
 
-    test("Get an object with the wrong type of path param returns 404",
-        () async {
+    test("Get an object with the wrong type of path param returns 404", () async {
       expect(await client.request("/controller/one").get(), hasStatus(404));
     });
 
-    test("Put an object with the wrong type of path param returns 404",
-        () async {
-      var resp = await (client.request("/controller/one")
-            ..body = {"name": "Fred"})
-          .put();
+    test("Put an object with the wrong type of path param returns 404", () async {
+      var resp = await (client.request("/controller/one")..body = {"name": "Fred"}).put();
       expect(resp, hasStatus(404));
     });
 
-    test("Delete an object with the wrong type of path param returns 404",
-        () async {
+    test("Delete an object with the wrong type of path param returns 404", () async {
       expect(await client.request("/controller/one").delete(), hasStatus(404));
     });
   });
@@ -133,15 +126,12 @@ void main() {
     });
 
     test("Can get all objects - there are none", () async {
-      expect(await client.request("/controller").get(),
-          hasResponse(200, body: []));
+      expect(await client.request("/controller").get(), hasResponse(200, body: []));
     });
 
     test("Updating an object returns 404", () async {
       expect(
-          await (client.request("/controller/1")..body = {"name": "Fred"})
-              .put(),
-          hasStatus(404));
+          await (client.request("/controller/1")..body = {"name": "Fred"}).put(), hasStatus(404));
     });
 
     test("Delete nonexistant object is 404", () async {
@@ -175,46 +165,35 @@ void main() {
     });
 
     test("Can get all objects w/ count and offset", () async {
-      expect(
-          await client.request("/controller?count=2&offset=1").get(),
-          hasResponse(200,
-              body: allObjects.sublist(1, 3).map((m) => m.asMap()).toList()));
+      expect(await client.request("/controller?count=2&offset=1").get(),
+          hasResponse(200, body: allObjects.sublist(1, 3).map((m) => m.asMap()).toList()));
     });
 
     test("Can get all objects w/ sort descriptor", () async {
-      expect(
-          await client.request("/controller?sortBy=name,asc").get(),
-          hasResponse(200,
-              body: allObjects.reversed.map((m) => m.asMap()).toList()));
+      expect(await client.request("/controller?sortBy=name,asc").get(),
+          hasResponse(200, body: allObjects.reversed.map((m) => m.asMap()).toList()));
       expect(await client.request("/controller?sortBy=createdAt,asc").get(),
           hasResponse(200, body: allObjects.map((m) => m.asMap()).toList()));
     });
 
-    test(
-        "Getting all objects with sort descriptor referencing unknown key fails",
-        () async {
+    test("Getting all objects with sort descriptor referencing unknown key fails", () async {
       expect(await client.request("/controller?sortBy=foobar,asc").get(),
           hasResponse(400, body: {"error": "cannot sort by '[foobar,asc]'"}));
     });
 
-    test("Getting all objects with a unknown sort descriptor order fails",
-        () async {
+    test("Getting all objects with a unknown sort descriptor order fails", () async {
       expect(
           await client.request("/controller?sortBy=name,name").get(),
-          hasResponse(400, body: {
-            "error":
-                "invalid 'sortBy' format. syntax: 'name,asc' or 'name,desc'."
-          }));
+          hasResponse(400,
+              body: {"error": "invalid 'sortBy' format. syntax: 'name,asc' or 'name,desc'."}));
     });
 
     test("Getting all objects with bad syntax fails", () async {
       var resp = await client.request("/controller?sortBy=name,asc,bar").get();
       expect(
           resp,
-          hasResponse(400, body: {
-            "error":
-                "invalid 'sortyBy' format. syntax: 'name,asc' or 'name,desc'."
-          }));
+          hasResponse(400,
+              body: {"error": "invalid 'sortyBy' format. syntax: 'name,asc' or 'name,desc'."}));
     });
 
     test("Paging after", () async {
@@ -223,8 +202,7 @@ void main() {
               .request(
                   "/controller?pageBy=createdAt&pageAfter=${allObjects[5].createdAt.toIso8601String()}")
               .get(),
-          hasResponse(200,
-              body: allObjects.sublist(6).map((m) => m.asMap()).toList()));
+          hasResponse(200, body: allObjects.sublist(6).map((m) => m.asMap()).toList()));
     });
 
     test("Paging before", () async {
@@ -233,19 +211,11 @@ void main() {
               .request(
                   "/controller?pageBy=createdAt&pagePrior=${allObjects[5].createdAt.toIso8601String()}")
               .get(),
-          hasResponse(200,
-              body: allObjects
-                  .sublist(0, 5)
-                  .reversed
-                  .map((m) => m.asMap())
-                  .toList()));
+          hasResponse(200, body: allObjects.sublist(0, 5).reversed.map((m) => m.asMap()).toList()));
     });
 
     test("Paging with null value", () async {
-      expect(
-          await client
-              .request("controller?pageBy=createdAt&pageAfter=null")
-              .get(),
+      expect(await client.request("controller?pageBy=createdAt&pageAfter=null").get(),
           hasResponse(200, body: allObjects.map((m) => m.asMap()).toList()));
     });
 
@@ -253,14 +223,12 @@ void main() {
       expect(
           await client.request("controller?pageBy=createdAt").get(),
           hasResponse(400, body: {
-            "error":
-                "missing required parameter 'pageAfter' or 'pagePrior' when 'pageBy' is given"
+            "error": "missing required parameter 'pageAfter' or 'pagePrior' when 'pageBy' is given"
           }));
     });
 
     test("Paging with wrong key", () async {
-      expect(
-          await client.request("/controller?pageBy=foobar&pagePrior=10").get(),
+      expect(await client.request("/controller?pageBy=foobar&pagePrior=10").get(),
           hasResponse(400, body: {"error": "cannot page by 'foobar'"}));
     });
   });
@@ -297,8 +265,7 @@ void main() {
 
     test("Can get all objects", () async {
       var resp = await client.request("/dynamic").get();
-      expect(resp,
-          hasResponse(200, body: allObjects.map((m) => m.asMap()).toList()));
+      expect(resp, hasResponse(200, body: allObjects.map((m) => m.asMap()).toList()));
     });
   });
 }
@@ -309,14 +276,12 @@ class TestChannel extends ApplicationChannel {
   @override
   Future prepare() async {
     var dataModel = ManagedDataModel([TestModel]);
-    var persistentStore = PostgreSQLPersistentStore(
-        "dart", "dart", "localhost", 5432, "dart_test");
+    var persistentStore = PostgreSQLPersistentStore("dart", "dart", "localhost", 5432, "dart_test");
     context = ManagedContext(dataModel, persistentStore);
 
     var targetSchema = Schema.fromDataModel(context.dataModel);
-    var schemaBuilder = SchemaBuilder.toSchema(
-        context.persistentStore, targetSchema,
-        isTemporary: true);
+    var schemaBuilder =
+        SchemaBuilder.toSchema(context.persistentStore, targetSchema, isTemporary: true);
 
     var commands = schemaBuilder.commands;
     for (var cmd in commands) {
@@ -327,12 +292,10 @@ class TestChannel extends ApplicationChannel {
   @override
   Controller get entryPoint {
     final router = Router();
-    router
-        .route("/controller/[:id]")
-        .link(() => ManagedObjectController<TestModel>(context));
+    router.route("/controller/[:id]").link(() => ManagedObjectController<TestModel>(context));
 
-    router.route("/dynamic/[:id]").link(() => ManagedObjectController.forEntity(
-        context.dataModel.entityForType(TestModel), context));
+    router.route("/dynamic/[:id]").link(() =>
+        ManagedObjectController.forEntity(context.dataModel.entityForType(TestModel), context));
     return router;
   }
 }

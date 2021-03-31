@@ -19,8 +19,8 @@ abstract class PersistentStore {
   /// Subclasses override this method to provide a concrete implementation of [Query]
   /// specific to this type. Objects returned from this method must implement [Query]. They
   /// should mixin [QueryMixin] to most of the behavior provided by a query.
-  Query<T> newQuery<T extends ManagedObject>(
-      ManagedContext context, ManagedEntity entity, {T values});
+  Query<T> newQuery<T extends ManagedObject>(ManagedContext context, ManagedEntity entity,
+      {T values});
 
   /// Executes an arbitrary command.
   Future execute(String sql, {Map<String, dynamic> substitutionValues});
@@ -29,8 +29,8 @@ abstract class PersistentStore {
       String formatString, Map<String, dynamic> values, int timeoutInSeconds,
       {PersistentStoreQueryReturnType returnType});
 
-  Future<T> transaction<T>(ManagedContext transactionContext,
-      Future<T> transactionBlock(ManagedContext transaction));
+  Future<T> transaction<T>(
+      ManagedContext transactionContext, Future<T> transactionBlock(ManagedContext transaction));
 
   /// Closes the underlying database connection.
   Future close();
@@ -47,13 +47,11 @@ abstract class PersistentStore {
 
   List<String> deleteTableUniqueColumnSet(SchemaTable table);
 
-  List<String> addColumn(SchemaTable table, SchemaColumn column,
-      {String unencodedInitialValue});
+  List<String> addColumn(SchemaTable table, SchemaColumn column, {String unencodedInitialValue});
 
   List<String> deleteColumn(SchemaTable table, SchemaColumn column);
 
-  List<String> renameColumn(
-      SchemaTable table, SchemaColumn column, String name);
+  List<String> renameColumn(SchemaTable table, SchemaColumn column, String name);
 
   List<String> alterColumnNullability(
       SchemaTable table, SchemaColumn column, String unencodedInitialValue);
@@ -66,8 +64,7 @@ abstract class PersistentStore {
 
   List<String> addIndexToColumn(SchemaTable table, SchemaColumn column);
 
-  List<String> renameIndex(
-      SchemaTable table, SchemaColumn column, String newIndexName);
+  List<String> renameIndex(SchemaTable table, SchemaColumn column, String newIndexName);
 
   List<String> deleteIndexFromColumn(SchemaTable table, SchemaColumn column);
 

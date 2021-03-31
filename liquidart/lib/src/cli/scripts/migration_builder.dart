@@ -7,8 +7,7 @@ import 'package:isolate_executor/isolate_executor.dart';
 
 class MigrationBuilderExecutable extends Executable<Map<String, dynamic>> {
   MigrationBuilderExecutable(Map<String, dynamic> message)
-      : inputSchema =
-            Schema.fromMap(message["inputSchema"] as Map<String, dynamic>),
+      : inputSchema = Schema.fromMap(message["inputSchema"] as Map<String, dynamic>),
         versionTag = message["versionTag"] as int,
         super(message);
 
@@ -25,9 +24,8 @@ class MigrationBuilderExecutable extends Executable<Map<String, dynamic>> {
       var schema = Schema.fromDataModel(dataModel);
       var changeList = <String>[];
 
-      final source = Migration.sourceForSchemaUpgrade(
-          inputSchema, schema, versionTag,
-          changeList: changeList);
+      final source =
+          Migration.sourceForSchemaUpgrade(inputSchema, schema, versionTag, changeList: changeList);
       return {
         "source": source,
         "tablesEvaluated": dataModel.entities.map((e) => e.name).toList(),
@@ -63,8 +61,7 @@ Future<MigrationBuilderResult> generateMigrationFileForProject(
   final resultMap = await IsolateExecutor.run(
       MigrationBuilderExecutable.input(initialSchema, inputVersion),
       packageConfigURI: project.packageConfigUri,
-      imports:
-          MigrationBuilderExecutable.importsForPackage(project.packageName),
+      imports: MigrationBuilderExecutable.importsForPackage(project.packageName),
       logHandler: project.displayProgress);
 
   if (resultMap.containsKey("error")) {

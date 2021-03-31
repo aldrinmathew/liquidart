@@ -99,9 +99,7 @@ void main() {
       expect(json.decode(resp.body), {"foo": "y", "x": "a"});
     });
 
-    test(
-        "Response modifier that throws uncaught exception sends 500 server error",
-        () async {
+    test("Response modifier that throws uncaught exception sends 500 server error", () async {
       root.linkFunction((r) async {
         return r..addResponseModifier((resp) => throw Exception('expected'));
       }).linkFunction((r) async {
@@ -162,11 +160,10 @@ void main() {
       await app.stop();
     });
 
-    test(
-        "Logging after socket is closed throws uncaught exception, still works correctly after",
+    test("Logging after socket is closed throws uncaught exception, still works correctly after",
         () async {
-          final request = await HttpClient().get("localhost", 8000, "/detach");
-          final response = await request.close();
+      final request = await HttpClient().get("localhost", 8000, "/detach");
+      final response = await request.close();
       try {
         await response.toList();
         expect(true, false);
@@ -176,8 +173,7 @@ void main() {
       expect((await http.get("http://localhost:8000/detach")).statusCode, 200);
     });
 
-    test("Request on bad state: header already sent is captured in Controller",
-        () async {
+    test("Request on bad state: header already sent is captured in Controller", () async {
       expect((await http.get("http://localhost:8000/closed")).statusCode, 200);
       expect((await http.get("http://localhost:8000/closed")).statusCode, 200);
     });
@@ -185,12 +181,8 @@ void main() {
     test(
         "Request controller throwing HttpResponseException that dies on bad state: header already sent is captured in Controller",
         () async {
-      expect(
-          (await http.get("http://localhost:8000/closed_exception")).statusCode,
-          200);
-      expect(
-          (await http.get("http://localhost:8000/closed_exception")).statusCode,
-          200);
+      expect((await http.get("http://localhost:8000/closed_exception")).statusCode, 200);
+      expect((await http.get("http://localhost:8000/closed_exception")).statusCode, 200);
     });
   });
 
@@ -200,8 +192,7 @@ void main() {
       await server.close();
     });
 
-    test(
-        "Request controller's can serialize and encode Serializable objects as JSON by default",
+    test("Request controller's can serialize and encode Serializable objects as JSON by default",
         () async {
       server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8888);
       server.map((req) => Request(req)).listen((req) async {
@@ -271,8 +262,7 @@ void main() {
       expect(resp.body.isEmpty, true);
     });
 
-    test(
-        "willSendResponse is always called prior to Response being sent for preflight requests",
+    test("willSendResponse is always called prior to Response being sent for preflight requests",
         () async {
       server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8888);
       server.map((req) => Request(req)).listen((req) async {
@@ -285,31 +275,25 @@ void main() {
       var req = await HttpClient().open("OPTIONS", "localhost", 8888, "");
       req.headers.set("Origin", "http://foobar.com");
       req.headers.set("Access-Control-Request-Method", "POST");
-      req.headers
-          .set("Access-Control-Request-Headers", "accept, authorization");
+      req.headers.set("Access-Control-Request-Headers", "accept, authorization");
       var resp = await req.close();
 
       expect(resp.statusCode, 200);
-      expect(json.decode(String.fromCharCodes(await resp.first)),
-          {"statusCode": 403});
+      expect(json.decode(String.fromCharCodes(await resp.first)), {"statusCode": 403});
 
       // valid preflight
       req = await HttpClient().open("OPTIONS", "localhost", 8888, "");
       req.headers.set("Origin", "http://somewhere.com");
       req.headers.set("Access-Control-Request-Method", "POST");
-      req.headers
-          .set("Access-Control-Request-Headers", "accept, authorization");
+      req.headers.set("Access-Control-Request-Headers", "accept, authorization");
       resp = await req.close();
 
       expect(resp.statusCode, 200);
-      expect(resp.headers.value("access-control-allow-methods"),
-          "POST, PUT, DELETE, GET");
-      expect(json.decode(String.fromCharCodes(await resp.first)),
-          {"statusCode": 200});
+      expect(resp.headers.value("access-control-allow-methods"), "POST, PUT, DELETE, GET");
+      expect(json.decode(String.fromCharCodes(await resp.first)), {"statusCode": 200});
     });
 
-    test(
-        "willSendResponse is always called prior to Response being sent for normal requests",
+    test("willSendResponse is always called prior to Response being sent for normal requests",
         () async {
       server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8888);
       server.map((req) => Request(req)).listen((req) async {
@@ -351,8 +335,7 @@ void main() {
       });
 
       var resp = await http.post("http://localhost:8888",
-          headers: {"content-type": "application/json"},
-          body: json.encode(["a"]));
+          headers: {"content-type": "application/json"}, body: json.encode(["a"]));
 
       expect(resp.statusCode, 400);
     });

@@ -2,13 +2,7 @@ import 'package:liquidart/src/db/managed/managed.dart';
 
 enum ValidateType { regex, comparison, length, present, absent, oneOf }
 
-enum ValidationOperator {
-  equalTo,
-  lessThan,
-  lessThanEqualTo,
-  greaterThan,
-  greaterThanEqualTo
-}
+enum ValidationOperator { equalTo, lessThan, lessThanEqualTo, greaterThan, greaterThanEqualTo }
 
 class ValidationExpression {
   ValidationExpression(this.operator, this.value);
@@ -38,8 +32,7 @@ class ValidationExpression {
       case ValidationOperator.greaterThanEqualTo:
         {
           if (comparisonValue.compareTo(input) > 0) {
-            context.addError(
-              "must be greater than or equal to '$comparisonValue'.");
+            context.addError("must be greater than or equal to '$comparisonValue'.");
           }
         }
         break;
@@ -54,8 +47,7 @@ class ValidationExpression {
       case ValidationOperator.lessThanEqualTo:
         {
           if (comparisonValue.compareTo(input) < 0) {
-            context
-              .addError("must be less than or equal to '$comparisonValue'.");
+            context.addError("must be less than or equal to '$comparisonValue'.");
           }
         }
         break;

@@ -17,20 +17,14 @@ import 'serializable.dart';
 ///         }
 class Operation {
   const Operation(this.method,
-      [String pathVariable1,
-      String pathVariable2,
-      String pathVariable3,
-      String pathVariable4])
+      [String pathVariable1, String pathVariable2, String pathVariable3, String pathVariable4])
       : _pathVariable1 = pathVariable1,
         _pathVariable2 = pathVariable2,
         _pathVariable3 = pathVariable3,
         _pathVariable4 = pathVariable4;
 
   const Operation.get(
-      [String pathVariable1,
-      String pathVariable2,
-      String pathVariable3,
-      String pathVariable4])
+      [String pathVariable1, String pathVariable2, String pathVariable3, String pathVariable4])
       : method = "GET",
         _pathVariable1 = pathVariable1,
         _pathVariable2 = pathVariable2,
@@ -38,10 +32,7 @@ class Operation {
         _pathVariable4 = pathVariable4;
 
   const Operation.put(
-      [String pathVariable1,
-      String pathVariable2,
-      String pathVariable3,
-      String pathVariable4])
+      [String pathVariable1, String pathVariable2, String pathVariable3, String pathVariable4])
       : method = "PUT",
         _pathVariable1 = pathVariable1,
         _pathVariable2 = pathVariable2,
@@ -49,10 +40,7 @@ class Operation {
         _pathVariable4 = pathVariable4;
 
   const Operation.post(
-      [String pathVariable1,
-      String pathVariable2,
-      String pathVariable3,
-      String pathVariable4])
+      [String pathVariable1, String pathVariable2, String pathVariable3, String pathVariable4])
       : method = "POST",
         _pathVariable1 = pathVariable1,
         _pathVariable2 = pathVariable2,
@@ -60,10 +48,7 @@ class Operation {
         _pathVariable4 = pathVariable4;
 
   const Operation.delete(
-      [String pathVariable1,
-      String pathVariable2,
-      String pathVariable3,
-      String pathVariable4])
+      [String pathVariable1, String pathVariable2, String pathVariable3, String pathVariable4])
       : method = "DELETE",
         _pathVariable1 = pathVariable1,
         _pathVariable2 = pathVariable2,

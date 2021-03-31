@@ -28,11 +28,9 @@ class WildfireChannel extends ApplicationChannel {
 
     // Prefer to use `link` instead of `linkFunction`.
     // See: https://aldrinsartfactory.github.io/liquidart/http/request_controller/
-    router
-      .route("/example")
-      .linkFunction((request) async {
-        return Response.ok({"key": "value"});
-      });
+    router.route("/example").linkFunction((request) async {
+      return Response.ok({"key": "value"});
+    });
 
     return router;
   }

@@ -182,8 +182,7 @@ void main() {
     var user = User();
     user.readFromMap(wash(map));
 
-    expect(
-        user.dateCreated.difference(DateTime.parse(dateString)), Duration.zero);
+    expect(user.dateCreated.difference(DateTime.parse(dateString)), Duration.zero);
 
     var remap = user.asMap();
     expect(remap["dateCreated"], dateString);
@@ -198,9 +197,7 @@ void main() {
     }
   });
 
-  test(
-      "Handles input of type num for double precision float properties of the model",
-      () {
+  test("Handles input of type num for double precision float properties of the model", () {
     var m = TransientTypeTest()
       ..readFromMap(wash({
         "transientDouble": 30,
@@ -250,8 +247,7 @@ void main() {
     var u = User();
     u.name = "Bob";
     u.dateCreated = null;
-    u.name =
-        null; // I previously set this to a value on purpose and then reset it to null
+    u.name = null; // I previously set this to a value on purpose and then reset it to null
 
     expect(u.name, isNull);
     expect(u.dateCreated, isNull);
@@ -273,8 +269,7 @@ void main() {
   });
 
   test("mappableInput properties are read in readMap", () {
-    var t = TransientTest()
-      ..readFromMap(wash({"id": 1, "defaultedText": "bar foo"}));
+    var t = TransientTest()..readFromMap(wash({"id": 1, "defaultedText": "bar foo"}));
     expect(t.id, 1);
     expect(t.text, "foo");
     expect(t.inputInt, isNull);
@@ -398,8 +393,7 @@ void main() {
     expect(m.containsKey("dateCreated"), true);
   });
 
-  test("Removing single non-existent property from backing map has no effect",
-      () {
+  test("Removing single non-existent property from backing map has no effect", () {
     var u = (User()
       ..id = 1
       ..name = "Bob"
@@ -427,8 +421,7 @@ void main() {
     expect(m.containsKey("dateCreated"), false);
   });
 
-  test("Can remove single property from backing map with multi-property method",
-      () {
+  test("Can remove single property from backing map with multi-property method", () {
     var u = (User()
       ..id = 1
       ..name = "Bob"
@@ -442,9 +435,7 @@ void main() {
     expect(m.containsKey("dateCreated"), true);
   });
 
-  test(
-      "Removing multiple non-existent properties from backing map has no effect",
-      () {
+  test("Removing multiple non-existent properties from backing map has no effect", () {
     var u = (User()
       ..id = 1
       ..name = "Bob"
@@ -460,12 +451,12 @@ void main() {
 
   test("DeepMap Transient Properties of all types can be read and returned", () {
     var m = (TransientTypeTest()
-      ..readFromMap(wash({
-        "deepMap": {
-          "ok": {"ik1": 1, "ik2": 2}
-        }
-      })))
-      .asMap();
+          ..readFromMap(wash({
+            "deepMap": {
+              "ok": {"ik1": 1, "ik2": 2}
+            }
+          })))
+        .asMap();
 
     expect(m["deepMap"], {
       "ok": {"ik1": 1, "ik2": 2}
@@ -496,8 +487,7 @@ void main() {
     expect(m["transientInt"], 5);
     expect(m["transientBigInt"], 123456789);
     expect(m["transientString"], "lowercase string");
-    expect(m["transientDate"].difference(DateTime.parse(dateString)),
-        Duration.zero);
+    expect(m["transientDate"].difference(DateTime.parse(dateString)), Duration.zero);
     expect(m["transientBool"], true);
     expect(m["transientDouble"], 30.5);
     expect(m["transientList"], [1, 2, 3, 4, 5]);
@@ -514,8 +504,7 @@ void main() {
     expect(tm["anotherKey"], "anotherValue");
   });
 
-  test(
-      "If primitive type cannot be parsed into correct type, it fails with validation exception",
+  test("If primitive type cannot be parsed into correct type, it fails with validation exception",
       () {
     try {
       TransientTypeTest().readFromMap({"transientInt": "a string"});
@@ -524,43 +513,36 @@ void main() {
     } on ValidationException {}
   });
 
-  test(
-    "If map type cannot be parsed into exact type, it fails with validation exception",
-      () {
-
-      try {
-        TransientTypeTest().readFromMap({
-          "deepMap": wash({"str": 1})
-        });
-        fail('unreachable');
-        // ignore: empty_catches
-      } on ValidationException {}
-
-      try {
-        TransientTypeTest().readFromMap({
-          "deepMap": wash({
-            "key": {"str": "val", "int": 2}
-          })
-        });
-        fail('unreachable');
-        // ignore: empty_catches
-      } on ValidationException {}
-
-      try {
-        TransientTypeTest().readFromMap({"deepMap": wash("str")});
-        fail('unreachable');
-        // ignore: empty_catches
-      } on ValidationException {}
-    });
-
-  test(
-      "If complex type cannot be parsed into exact type, it fails with validation exception",
-      () {
+  test("If map type cannot be parsed into exact type, it fails with validation exception", () {
     try {
       TransientTypeTest().readFromMap({
-        "deepList": wash([
-          "string"
-        ])
+        "deepMap": wash({"str": 1})
+      });
+      fail('unreachable');
+      // ignore: empty_catches
+    } on ValidationException {}
+
+    try {
+      TransientTypeTest().readFromMap({
+        "deepMap": wash({
+          "key": {"str": "val", "int": 2}
+        })
+      });
+      fail('unreachable');
+      // ignore: empty_catches
+    } on ValidationException {}
+
+    try {
+      TransientTypeTest().readFromMap({"deepMap": wash("str")});
+      fail('unreachable');
+      // ignore: empty_catches
+    } on ValidationException {}
+  });
+
+  test("If complex type cannot be parsed into exact type, it fails with validation exception", () {
+    try {
+      TransientTypeTest().readFromMap({
+        "deepList": wash(["string"])
       });
       fail('unreachable');
       // ignore: empty_catches
@@ -592,9 +574,7 @@ void main() {
     expect(u.posts[0].text, "Hi");
   });
 
-  test(
-      "Reading/writing instance property that isn't marked as transient shows up nowhere",
-      () {
+  test("Reading/writing instance property that isn't marked as transient shows up nowhere", () {
     var t = TransientTest();
     try {
       t.readFromMap(wash({"notAnAttribute": true}));
@@ -606,9 +586,7 @@ void main() {
     expect(t.asMap().containsKey("notAnAttribute"), false);
   });
 
-  test(
-      "Omit transient properties in asMap when object is a foreign key reference",
-      () {
+  test("Omit transient properties in asMap when object is a foreign key reference", () {
     var b = TransientBelongsTo()
       ..id = 1
       ..owner = (TransientOwner()..id = 1);
@@ -658,9 +636,7 @@ void main() {
       expect(e.asMap()["enumValues"], "other18");
     });
 
-    test(
-        "Cannot assign value via backingMap or readMap that isn't a valid enum case",
-        () {
+    test("Cannot assign value via backingMap or readMap that isn't a valid enum case", () {
       var e = EnumObject();
       try {
         e.readFromMap(wash({"enumValues": "foobar"}));
@@ -767,8 +743,7 @@ void main() {
   test("Can have constructor with only optional args", () {
     final dm = ManagedDataModel([DefaultConstructorHasOptionalArgs]);
     final _ = ManagedContext(dm, null);
-    final instance =
-        dm.entityForType(DefaultConstructorHasOptionalArgs).instanceOf();
+    final instance = dm.entityForType(DefaultConstructorHasOptionalArgs).instanceOf();
     expect(instance is DefaultConstructorHasOptionalArgs, true);
   });
 }
@@ -802,8 +777,7 @@ class _Post {
   User owner;
 }
 
-class TransientTest extends ManagedObject<_TransientTest>
-    implements _TransientTest {
+class TransientTest extends ManagedObject<_TransientTest> implements _TransientTest {
   String notAnAttribute;
 
   @Serialize(input: false, output: true)
@@ -868,8 +842,7 @@ class _TransientTest {
   String text;
 }
 
-class TransientTypeTest extends ManagedObject<_TransientTypeTest>
-    implements _TransientTypeTest {
+class TransientTypeTest extends ManagedObject<_TransientTypeTest> implements _TransientTypeTest {
   @Serialize(input: false, output: true)
   int get transientInt => backingInt + 1;
 
@@ -988,8 +961,7 @@ class _TransientTypeTest {
   String backingListString;
 }
 
-class PrivateField extends ManagedObject<_PrivateField>
-    implements _PrivateField {
+class PrivateField extends ManagedObject<_PrivateField> implements _PrivateField {
   @Serialize(input: true, output: false)
   set public(String p) {
     _private = p;
@@ -1017,8 +989,7 @@ class _EnumObject {
 
 enum EnumValues { abcd, efgh, other18 }
 
-class TransientOwner extends ManagedObject<_TransientOwner>
-    implements _TransientOwner {
+class TransientOwner extends ManagedObject<_TransientOwner> implements _TransientOwner {
   @Serialize(input: false, output: true)
   int v = 2;
 }
@@ -1030,8 +1001,8 @@ class _TransientOwner {
   TransientBelongsTo t;
 }
 
-class TransientBelongsTo extends ManagedObject<_TransientBelongsTo>
-    implements _TransientBelongsTo {}
+class TransientBelongsTo extends ManagedObject<_TransientBelongsTo> implements _TransientBelongsTo {
+}
 
 class _TransientBelongsTo {
   @primaryKey
@@ -1045,8 +1016,7 @@ void expectError(ValidationException exception, Matcher matcher) {
   expect(exception.toString(), matcher);
 }
 
-class DocumentTest extends ManagedObject<_DocumentTest>
-    implements _DocumentTest {}
+class DocumentTest extends ManagedObject<_DocumentTest> implements _DocumentTest {}
 
 class _DocumentTest {
   @primaryKey
@@ -1069,8 +1039,7 @@ class _ConstructorOverride {
   String value;
 }
 
-class DefaultConstructorHasOptionalArgs
-    extends ManagedObject<_ConstructorTableDef> {
+class DefaultConstructorHasOptionalArgs extends ManagedObject<_ConstructorTableDef> {
   // ignore: avoid_unused_constructor_parameters
   DefaultConstructorHasOptionalArgs({int foo});
 }
@@ -1115,8 +1084,7 @@ class _Bottom {
   Middle middles;
 }
 
-class OverrideField extends ManagedObject<_OverrideField>
-    implements _OverrideField {
+class OverrideField extends ManagedObject<_OverrideField> implements _OverrideField {
   @override
   String field;
 }

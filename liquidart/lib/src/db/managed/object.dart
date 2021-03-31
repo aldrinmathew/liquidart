@@ -112,8 +112,7 @@ abstract class ManagedObject<T> extends Serializable {
 
   /// Removes multiple properties from [backing].
   void removePropertiesFromBackingMap(List<String> propertyNames) {
-    propertyNames
-        .forEach((propertyName) => backing.removeProperty(propertyName));
+    propertyNames.forEach((propertyName) => backing.removeProperty(propertyName));
   }
 
   /// Checks whether or not a property has been set in this instances' [backing].
@@ -191,8 +190,7 @@ abstract class ManagedObject<T> extends Serializable {
       if (invocation.isGetter) {
         return this[propertyName];
       } else if (invocation.isSetter) {
-        this[propertyName] =
-          invocation.positionalArguments.first;
+        this[propertyName] = invocation.positionalArguments.first;
 
         return null;
       }
@@ -214,8 +212,7 @@ abstract class ManagedObject<T> extends Serializable {
 
       if (property is ManagedAttributeDescription) {
         if (!property.isTransient) {
-          backing.setValueForProperty(
-              property, property.convertFromPrimitiveValue(v));
+          backing.setValueForProperty(property, property.convertFromPrimitiveValue(v));
         } else {
           if (!property.transientStatus.isAvailableAsInput) {
             throw ValidationException(["invalid input key '$key'"]);
@@ -230,8 +227,7 @@ abstract class ManagedObject<T> extends Serializable {
           entity.runtime.setTransientValueForKey(this, key, decodedValue);
         }
       } else {
-        backing.setValueForProperty(
-            property, property.convertFromPrimitiveValue(v));
+        backing.setValueForProperty(property, property.convertFromPrimitiveValue(v));
       }
     });
   }
@@ -270,6 +266,5 @@ abstract class ManagedObject<T> extends Serializable {
   @override
   APISchemaObject documentSchema(APIDocumentContext context) => entity.document(context);
 
-  static bool _isPropertyPrivate(String propertyName) =>
-      propertyName.startsWith("_");
+  static bool _isPropertyPrivate(String propertyName) => propertyName.startsWith("_");
 }

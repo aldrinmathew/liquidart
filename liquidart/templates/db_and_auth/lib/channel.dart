@@ -9,8 +9,7 @@ import 'package:wildfire/wildfire.dart';
 ///
 /// Override methods in this class to set up routes and initialize services like
 /// database connections. See http://aldrinsartfactory.github.io/liquidart/http/channel/.
-class WildfireChannel extends ApplicationChannel
-    implements AuthRedirectControllerDelegate {
+class WildfireChannel extends ApplicationChannel implements AuthRedirectControllerDelegate {
   final HTMLRenderer htmlRenderer = HTMLRenderer();
   AuthServer authServer;
   ManagedContext context;
@@ -23,8 +22,7 @@ class WildfireChannel extends ApplicationChannel
   /// This method is invoked prior to [entryPoint] being accessed.
   @override
   Future prepare() async {
-    logger.onRecord.listen(
-        (rec) => print("$rec ${rec.error ?? ""} ${rec.stackTrace ?? ""}"));
+    logger.onRecord.listen((rec) => print("$rec ${rec.error ?? ""} ${rec.stackTrace ?? ""}"));
 
     final config = WildfireConfiguration(options.configurationFilePath);
 
@@ -47,9 +45,7 @@ class WildfireChannel extends ApplicationChannel
     /* OAuth 2.0 Endpoints */
     router.route("/auth/token").link(() => AuthController(authServer));
 
-    router
-        .route("/auth/form")
-        .link(() => AuthRedirectController(authServer, delegate: this));
+    router.route("/auth/form").link(() => AuthRedirectController(authServer, delegate: this));
 
     /* Create an account */
     router
@@ -76,27 +72,18 @@ class WildfireChannel extends ApplicationChannel
    * Helper methods
    */
 
-  ManagedContext contextWithConnectionInfo(
-      DatabaseConfiguration connectionInfo) {
+  ManagedContext contextWithConnectionInfo(DatabaseConfiguration connectionInfo) {
     final dataModel = ManagedDataModel.fromCurrentMirrorSystem();
-    final psc = PostgreSQLPersistentStore(
-        connectionInfo.username,
-        connectionInfo.password,
-        connectionInfo.host,
-        connectionInfo.port,
-        connectionInfo.databaseName);
+    final psc = PostgreSQLPersistentStore(connectionInfo.username, connectionInfo.password,
+        connectionInfo.host, connectionInfo.port, connectionInfo.databaseName);
 
     return ManagedContext(dataModel, psc);
   }
 
   @override
-  Future<String> render(AuthRedirectController forController, Uri requestUri,
-      String responseType, String clientID, String state, String scope) async {
-    final map = {
-      "response_type": responseType,
-      "client_id": clientID,
-      "state": state
-    };
+  Future<String> render(AuthRedirectController forController, Uri requestUri, String responseType,
+      String clientID, String state, String scope) async {
+    final map = {"response_type": responseType, "client_id": clientID, "state": state};
 
     map["path"] = requestUri.path;
     if (scope != null) {

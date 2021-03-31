@@ -22,7 +22,7 @@ ManagedType getManagedTypeFromType(TypeMirror type) {
   } else if (type.isSubtypeOf(reflectType(Map))) {
     if (!type.typeArguments.first.isAssignableTo(reflectType(String))) {
       throw UnsupportedError(
-        "Invalid type '${type.reflectedType}' for 'ManagedType'. Key is invalid; must be 'String'.");
+          "Invalid type '${type.reflectedType}' for 'ManagedType'. Key is invalid; must be 'String'.");
     }
     kind = ManagedPropertyType.map;
     elements = getManagedTypeFromType(type.typeArguments.last);
@@ -39,13 +39,11 @@ ManagedType getManagedTypeFromType(TypeMirror type) {
       return m;
     });
   } else {
-    throw UnsupportedError(
-      "Invalid type '${type.reflectedType}' for 'ManagedType'.");
+    throw UnsupportedError("Invalid type '${type.reflectedType}' for 'ManagedType'.");
   }
 
   return ManagedType(type.reflectedType, kind, elements, enumerationMap);
 }
-
 
 // Expanding the list of ivars for each class yields duplicates of
 // any ivar is overridden. Since the order in which ivars are returned
@@ -81,8 +79,7 @@ bool hasTransientMetadata(DeclarationMirror mirror) =>
     transientMetadataFromDeclaration(mirror) != null;
 
 bool isTransientProperty(DeclarationMirror declaration) {
-  return isInstanceVariableMirror(declaration) &&
-      hasTransientMetadata(declaration);
+  return isInstanceVariableMirror(declaration) && hasTransientMetadata(declaration);
 }
 
 bool isTransientAccessorMethod(DeclarationMirror declMir) {
@@ -95,8 +92,7 @@ bool isTransientAccessorMethod(DeclarationMirror declMir) {
     return false;
   }
 
-  if (!(methodMirror.isSetter || methodMirror.isGetter) ||
-      methodMirror.isSynthetic) {
+  if (!(methodMirror.isSetter || methodMirror.isGetter) || methodMirror.isSynthetic) {
     return false;
   }
 
@@ -111,12 +107,9 @@ bool isTransientAccessorMethod(DeclarationMirror declMir) {
 }
 
 bool isTransientPropertyOrAccessor(DeclarationMirror declaration) {
-  return isTransientAccessorMethod(declaration) ||
-      isTransientProperty(declaration);
+  return isTransientAccessorMethod(declaration) || isTransientProperty(declaration);
 }
 
-List<Validate> validatorsFromDeclaration(DeclarationMirror dm) =>
-    allMetadataOfType<Validate>(dm);
+List<Validate> validatorsFromDeclaration(DeclarationMirror dm) => allMetadataOfType<Validate>(dm);
 
-Serialize transientMetadataFromDeclaration(DeclarationMirror dm) =>
-    firstMetadataOfType(dm);
+Serialize transientMetadataFromDeclaration(DeclarationMirror dm) => firstMetadataOfType(dm);

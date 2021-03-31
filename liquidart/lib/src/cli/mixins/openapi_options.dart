@@ -2,9 +2,10 @@ import 'package:liquidart/src/cli/command.dart';
 import 'package:liquidart/src/cli/metadata.dart';
 
 abstract class CLIDocumentOptions implements CLICommand {
-  @Flag("resolve-relative-urls", defaultsTo: true,
-    abbr: "r",
-    help: "Whether relative URLs are resolved against the first server in document")
+  @Flag("resolve-relative-urls",
+      defaultsTo: true,
+      abbr: "r",
+      help: "Whether relative URLs are resolved against the first server in document")
   bool get resolveRelativeUrls => decode("resolve-relative-urls");
 
   @Option("title", help: "API Docs: Title")

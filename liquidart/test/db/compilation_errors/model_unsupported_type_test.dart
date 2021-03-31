@@ -1,8 +1,7 @@
 import 'package:liquidart/liquidart.dart';
 import 'package:test/test.dart';
 
-class InvalidModel extends ManagedObject<_InvalidModel>
-    implements _InvalidModel {}
+class InvalidModel extends ManagedObject<_InvalidModel> implements _InvalidModel {}
 
 class _InvalidModel {
   @primaryKey

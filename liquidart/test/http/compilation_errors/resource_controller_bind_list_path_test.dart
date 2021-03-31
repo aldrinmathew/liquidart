@@ -10,8 +10,7 @@ void main() {
       RuntimeContext.current;
       fail('unreachable');
     } on StateError catch (e) {
-      expect(e.toString(),
-        contains("Invalid binding 'x' on 'ErrorListPath.get1'"));
+      expect(e.toString(), contains("Invalid binding 'x' on 'ErrorListPath.get1'"));
     }
   });
 }

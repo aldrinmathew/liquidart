@@ -59,8 +59,7 @@ class RowInstantiator {
     return InstanceWrapper(instance, !alreadyExists);
   }
 
-  ManagedObject createInstanceWithPrimaryKeyValue(
-      TableBuilder table, dynamic primaryKeyValue) {
+  ManagedObject createInstanceWithPrimaryKeyValue(TableBuilder table, dynamic primaryKeyValue) {
     var instance = table.entity.instanceOf();
 
     instance[table.entity.primaryKey] = primaryKeyValue;
@@ -76,8 +75,7 @@ class RowInstantiator {
     return instance;
   }
 
-  ManagedObject getExistingInstance(
-      TableBuilder table, dynamic primaryKeyValue) {
+  ManagedObject getExistingInstance(TableBuilder table, dynamic primaryKeyValue) {
     var byType = distinctObjects[table];
     if (byType == null) {
       return null;
@@ -86,18 +84,18 @@ class RowInstantiator {
     return byType[primaryKeyValue];
   }
 
-  void applyRowValuesToInstance(ManagedObject instance, TableBuilder table,
-      Iterator<dynamic> rowIterator) {
+  void applyRowValuesToInstance(
+      ManagedObject instance, TableBuilder table, Iterator<dynamic> rowIterator) {
     if (table.flattenedColumnsToReturn.isEmpty) {
       return;
     }
 
-    var innerInstanceWrapper =
-        instanceFromRow(rowIterator, table.returning.iterator, table: table);
+    var innerInstanceWrapper = instanceFromRow(rowIterator, table.returning.iterator, table: table);
 
     if (table.joinedBy.relationshipType == ManagedRelationshipType.hasMany) {
       // If to many, put in a managed set.
-      final list = (instance[table.joinedBy.name] ?? table.joinedBy.destinationEntity.setOf([])) as ManagedSet;
+      final list = (instance[table.joinedBy.name] ?? table.joinedBy.destinationEntity.setOf([]))
+          as ManagedSet;
 
       if (innerInstanceWrapper != null && innerInstanceWrapper.isNew) {
         list.add(innerInstanceWrapper.instance);
@@ -117,8 +115,7 @@ class RowInstantiator {
     }
   }
 
-  void applyColumnValueToProperty(
-      ManagedObject instance, ColumnBuilder column, dynamic value) {
+  void applyColumnValueToProperty(ManagedObject instance, ColumnBuilder column, dynamic value) {
     var desc = column.property;
 
     if (desc is ManagedRelationshipDescription) {

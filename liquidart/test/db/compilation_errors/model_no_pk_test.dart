@@ -1,8 +1,7 @@
 import 'package:liquidart/liquidart.dart';
 import 'package:test/test.dart';
 
-class NoPrimaryKey extends ManagedObject<_NoPrimaryKey>
-    implements _NoPrimaryKey {}
+class NoPrimaryKey extends ManagedObject<_NoPrimaryKey> implements _NoPrimaryKey {}
 
 class _NoPrimaryKey {
   String foo;
@@ -14,10 +13,7 @@ void main() {
       ManagedDataModel([NoPrimaryKey]);
       expect(true, false);
     } on ManagedDataModelError catch (e) {
-      expect(
-          e.message,
-          contains(
-              "Class '_NoPrimaryKey' doesn't declare a primary key property"));
+      expect(e.message, contains("Class '_NoPrimaryKey' doesn't declare a primary key property"));
     }
   });
 }

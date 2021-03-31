@@ -73,8 +73,7 @@ class ApplicationServer {
     if (securityContext != null) {
       _requiresHTTPS = true;
 
-      server = await HttpServer.bindSecure(
-          options.address, options.port, securityContext,
+      server = await HttpServer.bindSecure(options.address, options.port, securityContext,
           requestClientCertificate: options.isUsingClientCertificate,
           v6Only: options.isIpv6Only,
           shared: shareHttpServer);

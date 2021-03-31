@@ -6,8 +6,7 @@ import 'postgresql_persistent_store.dart';
 import 'postgresql_query.dart';
 import 'query_builder.dart';
 
-class PostgresQueryReduce<T extends ManagedObject>
-    extends QueryReduceOperation<T> {
+class PostgresQueryReduce<T extends ManagedObject> extends QueryReduceOperation<T> {
   PostgresQueryReduce(this.query);
 
   final PostgresQuery<T> query;
@@ -59,8 +58,7 @@ class PostgresQueryReduce<T extends ManagedObject>
           .timeout(Duration(seconds: query.timeoutInSeconds));
       return result.first.first as U;
     } on TimeoutException catch (e) {
-      throw QueryException.transport("timed out connecting to database",
-          underlyingException: e);
+      throw QueryException.transport("timed out connecting to database", underlyingException: e);
     }
   }
 }

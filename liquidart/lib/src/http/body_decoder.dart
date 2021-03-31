@@ -9,8 +9,7 @@ import 'package:runtime/runtime.dart';
 ///
 /// See [RequestBody] for a concrete implementation.
 abstract class BodyDecoder {
-  BodyDecoder(Stream<List<int>> bodyByteStream)
-      : _originalByteStream = bodyByteStream;
+  BodyDecoder(Stream<List<int>> bodyByteStream) : _originalByteStream = bodyByteStream;
 
   /// The stream of bytes to decode.
   ///
@@ -47,8 +46,7 @@ abstract class BodyDecoder {
   /// Will throw an error if [bytes] have not been decoded yet.
   Type get decodedType {
     if (!hasBeenDecoded) {
-      throw StateError(
-          "Invalid body decoding. Must decode data prior to calling 'decodedType'.");
+      throw StateError("Invalid body decoding. Must decode data prior to calling 'decodedType'.");
     }
 
     return (_decodedData as Object).runtimeType;
@@ -87,8 +85,7 @@ abstract class BodyDecoder {
       return _cast<T>(_decodedData);
     }
 
-    final codec =
-        CodecRegistry.defaultInstance.codecForContentType(contentType);
+    final codec = CodecRegistry.defaultInstance.codecForContentType(contentType);
     final originalBytes = await _readBytes(bytes);
 
     if (retainOriginalBytes) {
@@ -105,8 +102,7 @@ abstract class BodyDecoder {
     } on Response {
       rethrow;
     } catch (_) {
-      throw Response.badRequest(
-          body: {"error": "request entity could not be decoded"});
+      throw Response.badRequest(body: {"error": "request entity could not be decoded"});
     }
 
     return _cast<T>(_decodedData);
@@ -128,14 +124,13 @@ abstract class BodyDecoder {
     try {
       return RuntimeContext.current.coerce<T>(body);
     } on TypeCoercionException {
-      throw Response.badRequest(
-          body: {"error": "request entity was unexpected type"});
+      throw Response.badRequest(body: {"error": "request entity was unexpected type"});
     }
   }
 
   Future<List<int>> _readBytes(Stream<List<int>> stream) async {
-    var bytes = await stream.fold(
-        BytesBuilder(), (BytesBuilder builder, data) => builder..add(data));
+    var bytes =
+        await stream.fold(BytesBuilder(), (BytesBuilder builder, data) => builder..add(data));
     return bytes.takeBytes();
   }
 }

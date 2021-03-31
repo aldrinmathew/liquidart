@@ -30,8 +30,7 @@ class UserController extends ResourceController {
   }
 
   @Operation.put("id")
-  Future<Response> updateUser(
-      @Bind.path("id") int id, @Bind.body() User user) async {
+  Future<Response> updateUser(@Bind.path("id") int id, @Bind.body() User user) async {
     if (request.authorization.ownerID != id) {
       return Response.unauthorized();
     }

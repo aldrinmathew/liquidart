@@ -47,14 +47,12 @@ void main() {
     });
 
     test("String value, case sensitive default", () async {
-      var q = Query<TestModel>(context)
-        ..where((o) => o.email).equalTo("0@a.com");
+      var q = Query<TestModel>(context)..where((o) => o.email).equalTo("0@a.com");
       var results = await q.fetch();
       expect(results.length, 1);
       expect(results.first.id, 1);
 
-      q = Query<TestModel>(context)
-        ..where((o) => o.email).not.equalTo("0@a.com");
+      q = Query<TestModel>(context)..where((o) => o.email).not.equalTo("0@a.com");
       results = await q.fetch();
       expect(results.length, 5);
       expect(results.any((tm) => tm.id == 1), false);
@@ -63,8 +61,7 @@ void main() {
       results = await q.fetch();
       expect(results.length, 0);
 
-      q = Query<TestModel>(context)
-        ..where((o) => o.email).not.equalTo("0@A.com");
+      q = Query<TestModel>(context)..where((o) => o.email).not.equalTo("0@A.com");
       results = await q.fetch();
       expect(results.length, 6);
 
@@ -80,8 +77,7 @@ void main() {
       results = await q.fetch();
       expect(results.length, 0);
 
-      q = Query<TestModel>(context)
-        ..where((o) => o.email).not.equalTo("\\%.com");
+      q = Query<TestModel>(context)..where((o) => o.email).not.equalTo("\\%.com");
       results = await q.fetch();
       expect(results.length, 6);
 
@@ -89,8 +85,7 @@ void main() {
       results = await q.fetch();
       expect(results.length, 0);
 
-      q = Query<TestModel>(context)
-        ..where((o) => o.email).not.equalTo("_@a.com");
+      q = Query<TestModel>(context)..where((o) => o.email).not.equalTo("_@a.com");
       results = await q.fetch();
       expect(results.length, 6);
     });
@@ -120,8 +115,7 @@ void main() {
       results = await q.fetch();
       expect(results.length, 0);
 
-      q = Query<TestModel>(context)
-        ..where((o) => o.email).not.equalTo("\\%.COM");
+      q = Query<TestModel>(context)..where((o) => o.email).not.equalTo("\\%.COM");
       results = await q.fetch();
       expect(results.length, 6);
 
@@ -129,8 +123,7 @@ void main() {
       results = await q.fetch();
       expect(results.length, 0);
 
-      q = Query<TestModel>(context)
-        ..where((o) => o.email).not.equalTo("_@a.COM");
+      q = Query<TestModel>(context)..where((o) => o.email).not.equalTo("_@a.COM");
       results = await q.fetch();
       expect(results.length, 6);
     });
@@ -174,30 +167,25 @@ void main() {
     });
 
     test("case insensitive default", () async {
-      var q = Query<TestModel>(context)
-        ..where((o) => o.email).like("0@A%", caseSensitive: false);
+      var q = Query<TestModel>(context)..where((o) => o.email).like("0@A%", caseSensitive: false);
       var results = await q.fetch();
       expect(results.length, 1);
       expect(results.first.id, 1);
 
-      q = Query<TestModel>(context)
-        ..where((o) => o.email).not.like("0@A%", caseSensitive: false);
+      q = Query<TestModel>(context)..where((o) => o.email).not.like("0@A%", caseSensitive: false);
       results = await q.fetch();
       expect(results.length, 5);
       expect(results.any((tm) => tm.email == "0@a.com"), false);
 
-      q = Query<TestModel>(context)
-        ..where((o) => o.email).like("%.COM", caseSensitive: false);
+      q = Query<TestModel>(context)..where((o) => o.email).like("%.COM", caseSensitive: false);
       results = await q.fetch();
       expect(results.length, 6);
 
-      q = Query<TestModel>(context)
-        ..where((o) => o.email).not.like("%.COM", caseSensitive: false);
+      q = Query<TestModel>(context)..where((o) => o.email).not.like("%.COM", caseSensitive: false);
       results = await q.fetch();
       expect(results.length, 0);
 
-      q = Query<TestModel>(context)
-        ..where((o) => o.email).like("_@a.COM", caseSensitive: false);
+      q = Query<TestModel>(context)..where((o) => o.email).like("_@a.COM", caseSensitive: false);
       results = await q.fetch();
       expect(results.length, 6);
 
@@ -276,25 +264,21 @@ void main() {
     });
 
     test("String value, case sensitive default", () async {
-      var q = Query<TestModel>(context)
-        ..where((o) => o.email).notEqualTo("0@a.com");
+      var q = Query<TestModel>(context)..where((o) => o.email).notEqualTo("0@a.com");
       var results = await q.fetch();
       expect(results.length, 5);
       expect(results.any((t) => t.id == 1), false);
 
-      q = Query<TestModel>(context)
-        ..where((o) => o.email).not.notEqualTo("0@a.com");
+      q = Query<TestModel>(context)..where((o) => o.email).not.notEqualTo("0@a.com");
       results = await q.fetch();
       expect(results.length, 1);
       expect(results.any((t) => t.id == 1), true);
 
-      q = Query<TestModel>(context)
-        ..where((o) => o.email).notEqualTo("0@A.com");
+      q = Query<TestModel>(context)..where((o) => o.email).notEqualTo("0@A.com");
       results = await q.fetch();
       expect(results.length, 6);
 
-      q = Query<TestModel>(context)
-        ..where((o) => o.email).not.notEqualTo("0@A.com");
+      q = Query<TestModel>(context)..where((o) => o.email).not.notEqualTo("0@A.com");
       results = await q.fetch();
       expect(results.length, 0);
     });
@@ -423,15 +407,13 @@ void main() {
     });
 
     test("Case insensitive", () async {
-      var q = Query<TestModel>(context)
-        ..where((o) => o.name).contains("Y", caseSensitive: false);
+      var q = Query<TestModel>(context)..where((o) => o.name).contains("Y", caseSensitive: false);
       var results = await q.fetch();
       expect(results.length, 2);
       expect(results.first.name, "Sally");
       expect(results.last.name, "Kanye");
 
-      q = Query<TestModel>(context)
-        ..where((o) => o.name).not.contains("Y", caseSensitive: false);
+      q = Query<TestModel>(context)..where((o) => o.name).not.contains("Y", caseSensitive: false);
       results = await q.fetch();
       expect(results.length, 4);
       expect(results.any((tm) => tm.name == "Sally"), false);
@@ -453,14 +435,12 @@ void main() {
     });
 
     test("Case insensitive", () async {
-      var q = Query<TestModel>(context)
-        ..where((o) => o.name).beginsWith("b", caseSensitive: false);
+      var q = Query<TestModel>(context)..where((o) => o.name).beginsWith("b", caseSensitive: false);
       var results = await q.fetch();
       expect(results.length, 1);
       expect(results.first.name, "Bob");
 
-      q = Query<TestModel>(context)
-        ..where((o) => o.name).not.beginsWith("b", caseSensitive: false);
+      q = Query<TestModel>(context)..where((o) => o.name).not.beginsWith("b", caseSensitive: false);
       results = await q.fetch();
       expect(results.length, 5);
       expect(results.any((tm) => tm.name == "Bob"), false);
@@ -481,14 +461,12 @@ void main() {
     });
 
     test("Case insensitive", () async {
-      var q = Query<TestModel>(context)
-        ..where((o) => o.name).endsWith("M", caseSensitive: false);
+      var q = Query<TestModel>(context)..where((o) => o.name).endsWith("M", caseSensitive: false);
       var results = await q.fetch();
       expect(results.length, 1);
       expect(results.first.name, "Tim");
 
-      q = Query<TestModel>(context)
-        ..where((o) => o.name).not.endsWith("M", caseSensitive: false);
+      q = Query<TestModel>(context)..where((o) => o.name).not.endsWith("M", caseSensitive: false);
       results = await q.fetch();
       expect(results.length, 5);
       expect(results.any((tm) => tm.name == "Tim"), false);

@@ -118,8 +118,7 @@ class CORSPolicy {
     headers["Access-Control-Allow-Origin"] = origin;
 
     if (exposedResponseHeaders.isNotEmpty) {
-      headers["Access-Control-Expose-Headers"] =
-          exposedResponseHeaders.join(", ");
+      headers["Access-Control-Expose-Headers"] = exposedResponseHeaders.join(", ");
     }
 
     if (allowCredentials) {
@@ -167,8 +166,7 @@ class CORSPolicy {
         ?.map((str) => str.trim().toLowerCase())
         ?.toList();
     if (requestedHeaders?.isNotEmpty ?? false) {
-      var nonSimpleHeaders =
-          requestedHeaders.where((str) => !simpleRequestHeaders.contains(str));
+      var nonSimpleHeaders = requestedHeaders.where((str) => !simpleRequestHeaders.contains(str));
       if (nonSimpleHeaders.any((h) => !allowedRequestHeaders.contains(h))) {
         return false;
       }

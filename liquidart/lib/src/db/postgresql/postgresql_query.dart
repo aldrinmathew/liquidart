@@ -18,8 +18,7 @@ class PostgresQuery<InstanceType extends ManagedObject> extends Object
   ManagedContext context;
 
   @override
-  ManagedEntity get entity =>
-      _entity ?? context.dataModel.entityForType(InstanceType);
+  ManagedEntity get entity => _entity ?? context.dataModel.entityForType(InstanceType);
 
   ManagedEntity _entity;
 
@@ -150,8 +149,7 @@ class PostgresQuery<InstanceType extends ManagedObject> extends Object
     }
 
     if (builder.containsJoins && pageDescriptor != null) {
-      throw StateError(
-          "Invalid query. Cannot set both 'pageDescription' and use 'join' in query.");
+      throw StateError("Invalid query. Cannot set both 'pageDescription' and use 'join' in query.");
     }
 
     return builder;

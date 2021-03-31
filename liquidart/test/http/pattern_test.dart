@@ -15,10 +15,7 @@ void main() {
         [RouteSegment.direct(literal: "a"), RouteSegment.direct(literal: "b")]
       ]);
       expect(_segmentsForRoute("/a/:b"), [
-        [
-          RouteSegment.direct(literal: "a"),
-          RouteSegment.direct(variableName: "b")
-        ]
+        [RouteSegment.direct(literal: "a"), RouteSegment.direct(variableName: "b")]
       ]);
       expect(_segmentsForRoute("/abcd/:efgh/*"), [
         [
@@ -34,10 +31,7 @@ void main() {
         [RouteSegment.direct(expression: r"\d+")]
       ]);
       expect(_segmentsForRoute("/a/(\\d+)"), [
-        [
-          RouteSegment.direct(literal: "a"),
-          RouteSegment.direct(expression: r"\d+")
-        ]
+        [RouteSegment.direct(literal: "a"), RouteSegment.direct(expression: r"\d+")]
       ]);
       expect(_segmentsForRoute("/a/:id/(\\d+)"), [
         [
@@ -53,10 +47,7 @@ void main() {
         [RouteSegment.direct(expression: r"[^x]*")]
       ]);
       expect(_segmentsForRoute("/a/([^x])"), [
-        [
-          RouteSegment.direct(literal: "a"),
-          RouteSegment.direct(expression: "[^x]")
-        ]
+        [RouteSegment.direct(literal: "a"), RouteSegment.direct(expression: "[^x]")]
       ]);
       expect(_segmentsForRoute("/a/:id/([^\\]])"), [
         [
@@ -74,10 +65,7 @@ void main() {
       ]);
       expect(_segmentsForRoute("/a[/:b]"), [
         [RouteSegment.direct(literal: "a")],
-        [
-          RouteSegment.direct(literal: "a"),
-          RouteSegment.direct(variableName: "b")
-        ]
+        [RouteSegment.direct(literal: "a"), RouteSegment.direct(variableName: "b")]
       ]);
       expect(_segmentsForRoute("/a[/b[/c]]"), [
         [RouteSegment.direct(literal: "a")],
@@ -106,10 +94,7 @@ void main() {
       ]);
       expect(_segmentsForRoute("/a[/*]"), [
         [RouteSegment.direct(literal: "a")],
-        [
-          RouteSegment.direct(literal: "a"),
-          RouteSegment.direct(matchesAnything: true)
-        ]
+        [RouteSegment.direct(literal: "a"), RouteSegment.direct(matchesAnything: true)]
       ]);
 
       expect(_segmentsForRoute("/a/[b]"), [
@@ -158,10 +143,7 @@ void main() {
     test("Optionals with expressions that look like optionals", () {
       expect(_segmentsForRoute("/a[/([^x])]"), [
         [RouteSegment.direct(literal: "a")],
-        [
-          RouteSegment.direct(literal: "a"),
-          RouteSegment.direct(expression: "[^x]")
-        ]
+        [RouteSegment.direct(literal: "a"), RouteSegment.direct(expression: "[^x]")]
       ]);
       expect(_segmentsForRoute("/a[/:b([^x])]"), [
         [RouteSegment.direct(literal: "a")],

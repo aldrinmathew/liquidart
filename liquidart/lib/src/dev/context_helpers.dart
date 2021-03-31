@@ -3,8 +3,7 @@ import 'dart:async';
 import 'package:liquidart/liquidart.dart';
 
 Future<ManagedContext> contextWithModels(List<Type> instanceTypes) async {
-  var persistentStore =
-      PostgreSQLPersistentStore("dart", "dart", "localhost", 5432, "dart_test");
+  var persistentStore = PostgreSQLPersistentStore("dart", "dart", "localhost", 5432, "dart_test");
 
   var dataModel = ManagedDataModel(instanceTypes);
   var commands = commandsFromDataModel(dataModel, temporary: true);
@@ -17,8 +16,7 @@ Future<ManagedContext> contextWithModels(List<Type> instanceTypes) async {
   return context;
 }
 
-List<String> commandsFromDataModel(ManagedDataModel dataModel,
-    {bool temporary = false}) {
+List<String> commandsFromDataModel(ManagedDataModel dataModel, {bool temporary = false}) {
   var targetSchema = Schema.fromDataModel(dataModel);
   var builder = SchemaBuilder.toSchema(
       PostgreSQLPersistentStore(null, null, null, 5432, null), targetSchema,
@@ -26,8 +24,7 @@ List<String> commandsFromDataModel(ManagedDataModel dataModel,
   return builder.commands;
 }
 
-List<String> commandsForModelInstanceTypes(List<Type> instanceTypes,
-    {bool temporary = false}) {
+List<String> commandsForModelInstanceTypes(List<Type> instanceTypes, {bool temporary = false}) {
   var dataModel = ManagedDataModel(instanceTypes);
   return commandsFromDataModel(dataModel, temporary: temporary);
 }

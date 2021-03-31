@@ -5,8 +5,7 @@ import 'package:liquidart/src/db/query/matcher_internal.dart';
 import 'package:liquidart/src/db/query/query.dart';
 
 class ColumnExpressionBuilder extends ColumnBuilder {
-  ColumnExpressionBuilder(
-      TableBuilder table, ManagedPropertyDescription property, this.expression,
+  ColumnExpressionBuilder(TableBuilder table, ManagedPropertyDescription property, this.expression,
       {this.prefix = ""})
       : super(table, property);
 
@@ -36,8 +35,7 @@ class ColumnExpressionBuilder extends ColumnBuilder {
         "Unknown expression applied to 'Query'. '${expr.runtimeType}' is not supported by 'PostgreSQL'.");
   }
 
-  QueryPredicate comparisonPredicate(
-      PredicateOperator operator, dynamic value) {
+  QueryPredicate comparisonPredicate(PredicateOperator operator, dynamic value) {
     final name = sqlColumnName(withTableNamespace: true);
     final variableName = sqlColumnName(withPrefix: defaultPrefix);
 
@@ -46,8 +44,7 @@ class ColumnExpressionBuilder extends ColumnBuilder {
         {variableName: convertValueForStorage(value)});
   }
 
-  QueryPredicate containsPredicate(Iterable<dynamic> values,
-      {bool within = true}) {
+  QueryPredicate containsPredicate(Iterable<dynamic> values, {bool within = true}) {
     var tokenList = [];
     var pairedMap = <String, dynamic>{};
 
@@ -72,19 +69,14 @@ class ColumnExpressionBuilder extends ColumnBuilder {
     return QueryPredicate("$name ${isNull ? "ISNULL" : "NOTNULL"}", {});
   }
 
-  QueryPredicate rangePredicate(dynamic lhsValue, dynamic rhsValue,
-      {bool insideRange = true}) {
+  QueryPredicate rangePredicate(dynamic lhsValue, dynamic rhsValue, {bool insideRange = true}) {
     final name = sqlColumnName(withTableNamespace: true);
     final lhsName = sqlColumnName(withPrefix: "${defaultPrefix}lhs_");
     final rhsName = sqlColumnName(withPrefix: "${defaultPrefix}rhs_");
     final operation = insideRange ? "BETWEEN" : "NOT BETWEEN";
 
-    return QueryPredicate(
-        "$name $operation @$lhsName$sqlTypeSuffix AND @$rhsName$sqlTypeSuffix",
-        {
-          lhsName: convertValueForStorage(lhsValue),
-          rhsName: convertValueForStorage(rhsValue)
-        });
+    return QueryPredicate("$name $operation @$lhsName$sqlTypeSuffix AND @$rhsName$sqlTypeSuffix",
+        {lhsName: convertValueForStorage(lhsValue), rhsName: convertValueForStorage(rhsValue)});
   }
 
   QueryPredicate stringPredicate(PredicateStringOperator operator, String value,
@@ -114,8 +106,7 @@ class ColumnExpressionBuilder extends ColumnBuilder {
         break;
     }
 
-    return QueryPredicate("$n $operation @$variableName$sqlTypeSuffix",
-        {variableName: matchValue});
+    return QueryPredicate("$n $operation @$variableName$sqlTypeSuffix", {variableName: matchValue});
   }
 
   String escapeLikeString(String input) {

@@ -45,8 +45,7 @@ class ManagedEntity implements APIComponentDocumenter {
   ///
   /// If running in default mode (mirrors enabled), is a set of mirror operations. Otherwise,
   /// code generated.
-  ManagedEntityRuntime get runtime =>
-      RuntimeContext.current[instanceType] as ManagedEntityRuntime;
+  ManagedEntityRuntime get runtime => RuntimeContext.current[instanceType] as ManagedEntityRuntime;
 
   /// The name of type of persistent instances represented by this entity.
   ///
@@ -168,8 +167,7 @@ class ManagedEntity implements APIComponentDocumenter {
   /// If [backing] is non-null, it will be the backing map of the returned object.
   T instanceOf<T extends ManagedObject>({ManagedBacking backing}) {
     if (backing != null) {
-      return (runtime.instanceOfImplementation(backing: backing)..entity = this)
-          as T;
+      return (runtime.instanceOfImplementation(backing: backing)..entity = this) as T;
     }
     return (runtime.instanceOfImplementation()..entity = this) as T;
   }
@@ -206,13 +204,11 @@ class ManagedEntity implements APIComponentDocumenter {
     var attribute = attributes[propertyName];
     if (attribute == null) {
       if (relationships.containsKey(propertyName)) {
-        throw ArgumentError(
-            "Invalid property selection. Property '$propertyName' on "
+        throw ArgumentError("Invalid property selection. Property '$propertyName' on "
             "'$name' "
             "is a relationship and cannot be selected for this operation.");
       } else {
-        throw ArgumentError(
-            "Invalid property selection. Column '$propertyName' does not "
+        throw ArgumentError("Invalid property selection. Column '$propertyName' does not "
             "exist on table '$tableName'.");
       }
     }
@@ -224,9 +220,8 @@ class ManagedEntity implements APIComponentDocumenter {
   ///
   /// Invokes [identifyProperties] with [propertyIdentifier], and ensures that a single relationship
   /// on this entity was selected. Returns that relationship.
-  ManagedRelationshipDescription
-      identifyRelationship<T, U extends ManagedObject>(
-          T propertyIdentifier(U x)) {
+  ManagedRelationshipDescription identifyRelationship<T, U extends ManagedObject>(
+      T propertyIdentifier(U x)) {
     final keyPaths = identifyProperties(propertyIdentifier);
     if (keyPaths.length != 1) {
       throw ArgumentError(
@@ -259,12 +254,10 @@ class ManagedEntity implements APIComponentDocumenter {
   ///
   /// Invokes [identifyProperties] with [propertyIdentifier], and ensures that a single property
   /// on this entity was selected. Returns that property.
-  KeyPath identifyProperty<T, U extends ManagedObject>(
-      T propertyIdentifier(U x)) {
+  KeyPath identifyProperty<T, U extends ManagedObject>(T propertyIdentifier(U x)) {
     final properties = identifyProperties(propertyIdentifier);
     if (properties.length != 1) {
-      throw ArgumentError(
-          "Invalid property selector. Must reference a single property only.");
+      throw ArgumentError("Invalid property selector. Must reference a single property only.");
     }
 
     return properties.first;
@@ -274,8 +267,7 @@ class ManagedEntity implements APIComponentDocumenter {
   ///
   /// Each selected property in [propertiesIdentifier] is returned in a [KeyPath] object that fully identifies the
   /// property relative to this entity.
-  List<KeyPath> identifyProperties<T, U extends ManagedObject>(
-      T propertiesIdentifier(U x)) {
+  List<KeyPath> identifyProperties<T, U extends ManagedObject>(T propertiesIdentifier(U x)) {
     final tracker = ManagedAccessTrackingBacking();
     var obj = instanceOf<U>(backing: tracker);
     propertiesIdentifier(obj);
@@ -290,8 +282,7 @@ class ManagedEntity implements APIComponentDocumenter {
     final buffer = StringBuffer();
     if (uniquePropertySet != null) {
       final propString = uniquePropertySet.map((s) => "'${s.name}'").join(", ");
-      buffer.writeln(
-          "No two objects may have the same value for all of: $propString.");
+      buffer.writeln("No two objects may have the same value for all of: $propString.");
     }
 
     obj.description = buffer.toString();
@@ -360,6 +351,5 @@ abstract class ManagedEntityRuntime {
 
   String getPropertyName(Invocation invocation, ManagedEntity entity);
 
-  dynamic dynamicConvertFromPrimitiveValue(
-      ManagedPropertyDescription property, dynamic value);
+  dynamic dynamicConvertFromPrimitiveValue(ManagedPropertyDescription property, dynamic value);
 }

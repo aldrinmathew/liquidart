@@ -7,8 +7,8 @@ import 'package:liquidart/src/runtime/resource_controller_impl.dart';
 import 'package:liquidart/src/utilities/sourcify.dart';
 import 'package:runtime/runtime.dart';
 
-String getInvokerSource(BuildContext context,
-    ResourceControllerRuntimeImpl controller, ResourceControllerOperation op) {
+String getInvokerSource(BuildContext context, ResourceControllerRuntimeImpl controller,
+    ResourceControllerOperation op) {
   final buf = StringBuffer();
   final subclassName = MirrorSystem.getName(controller.type.simpleName);
 
@@ -49,12 +49,10 @@ String getApplyRequestPropertiesSource(
 
 String getResourceControllerImplSource(
     BuildContext context, ResourceControllerRuntimeImpl runtime) {
-  final ivarSources = runtime.ivarParameters
-      .map((i) => getParameterSource(context, runtime, i))
-      .join(",\n");
-  final operationSources = runtime.operations
-      .map((o) => getOperationSource(context, runtime, o))
-      .join(",\n");
+  final ivarSources =
+      runtime.ivarParameters.map((i) => getParameterSource(context, runtime, i)).join(",\n");
+  final operationSources =
+      runtime.operations.map((o) => getOperationSource(context, runtime, o)).join(",\n");
 
   return """
 class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
@@ -71,9 +69,7 @@ class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
   """;
 }
 
-String getDecoderSource(
-    BuildContext context,
-    ResourceControllerRuntimeImpl runtime,
+String getDecoderSource(BuildContext context, ResourceControllerRuntimeImpl runtime,
     ResourceControllerParameter parameter) {
   switch (parameter.location) {
     case BindingType.path:
@@ -169,8 +165,7 @@ String getElementDecoderSource(Type type) {
 
 String getListDecoderSource(ResourceControllerParameter p) {
   if (reflectType(p.type).isSubtypeOf(reflectType(List))) {
-    final mapper = getElementDecoderSource(
-      reflectType(p.type).typeArguments.first.reflectedType);
+    final mapper = getElementDecoderSource(reflectType(p.type).typeArguments.first.reflectedType);
     return """(v) {
   return ${p.type}.from((v as List).map($mapper));  
 }  """;
@@ -186,9 +181,7 @@ String getListDecoderSource(ResourceControllerParameter p) {
   """;
 }
 
-String getParameterSource(
-    BuildContext context,
-    ResourceControllerRuntimeImpl runtime,
+String getParameterSource(BuildContext context, ResourceControllerRuntimeImpl runtime,
     ResourceControllerParameter parameter) {
   return """
 ResourceControllerParameter.make<${parameter.type}>(
@@ -205,17 +198,14 @@ ResourceControllerParameter.make<${parameter.type}>(
   """;
 }
 
-String getOperationSource(
-    BuildContext context,
-    ResourceControllerRuntimeImpl runtime,
+String getOperationSource(BuildContext context, ResourceControllerRuntimeImpl runtime,
     ResourceControllerOperation operation) {
-  final scopeElements = operation.scopes?.map((s) => "AuthScope(${sourcifyValue(s.toString())})")?.join(",");
-  final namedParameters = operation.namedParameters
-      .map((p) => getParameterSource(context, runtime, p))
-      .join(",");
-  final positionalParameters = operation.positionalParameters
-      .map((p) => getParameterSource(context, runtime, p))
-      .join(",");
+  final scopeElements =
+      operation.scopes?.map((s) => "AuthScope(${sourcifyValue(s.toString())})")?.join(",");
+  final namedParameters =
+      operation.namedParameters.map((p) => getParameterSource(context, runtime, p)).join(",");
+  final positionalParameters =
+      operation.positionalParameters.map((p) => getParameterSource(context, runtime, p)).join(",");
   final pathVars = operation.pathVariables.map((s) => "'$s'").join(",");
 
   return """

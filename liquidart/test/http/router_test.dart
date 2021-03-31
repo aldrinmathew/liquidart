@@ -54,8 +54,8 @@ void main() {
 
       server = await enableRouter(router);
 
-      var response =
-          await http.get("http://localhost:4040/notplayer", headers: {HttpHeaders.acceptHeader: "application/json"});
+      var response = await http.get("http://localhost:4040/notplayer",
+          headers: {HttpHeaders.acceptHeader: "application/json"});
       expect(response.statusCode, equals(404));
       expect(response.headers[HttpHeaders.contentTypeHeader], isNull);
       expect(response.body.isEmpty, true);
@@ -155,10 +155,12 @@ void main() {
         return Response(200, null, "/locations/${req.path.variables["id"]}/vacation");
       });
       router.route("/locations/:id/alarms[/*]").linkFunction((req) async {
-        return Response(200, null, "/locations/${req.path.variables["id"]}/alarms/${req.path.remainingPath}");
+        return Response(
+            200, null, "/locations/${req.path.variables["id"]}/alarms/${req.path.remainingPath}");
       });
       router.route("/equipment/[:id[/:property]]").linkFunction((req) async {
-        return Response(200, null, "/equipment/${req.path.variables["id"]}/${req.path.variables["property"]}");
+        return Response(
+            200, null, "/equipment/${req.path.variables["id"]}/${req.path.variables["property"]}");
       });
       router.route("/file/*").linkFunction((req) async {
         return Response(200, null, "/file/${req.path.remainingPath}");
@@ -264,7 +266,9 @@ void main() {
 
     test("Router can be linked to", () async {
       final root = PassthruController();
-      final router = Router()..route("/1").link(() => NumberEmitter(1))..route("/2").link(() => NumberEmitter(2));
+      final router = Router()
+        ..route("/1").link(() => NumberEmitter(1))
+        ..route("/2").link(() => NumberEmitter(2));
 
       root.link(() => router);
 
@@ -332,8 +336,6 @@ class PrepareTailController extends Controller {
   FutureOr<RequestOrResponse> handle(Request request) {
     return request;
   }
-
-
 }
 
 class OKController extends Controller {

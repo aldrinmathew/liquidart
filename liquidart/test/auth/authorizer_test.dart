@@ -21,17 +21,11 @@ void main() {
 
     authServer = AuthServer(delegate);
 
-    accessToken = (await authServer.authenticate(
-            delegate.users[1].username,
-            InMemoryAuthStorage.defaultPassword,
-            "com.stablekernel.app1",
-            "kilimanjaro"))
+    accessToken = (await authServer.authenticate(delegate.users[1].username,
+            InMemoryAuthStorage.defaultPassword, "com.stablekernel.app1", "kilimanjaro"))
         .accessToken;
-    expiredErrorToken = (await authServer.authenticate(
-            delegate.users[1].username,
-            InMemoryAuthStorage.defaultPassword,
-            "com.stablekernel.app1",
-            "kilimanjaro",
+    expiredErrorToken = (await authServer.authenticate(delegate.users[1].username,
+            InMemoryAuthStorage.defaultPassword, "com.stablekernel.app1", "kilimanjaro",
             expiration: const Duration(seconds: 0)))
         .accessToken;
   });
@@ -54,20 +48,19 @@ void main() {
       var authorizer = Authorizer(authServer);
       server = await enableAuthorizer(authorizer);
 
-      var res = await http.get("http://localhost:8000",
-          headers: {HttpHeaders.authorizationHeader: "Notbearer"});
+      var res = await http
+          .get("http://localhost:8000", headers: {HttpHeaders.authorizationHeader: "Notbearer"});
       expect(res.statusCode, 400);
       expect(json.decode(res.body), {"error": "invalid_authorization_header"});
     });
 
-    test(
-        "Malformed, but has credential identifier, authorization bearer header returns 400",
+    test("Malformed, but has credential identifier, authorization bearer header returns 400",
         () async {
       var authorizer = Authorizer(authServer);
       server = await enableAuthorizer(authorizer);
 
-      var res = await http.get("http://localhost:8000",
-          headers: {HttpHeaders.authorizationHeader: "Bearer "});
+      var res = await http
+          .get("http://localhost:8000", headers: {HttpHeaders.authorizationHeader: "Bearer "});
       expect(res.statusCode, 400);
       expect(json.decode(res.body), {"error": "invalid_authorization_header"});
     });
@@ -76,9 +69,8 @@ void main() {
       var authorizer = Authorizer(authServer);
       server = await enableAuthorizer(authorizer);
 
-      var res = await http.get("http://localhost:8000", headers: {
-        HttpHeaders.authorizationHeader: "Bearer 1234567890asdfghjkl"
-      });
+      var res = await http.get("http://localhost:8000",
+          headers: {HttpHeaders.authorizationHeader: "Bearer 1234567890asdfghjkl"});
       expect(res.statusCode, 401);
     });
 
@@ -86,9 +78,8 @@ void main() {
       var authorizer = Authorizer.bearer(authServer);
       server = await enableAuthorizer(authorizer);
 
-      var res = await http.get("http://localhost:8000", headers: {
-        HttpHeaders.authorizationHeader: "Bearer $expiredErrorToken"
-      });
+      var res = await http.get("http://localhost:8000",
+          headers: {HttpHeaders.authorizationHeader: "Bearer $expiredErrorToken"});
       expect(res.statusCode, 401);
     });
 
@@ -99,11 +90,8 @@ void main() {
       var res = await http.get("http://localhost:8000",
           headers: {HttpHeaders.authorizationHeader: "Bearer $accessToken"});
       expect(res.statusCode, 200);
-      expect(json.decode(res.body), {
-        "clientID": "com.stablekernel.app1",
-        "resourceOwnerIdentifier": 1,
-        "credentials": null
-      });
+      expect(json.decode(res.body),
+          {"clientID": "com.stablekernel.app1", "resourceOwnerIdentifier": 1, "credentials": null});
     });
   });
 
@@ -121,8 +109,8 @@ void main() {
       var authorizer = Authorizer.basic(authServer);
       server = await enableAuthorizer(authorizer);
 
-      var res = await http.get("http://localhost:8000",
-          headers: {HttpHeaders.authorizationHeader: "Notright"});
+      var res = await http
+          .get("http://localhost:8000", headers: {HttpHeaders.authorizationHeader: "Notright"});
       expect(res.statusCode, 400);
       expect(json.decode(res.body), {"error": "invalid_authorization_header"});
     });
@@ -131,20 +119,18 @@ void main() {
       var authorizer = Authorizer.basic(authServer);
       server = await enableAuthorizer(authorizer);
 
-      var res = await http.get("http://localhost:8000",
-          headers: {HttpHeaders.authorizationHeader: "Basic "});
+      var res = await http
+          .get("http://localhost:8000", headers: {HttpHeaders.authorizationHeader: "Basic "});
       expect(res.statusCode, 400);
       expect(json.decode(res.body), {"error": "invalid_authorization_header"});
     });
 
-    test(
-        "Basic authorization, but bad data after Basic identifier, header returns 400",
-        () async {
+    test("Basic authorization, but bad data after Basic identifier, header returns 400", () async {
       var authorizer = Authorizer.basic(authServer);
       server = await enableAuthorizer(authorizer);
 
-      var res = await http.get("http://localhost:8000",
-          headers: {HttpHeaders.authorizationHeader: "Basic asasd"});
+      var res = await http
+          .get("http://localhost:8000", headers: {HttpHeaders.authorizationHeader: "Basic asasd"});
       expect(res.statusCode, 400);
       expect(json.decode(res.body), {"error": "invalid_authorization_header"});
     });
@@ -211,8 +197,7 @@ void main() {
       expect(res.statusCode, 401);
     });
 
-    test("Confidential client can never be authorized with no password",
-        () async {
+    test("Confidential client can never be authorized with no password", () async {
       var authorizer = Authorizer.basic(authServer);
       server = await enableAuthorizer(authorizer);
 
@@ -237,27 +222,18 @@ void main() {
     String userAndOtherReadOnlyScopedAccessToken;
 
     setUp(() async {
-      userReadOnlyScopedAccessToken = (await authServer.authenticate(
-              delegate.users[1].username,
-              InMemoryAuthStorage.defaultPassword,
-              "com.stablekernel.scoped",
-              "kilimanjaro",
+      userReadOnlyScopedAccessToken = (await authServer.authenticate(delegate.users[1].username,
+              InMemoryAuthStorage.defaultPassword, "com.stablekernel.scoped", "kilimanjaro",
               requestedScopes: [AuthScope("user.readonly")]))
           .accessToken;
 
-      userScopedAccessToken = (await authServer.authenticate(
-              delegate.users[1].username,
-              InMemoryAuthStorage.defaultPassword,
-              "com.stablekernel.scoped",
-              "kilimanjaro",
+      userScopedAccessToken = (await authServer.authenticate(delegate.users[1].username,
+              InMemoryAuthStorage.defaultPassword, "com.stablekernel.scoped", "kilimanjaro",
               requestedScopes: [AuthScope("user")]))
           .accessToken;
 
-      userAndOtherScopedAccessToken = (await authServer.authenticate(
-              delegate.users[1].username,
-              InMemoryAuthStorage.defaultPassword,
-              "com.stablekernel.scoped",
-              "kilimanjaro",
+      userAndOtherScopedAccessToken = (await authServer.authenticate(delegate.users[1].username,
+              InMemoryAuthStorage.defaultPassword, "com.stablekernel.scoped", "kilimanjaro",
               requestedScopes: [AuthScope("user"), AuthScope("other_scope")]))
           .accessToken;
 
@@ -266,21 +242,16 @@ void main() {
               InMemoryAuthStorage.defaultPassword,
               "com.stablekernel.scoped",
               "kilimanjaro",
-              requestedScopes: [
-            AuthScope("user"),
-            AuthScope("other_scope.readonly")
-          ]))
+              requestedScopes: [AuthScope("user"), AuthScope("other_scope.readonly")]))
           .accessToken;
     });
 
-    test("Single scoped authorizer, valid single scoped token pass authorizer",
-        () async {
+    test("Single scoped authorizer, valid single scoped token pass authorizer", () async {
       var authorizer = Authorizer.bearer(authServer, scopes: ["user"]);
       server = await enableAuthorizer(authorizer);
 
-      var res = await http.get("http://localhost:8000", headers: {
-        HttpHeaders.authorizationHeader: "Bearer $userScopedAccessToken"
-      });
+      var res = await http.get("http://localhost:8000",
+          headers: {HttpHeaders.authorizationHeader: "Bearer $userScopedAccessToken"});
       expect(res.statusCode, 200);
       expect(json.decode(res.body)["scopes"], ["user"]);
     });
@@ -291,35 +262,28 @@ void main() {
       var authorizer = Authorizer.bearer(authServer, scopes: ["user.readonly"]);
       server = await enableAuthorizer(authorizer);
 
-      var res = await http.get("http://localhost:8000", headers: {
-        HttpHeaders.authorizationHeader: "Bearer $userScopedAccessToken"
-      });
+      var res = await http.get("http://localhost:8000",
+          headers: {HttpHeaders.authorizationHeader: "Bearer $userScopedAccessToken"});
       expect(res.statusCode, 200);
       expect(json.decode(res.body)["scopes"], ["user"]);
     });
 
-    test(
-        "Single scoped authorizer, multiple scoped valid token pass authorizer",
-        () async {
+    test("Single scoped authorizer, multiple scoped valid token pass authorizer", () async {
       var authorizer = Authorizer.bearer(authServer, scopes: ["user"]);
       server = await enableAuthorizer(authorizer);
 
-      var res = await http.get("http://localhost:8000", headers: {
-        HttpHeaders.authorizationHeader: "Bearer $userAndOtherScopedAccessToken"
-      });
+      var res = await http.get("http://localhost:8000",
+          headers: {HttpHeaders.authorizationHeader: "Bearer $userAndOtherScopedAccessToken"});
       expect(res.statusCode, 200);
       expect(json.decode(res.body)["scopes"], ["user", "other_scope"]);
     });
 
-    test("Multi-scoped authorizer, multi-scoped valid token pass authorizer",
-        () async {
-      var authorizer =
-          Authorizer.bearer(authServer, scopes: ["user", "other_scope"]);
+    test("Multi-scoped authorizer, multi-scoped valid token pass authorizer", () async {
+      var authorizer = Authorizer.bearer(authServer, scopes: ["user", "other_scope"]);
       server = await enableAuthorizer(authorizer);
 
-      var res = await http.get("http://localhost:8000", headers: {
-        HttpHeaders.authorizationHeader: "Bearer $userAndOtherScopedAccessToken"
-      });
+      var res = await http.get("http://localhost:8000",
+          headers: {HttpHeaders.authorizationHeader: "Bearer $userAndOtherScopedAccessToken"});
       expect(res.statusCode, 200);
       expect(json.decode(res.body)["scopes"], ["user", "other_scope"]);
     });
@@ -327,111 +291,90 @@ void main() {
     test(
         "Multi-scoped authorizer, multi-scoped valid token with more privilegs than necessary pass authorizer",
         () async {
-      var authorizer = Authorizer.bearer(authServer,
-          scopes: ["user:foo", "other_scope.readonly"]);
+      var authorizer = Authorizer.bearer(authServer, scopes: ["user:foo", "other_scope.readonly"]);
       server = await enableAuthorizer(authorizer);
 
-      var res = await http.get("http://localhost:8000", headers: {
-        HttpHeaders.authorizationHeader: "Bearer $userAndOtherScopedAccessToken"
-      });
+      var res = await http.get("http://localhost:8000",
+          headers: {HttpHeaders.authorizationHeader: "Bearer $userAndOtherScopedAccessToken"});
       expect(res.statusCode, 200);
       expect(json.decode(res.body)["scopes"], ["user", "other_scope"]);
     });
 
     // non-passing
 
-    test(
-        "Singled scoped authorizer requiring more privileges does not pass authorizer",
-        () async {
+    test("Singled scoped authorizer requiring more privileges does not pass authorizer", () async {
       var authorizer = Authorizer.bearer(authServer, scopes: ["user"]);
       server = await enableAuthorizer(authorizer);
 
-      var res = await http.get("http://localhost:8000", headers: {
-        HttpHeaders.authorizationHeader: "Bearer $userReadOnlyScopedAccessToken"
-      });
+      var res = await http.get("http://localhost:8000",
+          headers: {HttpHeaders.authorizationHeader: "Bearer $userReadOnlyScopedAccessToken"});
       expect(res.statusCode, 403);
-      expect(json.decode(res.body),
-          {"error": "insufficient_scope", "scope": "user"});
+      expect(json.decode(res.body), {"error": "insufficient_scope", "scope": "user"});
     });
 
-    test(
-        "Singled scoped authorized requiring different privileges does not pass authorizer",
+    test("Singled scoped authorized requiring different privileges does not pass authorizer",
         () async {
       var authorizer = Authorizer.bearer(authServer, scopes: ["other_scope"]);
       server = await enableAuthorizer(authorizer);
 
-      var res = await http.get("http://localhost:8000", headers: {
-        HttpHeaders.authorizationHeader: "Bearer $userScopedAccessToken"
-      });
+      var res = await http.get("http://localhost:8000",
+          headers: {HttpHeaders.authorizationHeader: "Bearer $userScopedAccessToken"});
       expect(res.statusCode, 403);
-      expect(json.decode(res.body),
-          {"error": "insufficient_scope", "scope": "other_scope"});
+      expect(json.decode(res.body), {"error": "insufficient_scope", "scope": "other_scope"});
     });
 
-    test("Multi-scoped authorizer, single scoped token do not pass authorizer",
-        () async {
-      var authorizer =
-          Authorizer.bearer(authServer, scopes: ["user", "other_scope"]);
+    test("Multi-scoped authorizer, single scoped token do not pass authorizer", () async {
+      var authorizer = Authorizer.bearer(authServer, scopes: ["user", "other_scope"]);
       server = await enableAuthorizer(authorizer);
 
-      var res = await http.get("http://localhost:8000", headers: {
-        HttpHeaders.authorizationHeader: "Bearer $userScopedAccessToken"
-      });
+      var res = await http.get("http://localhost:8000",
+          headers: {HttpHeaders.authorizationHeader: "Bearer $userScopedAccessToken"});
       expect(res.statusCode, 403);
-      expect(json.decode(res.body),
-          {"error": "insufficient_scope", "scope": "user other_scope"});
+      expect(json.decode(res.body), {"error": "insufficient_scope", "scope": "user other_scope"});
     });
 
     test(
         "Multi-scoped authorizer, multi-scoped token but with different scopes do not pass authorzer",
         () async {
-      var authorizer =
-          Authorizer.bearer(authServer, scopes: ["other", "something_else"]);
+      var authorizer = Authorizer.bearer(authServer, scopes: ["other", "something_else"]);
       server = await enableAuthorizer(authorizer);
 
-      var res = await http.get("http://localhost:8000", headers: {
-        HttpHeaders.authorizationHeader: "Bearer $userScopedAccessToken"
-      });
+      var res = await http.get("http://localhost:8000",
+          headers: {HttpHeaders.authorizationHeader: "Bearer $userScopedAccessToken"});
       expect(res.statusCode, 403);
-      expect(json.decode(res.body),
-          {"error": "insufficient_scope", "scope": "other something_else"});
+      expect(
+          json.decode(res.body), {"error": "insufficient_scope", "scope": "other something_else"});
     });
 
     test(
         "Multi-scoped authorizer, multi-scoped token but with less privileges on one scope do not pass authorizer",
         () async {
-      var authorizer =
-          Authorizer.bearer(authServer, scopes: ["user", "other_scope"]);
+      var authorizer = Authorizer.bearer(authServer, scopes: ["user", "other_scope"]);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get("http://localhost:8000", headers: {
-        HttpHeaders.authorizationHeader:
-            "Bearer $userAndOtherReadOnlyScopedAccessToken"
+        HttpHeaders.authorizationHeader: "Bearer $userAndOtherReadOnlyScopedAccessToken"
       });
       expect(res.statusCode, 403);
-      expect(json.decode(res.body),
-          {"error": "insufficient_scope", "scope": "user other_scope"});
+      expect(json.decode(res.body), {"error": "insufficient_scope", "scope": "user other_scope"});
     });
   });
 
   group("Exceptions", () {
-    test("Actual status code returned for exception in basic authorizer",
-        () async {
+    test("Actual status code returned for exception in basic authorizer", () async {
       var anotherAuthServer = AuthServer(CrashingStorage());
       server = await enableAuthorizer(Authorizer.basic(anotherAuthServer));
       var res = await http.get("http://localhost:8000", headers: {
-        HttpHeaders.authorizationHeader:
-            "Basic ${const Base64Encoder().convert("a:".codeUnits)}"
+        HttpHeaders.authorizationHeader: "Basic ${const Base64Encoder().convert("a:".codeUnits)}"
       });
       expect(res.statusCode, 504);
     });
 
-    test("Actual status code returned for exception in bearer authorizer",
-        () async {
+    test("Actual status code returned for exception in bearer authorizer", () async {
       var anotherAuthServer = AuthServer(CrashingStorage());
       server = await enableAuthorizer(Authorizer.bearer(anotherAuthServer));
-      var res = await http.get("http://localhost:8000",
-          headers: {HttpHeaders.authorizationHeader: "Bearer axy"});
+      var res = await http
+          .get("http://localhost:8000", headers: {HttpHeaders.authorizationHeader: "Bearer axy"});
       expect(res.statusCode, 504);
     });
   });
@@ -452,8 +395,7 @@ void main() {
       expect(auth.isAuthorizedForScope("b"), false);
     });
 
-    test("Authorization does not have access to higher privileged scope",
-        () async {
+    test("Authorization does not have access to higher privileged scope", () async {
       var auth = Authorization("id", 1, null, scopes: [AuthScope("a:foo")]);
       expect(auth.isAuthorizedForScope("a"), false);
     });

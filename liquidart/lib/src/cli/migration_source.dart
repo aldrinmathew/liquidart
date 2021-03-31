@@ -20,7 +20,7 @@ class MigrationSource {
     final migrationTypes = analyzer.getSubclassesFromFile("Migration", uri);
     if (migrationTypes.length != 1) {
       throw StateError(
-        "Invalid migration file. Must contain exactly one 'Migration' subclass. File: '$uri'.");
+          "Invalid migration file. Must contain exactly one 'Migration' subclass. File: '$uri'.");
     }
 
     final klass = migrationTypes.first;
@@ -30,12 +30,7 @@ class MigrationSource {
   }
 
   Map<String, dynamic> asMap() {
-    return {
-      "originalName": originalName,
-      "name": name,
-      "source": source,
-      "uri": uri
-    };
+    return {"originalName": originalName, "name": name, "source": source, "uri": uri};
   }
 
   static String combine(List<MigrationSource> sources) {

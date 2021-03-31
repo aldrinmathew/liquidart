@@ -14,8 +14,7 @@ class CodecRegistry {
   CodecRegistry._() {
     add(ContentType("application", "json", charset: "utf-8"), const JsonCodec(),
         allowCompression: true);
-    add(ContentType("application", "x-www-form-urlencoded", charset: "utf-8"),
-        const _FormCodec(),
+    add(ContentType("application", "x-www-form-urlencoded", charset: "utf-8"), const _FormCodec(),
         allowCompression: true);
     setAllowsCompression(ContentType("text", "*"), true);
     setAllowsCompression(ContentType("application", "javascript"), true);
@@ -65,8 +64,7 @@ class CodecRegistry {
   /// In the event that a request is sent without a charset, the codec will automatically apply a UTF8 decode step because of this default.
   ///
   /// Only use default charsets when the codec must first be decoded into a [String].
-  void add(ContentType contentType, Codec codec,
-      {bool allowCompression = true}) {
+  void add(ContentType contentType, Codec codec, {bool allowCompression = true}) {
     if (contentType.subType == "*") {
       _primaryTypeCodecs[contentType.primaryType] = codec;
       _primaryTypeCompressionMap[contentType.primaryType] = allowCompression;
@@ -75,8 +73,7 @@ class CodecRegistry {
       innerCodecs[contentType.subType] = codec;
       _fullySpecificedCodecs[contentType.primaryType] = innerCodecs;
 
-      var innerCompress =
-          _fullySpecifiedCompressionMap[contentType.primaryType] ?? {};
+      var innerCompress = _fullySpecifiedCompressionMap[contentType.primaryType] ?? {};
       innerCompress[contentType.subType] = allowCompression;
       _fullySpecifiedCompressionMap[contentType.primaryType] = innerCompress;
     }
@@ -97,8 +94,7 @@ class CodecRegistry {
     if (contentType.subType == "*") {
       _primaryTypeCompressionMap[contentType.primaryType] = allowed;
     } else {
-      var innerCompress =
-          _fullySpecifiedCompressionMap[contentType.primaryType] ?? {};
+      var innerCompress = _fullySpecifiedCompressionMap[contentType.primaryType] ?? {};
       innerCompress[contentType.subType] = allowed;
       _fullySpecifiedCompressionMap[contentType.primaryType] = innerCompress;
     }
@@ -108,8 +104,7 @@ class CodecRegistry {
   ///
   /// See also [setAllowsCompression].
   bool isContentTypeCompressable(ContentType contentType) {
-    var subtypeCompress =
-        _fullySpecifiedCompressionMap[contentType.primaryType];
+    var subtypeCompress = _fullySpecifiedCompressionMap[contentType.primaryType];
     if (subtypeCompress != null) {
       if (subtypeCompress.containsKey(contentType.subType)) {
         return subtypeCompress[contentType.subType];

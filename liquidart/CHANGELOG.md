@@ -1,4 +1,6 @@
 ## 4.0.0-b2
+- Updated Package Code and Documentation Links.
+- Refactored and formatted all code to meet pub.dev publishing guidelines.
 - New version to correctly resolve liquidart_test dependency.
 
 ## 4.0.0-b1

@@ -43,10 +43,7 @@ void main() {
     test("Can get all objects", () async {
       var resp = await client.request("/controller").get();
       var sublist = allObjects.sublist(1);
-      expect(
-          resp,
-          hasResponse(200,
-              body: {"data": sublist.map((m) => m.asMap()).toList()}));
+      expect(resp, hasResponse(200, body: {"data": sublist.map((m) => m.asMap()).toList()}));
     });
 
     test("Can update an object", () async {
@@ -56,16 +53,12 @@ void main() {
         "createdAt": allObjects[1].createdAt.toIso8601String()
       };
 
-      var resp = await (client.request("/controller/2")
-            ..body = {"name": "Fred"})
-          .put();
+      var resp = await (client.request("/controller/2")..body = {"name": "Fred"}).put();
       expect(resp, hasResponse(200, body: {"data": expectedMap}));
     });
 
     test("Missing object for update returns overridden status code", () async {
-      var resp = await (client.request("/controller/25")
-            ..body = {"name": "Fred"})
-          .put();
+      var resp = await (client.request("/controller/25")..body = {"name": "Fred"}).put();
 
       expect(resp, hasStatus(403));
     });
@@ -108,14 +101,12 @@ class TestChannel extends ApplicationChannel {
   @override
   Future prepare() async {
     var dataModel = ManagedDataModel([TestModel]);
-    var persistentStore = PostgreSQLPersistentStore(
-        "dart", "dart", "localhost", 5432, "dart_test");
+    var persistentStore = PostgreSQLPersistentStore("dart", "dart", "localhost", 5432, "dart_test");
     context = ManagedContext(dataModel, persistentStore);
 
     var targetSchema = Schema.fromDataModel(context.dataModel);
-    var schemaBuilder = SchemaBuilder.toSchema(
-        context.persistentStore, targetSchema,
-        isTemporary: true);
+    var schemaBuilder =
+        SchemaBuilder.toSchema(context.persistentStore, targetSchema, isTemporary: true);
 
     var commands = schemaBuilder.commands;
     for (var cmd in commands) {
@@ -145,8 +136,7 @@ class Subclass extends ManagedObjectController<TestModel> {
   Subclass(ManagedContext context) : super(context);
 
   @override
-  Future<Query<TestModel>> willFindObjectWithQuery(
-      Query<TestModel> query) async {
+  Future<Query<TestModel>> willFindObjectWithQuery(Query<TestModel> query) async {
     query.where((o) => o.name).oneOf(["1", "2", "3"]);
     return query;
   }
@@ -162,8 +152,7 @@ class Subclass extends ManagedObjectController<TestModel> {
   }
 
   @override
-  Future<Query<TestModel>> willInsertObjectWithQuery(
-      Query<TestModel> query) async {
+  Future<Query<TestModel>> willInsertObjectWithQuery(Query<TestModel> query) async {
     query.values.name = "Mr. ${query.values.name}";
     return query;
   }
@@ -174,8 +163,7 @@ class Subclass extends ManagedObjectController<TestModel> {
   }
 
   @override
-  Future<Query<TestModel>> willDeleteObjectWithQuery(
-      Query<TestModel> query) async {
+  Future<Query<TestModel>> willDeleteObjectWithQuery(Query<TestModel> query) async {
     if (request.path.variables["id"] == "3") {
       throw Response(301, null, {"error": "invalid"});
     }
@@ -193,8 +181,7 @@ class Subclass extends ManagedObjectController<TestModel> {
   }
 
   @override
-  Future<Query<TestModel>> willUpdateObjectWithQuery(
-      Query<TestModel> query) async {
+  Future<Query<TestModel>> willUpdateObjectWithQuery(Query<TestModel> query) async {
     query.values.name = "Mr. ${query.values.name}";
     return query;
   }
@@ -210,8 +197,7 @@ class Subclass extends ManagedObjectController<TestModel> {
   }
 
   @override
-  Future<Query<TestModel>> willFindObjectsWithQuery(
-      Query<TestModel> query) async {
+  Future<Query<TestModel>> willFindObjectsWithQuery(Query<TestModel> query) async {
     query.where((o) => o.id).greaterThan(1);
     return query;
   }

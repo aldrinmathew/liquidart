@@ -6,8 +6,7 @@ import 'package:liquidart/src/cli/mixins/database_managing.dart';
 import 'package:liquidart/src/cli/mixins/project.dart';
 import 'package:liquidart/src/cli/scripts/get_schema.dart';
 
-class CLIDatabaseSchema extends CLICommand
-    with CLIDatabaseManagingCommand, CLIProject {
+class CLIDatabaseSchema extends CLICommand with CLIDatabaseManagingCommand, CLIProject {
   @override
   Future<int> handle() async {
     var map = (await getProjectSchema(this)).asMap();

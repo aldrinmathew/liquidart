@@ -15,9 +15,7 @@ import 'package:runtime/runtime.dart';
 ///
 /// Most applications do not need to access instances of this type.
 ///
-class ManagedDataModel extends Object
-    with ReferenceCountable
-    implements APIComponentDocumenter {
+class ManagedDataModel extends Object with ReferenceCountable implements APIComponentDocumenter {
   /// Creates an instance of [ManagedDataModel] from a list of types that extend [ManagedObject]. It is preferable
   /// to use [ManagedDataModel.fromCurrentMirrorSystem] over this method.
   ///
@@ -25,12 +23,10 @@ class ManagedDataModel extends Object
   ///
   ///       new DataModel([User, Token, Post]);
   ManagedDataModel(List<Type> instanceTypes) {
-    final runtimes = RuntimeContext.current.runtimes.iterable
-        .whereType<ManagedEntityRuntime>()
-        .toList();
+    final runtimes =
+        RuntimeContext.current.runtimes.iterable.whereType<ManagedEntityRuntime>().toList();
     final expectedRuntimes = instanceTypes
-        .map((t) => runtimes.firstWhere((e) => e.entity.instanceType == t,
-            orElse: () => null))
+        .map((t) => runtimes.firstWhere((e) => e.entity.instanceType == t, orElse: () => null))
         .toList();
 
     final notFound = expectedRuntimes.where((e) => e == null).toList();
@@ -41,8 +37,7 @@ class ManagedDataModel extends Object
 
     expectedRuntimes.forEach((runtime) {
       _entities[runtime.entity.instanceType] = runtime.entity;
-      _tableDefinitionToEntityMap[runtime.entity.tableDefinition] =
-          runtime.entity;
+      _tableDefinitionToEntityMap[runtime.entity.tableDefinition] = runtime.entity;
     });
     expectedRuntimes.forEach((runtime) => runtime.finalize(this));
   }
@@ -57,13 +52,11 @@ class ManagedDataModel extends Object
   ///
   /// This is the preferred method of instantiating this type.
   ManagedDataModel.fromCurrentMirrorSystem() {
-    final runtimes = RuntimeContext.current.runtimes.iterable
-        .whereType<ManagedEntityRuntime>();
+    final runtimes = RuntimeContext.current.runtimes.iterable.whereType<ManagedEntityRuntime>();
 
     runtimes.forEach((runtime) {
       _entities[runtime.entity.instanceType] = runtime.entity;
-      _tableDefinitionToEntityMap[runtime.entity.tableDefinition] =
-          runtime.entity;
+      _tableDefinitionToEntityMap[runtime.entity.tableDefinition] = runtime.entity;
     });
     runtimes.forEach((runtime) => runtime.finalize(this));
   }
