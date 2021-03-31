@@ -10,7 +10,7 @@ class CLISetup extends CLICommand with CLIProject {
 
   @Option("heroku",
       help:
-          "DEPRECATED. Please see https://liquidart.io/docs/deploy/deploy_heroku/.")
+          "DEPRECATED. Please see https://aqueduct.io/docs/deploy/deploy_heroku/.")
   String get herokuName => decode("heroku");
 
   @Flag("tests",
@@ -35,7 +35,7 @@ class CLISetup extends CLICommand with CLIProject {
   Future<int> handle() async {
     if (shouldSetupHeroku) {
       displayInfo("This option has been deprecated.");
-      displayProgress("Please see https://liquidart.io/docs/deploy/deploy_heroku/ for instructions.");
+      displayProgress("Please see https://aqueduct.io/docs/deploy/deploy_heroku/ for instructions.");
       return 0;
     } else /*if (shouldSetupTests*/ {
       return setupTestEnvironment();

@@ -13,7 +13,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 /// The core libraries of the liquidart framework.
 ///
-/// See documentation guides at https://liquidart.io/docs/.
+/// See documentation guides at https://aqueduct.io/docs/.
 library liquidart;
 
 export 'package:logging/logging.dart';

@@ -4,7 +4,7 @@ import 'package:wildfire/wildfire.dart';
 /// This type initializes an application.
 ///
 /// Override methods in this class to set up routes and initialize services like
-/// database connections. See http://liquidart.io/docs/http/channel/.
+/// database connections. See http://aqueduct.io/docs/http/channel/.
 class WildfireChannel extends ApplicationChannel {
   ManagedContext context;
 
@@ -62,7 +62,7 @@ class WildfireChannel extends ApplicationChannel {
 /// file specific to this application.
 ///
 /// Configuration files must have key-value for the properties in this class.
-/// For more documentation on configuration files, see https://liquidart.io/docs/configure/ and
+/// For more documentation on configuration files, see https://aqueduct.io/docs/configure/ and
 /// https://pub.dartlang.org/packages/safe_config.
 class WildfireConfiguration extends Configuration {
   WildfireConfiguration(String fileName) : super.fromFile(File(fileName));

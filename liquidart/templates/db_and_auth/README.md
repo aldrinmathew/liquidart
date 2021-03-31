@@ -2,7 +2,7 @@
 
 ## Database
 
-You will need a local database for testing, and another database for running the application locally. The behavior and configuration of these databases are documented here: http://liquidart.io/docs/testing/mixins/.
+You will need a local database for testing, and another database for running the application locally. The behavior and configuration of these databases are documented here: http://aqueduct.io/docs/testing/mixins/.
 
 To run tests, you must have a configuration file named `config.src.yaml`. By default, it is configured to connect your application to a database named `dart_test` (documented in the link above) and should not need to be edited. Tables are automatically created and deleted during test execution.
 
@@ -24,7 +24,7 @@ liquidart auth add-client --id com.local.test \
     --connect postgres://user:password@localhost:5432/wildfire
 ```
 
-To run your tests with OAuth 2.0 client identifiers, see this documentation: http://liquidart.io/docs/testing/mixins/#testing-applications-that-use-oauth-20.
+To run your tests with OAuth 2.0 client identifiers, see this documentation: http://aqueduct.io/docs/testing/mixins/#testing-applications-that-use-oauth-20.
 
 ## Running the server locally
 
@@ -154,4 +154,4 @@ The default configuration file used when testing is `config.src.yaml`. This file
 
 ## Deploying an Application
 
-See the documentation for [Deployment](https://liquidart.io/docs/deploy/).
+See the documentation for [Deployment](https://aqueduct.io/docs/deploy/).
