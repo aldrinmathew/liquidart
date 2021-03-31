@@ -14,12 +14,12 @@ Open the project directory in an [IntelliJ IDE](https://www.jetbrains.com/idea/d
 
 There are different approaches depending on how you prefer to learn.
 
-- The [guided tutorial](https://liquidart.aldrinsartfactory.com/documentation/tut/getting-started/) is a hands-on walkthrough where you build an application while learning basic Liquidart concepts.
+- The [guided tutorial](https://aldrinsartfactory.github.io/liquidart/tutorial/getting-started/) is a hands-on walkthrough where you build an application while learning basic Liquidart concepts.
 - The [example repository](https://github.com/stablekernel/liquidart_examples) contains a few deployable applications that you may review or tinker with.
 - The guides (located in the menu on this website) dive deeply into the concepts of Liquidart and show example code.
-- [Creating a new project](https://liquidart.aldrinsartfactory.com/documentation/getting_started/#creating-a-project) and using the [API reference](https://pub.dev/documentation/liquidart/latest/) to jump right in.
+- [Creating a new project](https://aldrinsartfactory.github.io/liquidart/getting_started/#creating-a-project) and using the [API reference](https://pub.dev/documentation/liquidart/latest/) to jump right in.
 
-It is best to first understand how HTTP requests are responded to - the foundation of Liquidart - before moving on to topics such as the ORM and OAuth 2.0. Both the tutorial and the [HTTP guides](https://liquidart.aldrinsartfactory.com/documentation/http/) are the primary source of this information. A project created by the liquidart tool has example routes connected for modification, too.
+It is best to first understand how HTTP requests are responded to - the foundation of Liquidart - before moving on to topics such as the ORM and OAuth 2.0. Both the tutorial and the [HTTP guides](https://aldrinsartfactory.github.io/liquidart/http/) are the primary source of this information. A project created by the liquidart tool has example routes connected for modification, too.
 
 ## Creating a Project
 
@@ -90,4 +90,4 @@ liquidart db generate
 liquidart db upgrade --connect postgres://dart_app:dart@localhost:5432/my_database_name
 ```
 
-See the guides on [connecting to a database](https://liquidart.aldrinsartfactory.com/documentation/db/connecting/) and [testing with a database](https://liquidart.aldrinsartfactory.com/documentation/testing/mixins/) for more details on configuring a database connection.
+See the guides on [connecting to a database](https://aldrinsartfactory.github.io/liquidart/db/connecting/) and [testing with a database](https://aldrinsartfactory.github.io/liquidart/testing/mixins/) for more details on configuring a database connection.

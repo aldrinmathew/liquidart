@@ -61,7 +61,7 @@ In IntelliJ IDEA, right-click on any file with a `main` function (which includes
 
 ## Use the Suggested Project Directory Structure
 
-See [Liquidart Project Structure](https://liquidart.aldrinsartfactory.com/documentation/application/structure/#liquidart-project-structure-and-organization).
+See [Liquidart Project Structure](https://aldrinsartfactory.github.io/liquidart/application/structure/#liquidart-project-structure-and-organization).
 
 ## Pass Services to Controllers in entryPoint
 
@@ -101,19 +101,19 @@ Minimize the access a controller has to its dependencies; e.g. don't pass it a `
 
 ## Use a Test Harness
 
-A test harness initializes your application in a test suite. It has built in behavior that you can add to for things that are specific to your application. Documentation for using a test harness in your application is located [here](https://liquidart.aldrinsartfactory.com/documentation/testing/tests/).
+A test harness initializes your application in a test suite. It has built in behavior that you can add to for things that are specific to your application. Documentation for using a test harness in your application is located [here](https://aldrinsartfactory.github.io/liquidart/testing/tests/).
 
 ## Use config.src.yaml
 
-Use the convention of [config.src.yaml](https://liquidart.aldrinsartfactory.com/documentation/application/configure/) file to prevent configuration errors and inject test dependencies.
+Use the convention of [config.src.yaml](https://aldrinsartfactory.github.io/liquidart/application/configure/) file to prevent configuration errors and inject test dependencies.
 
 ## Understand how Liquidart Uses Isolates
 
-See more in [Application Structure](https://liquidart.aldrinsartfactory.com/documentation/application/structure/).
+See more in [Application Structure](https://aldrinsartfactory.github.io/liquidart/application/structure/).
 
 ## Use ResourceController Subclasses
 
-Subclassing [ResourceController](https://liquidart.aldrinsartfactory.com/documentation/http/resource_controller/) provides significant conveniences, safeties and behaviors used by the majority of an application's request handling logic. Prefer to use this class for non-middleware controllers.
+Subclassing [ResourceController](https://aldrinsartfactory.github.io/liquidart/http/resource_controller/) provides significant conveniences, safeties and behaviors used by the majority of an application's request handling logic. Prefer to use this class for non-middleware controllers.
 
 ## Keep ApplicationChannel Tidy
 

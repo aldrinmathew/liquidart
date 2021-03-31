@@ -14,7 +14,7 @@ Resources are identified by the path of an HTTP request. For example, the URL `h
 
 An application exposes routes for each resource it manages. A route is a string that matches the path of a request. When a request's path matches a route, the associated handler is invoked to handle the request. Routes look like paths, but have some additional syntax. For example, the route /organizations will match requests with the path /organizations. The route `/organizations/:id` will match the paths `/organizations/1`, `/organizations/2`, and so on.
 
-Complex routes can be formed with additional syntax. See the guide on [routing](https://liquidart.aldrinsartfactory.com/documentation/http/routing/) for usage details.
+Complex routes can be formed with additional syntax. See the guide on [routing](https://aldrinsartfactory.github.io/liquidart/http/routing/) for usage details.
 
 ## Controllers
 
@@ -32,7 +32,7 @@ A channel must have exactly one endpoint controller. It can be preceded by zero 
 
 The application channel is an object that contains all of the controllers in an application. It designates one controller as the first controller to receive every request called its entry point. Controllers are linked to the entry point (directly or transitively) to form the entire application channel. In nearly every application, the entry point is a router; this controller splits the channel into sub-channels for a given route.
 
-The application channel is also responsible for initializing the application's services, reading configuration files and other startup related tasks. See the guide on the [Application Channel](https://liquidart.aldrinsartfactory.com/documentation/application/channel/) for more details.
+The application channel is also responsible for initializing the application's services, reading configuration files and other startup related tasks. See the guide on the [Application Channel](https://aldrinsartfactory.github.io/liquidart/application/channel/) for more details.
 
 ## Services
 
@@ -40,7 +40,7 @@ A service is an object that encapsulates complex tasks or algorithms, external c
 
 The primary user of service objects are controllers. Services are injected into controllers by passing them as arguments to the controller's constructor. The controller keeps a reference to the service, so that it can use it when handling a request.
 
-For more details on injecting services, see the guide on the [Application Channel](https://liquidart.aldrinsartfactory.com/documentation/application/channel/).
+For more details on injecting services, see the guide on the [Application Channel](https://aldrinsartfactory.github.io/liquidart/application/channel/).
 
 ## Isolates
 
@@ -52,23 +52,23 @@ A benefit to this structure is that each isolate has its own set of services, li
 
 A request might contain headers, query parameters, a body and path parameters that need to be parsed, validated and used in controller code. Bindings are annotations added to variables that perform this parsing and validation automatically. Appropriate error responses are sent when a bound value can't be parsed into expected type or validation fails.
 
-Bindings cut down on boiler plate code and reduce testing surface, making development faster and code easier to reason about. For more information on bindings, see the guide on [Resource Controllers](https://liquidart.aldrinsartfactory.com/documentation/http/resource_controller/).
+Bindings cut down on boiler plate code and reduce testing surface, making development faster and code easier to reason about. For more information on bindings, see the guide on [Resource Controllers](https://aldrinsartfactory.github.io/liquidart/http/resource_controller/).
 
 ## Queries and Data Models
 Application store information in databases for persistence. Writing database queries by hand is error-prone and doesn't leverage static analysis tools that are so valuable in a Dart application. Liquidart's ORM (Object-Relational Mapping) provides statically-typed queries that are easy to write and test.
 
 Your application's data model is defined by creating Dart classes. Each class is mapped to a database table, and each property of that class is mapped to a column in that table. Liquidart's command-line tool generates database migration files that detect changes in your data model that can be applied to a live, versioned database. A data model can also be represented as a JSON object to build tools on top of your application.
 
-For more details, see the guide on [Databases](https://liquidart.aldrinsartfactory.com/documentation/db/).
+For more details, see the guide on [Databases](https://aldrinsartfactory.github.io/liquidart/db/).
 
 ## Authorization
 
 OAuth 2.0 is a standardized authorization framework. Liquidart contains a specification-compliant implementation of an OAuth 2.0 server that can be integrated directly into your application, or stood up alone to provide an authorization server for federated services. This implementation is easily customizable - it can store authorization artifacts - like tokens and client identifiers - in different types of databases or use stateless authorization mechanisms like JWT. The default implementation leverages the Liquidart ORM to store artifacts in PostgreSQL.
 
-For more details, see the guide on [Authorization](https://liquidart.aldrinsartfactory.com/documentation/auth/).
+For more details, see the guide on [Authorization](https://aldrinsartfactory.github.io/liquidart/auth/).
 
 ## Documentation
 
 OpenAPI 3.0 is a standardized documentation format for HTTP APIs. Many built-in Liquidart objects support 'automatic' documentation. Objects that are specific to your application can build on top of this to immediately document your application for every change you make.
 
-For more details, see the guide on [OpenAPI Documentation](https://liquidart.aldrinsartfactory.com/documentation/openapi/).
+For more details, see the guide on [OpenAPI Documentation](https://aldrinsartfactory.github.io/liquidart/openapi/).

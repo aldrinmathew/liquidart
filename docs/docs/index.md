@@ -23,7 +23,7 @@ In addition to these guides, be sure to use the [API Reference](https://pub.dev/
 
 ## Getting Started Tips
 
-The best way to get started is to read the [Core Concepts](https://liquidart.aldrinsartfactory.com/documentation/core_concepts/) guide while working through the [tutorial](https://liquidart.aldrinsartfactory.com/documentation/tut/getting-started/). Then, add new features to the application created during the tutorial by looking up the classes you are using in the [API Reference](https://pub.dev/documentation/liquidart/latest), and implementing behavior not found in the tutorial.
+The best way to get started is to read the [Core Concepts](https://aldrinsartfactory.github.io/liquidart/core_concepts/) guide while working through the [tutorial](https://aldrinsartfactory.github.io/liquidart/tutorial/getting-started/). Then, add new features to the application created during the tutorial by looking up the classes you are using in the [API Reference](https://pub.dev/documentation/liquidart/latest), and implementing behavior not found in the tutorial.
 
 Once you have the basic concepts down, start reading the guides in the left hand menu to take advantage of the many features of the framework. Check out the repository of examples here.
 

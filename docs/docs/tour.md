@@ -16,7 +16,7 @@ liquidart serve
 
 ## Initialization
 
-An Liquidart application starts at an [ApplicationChannel](https://liquidart.aldrinsartfactory.com/documentation/application/channel/). You subclass it once per application to handle initialization tasks like setting up routes and database connections. An example application looks like this:
+An Liquidart application starts at an [ApplicationChannel](https://aldrinsartfactory.github.io/liquidart/application/channel/). You subclass it once per application to handle initialization tasks like setting up routes and database connections. An example application looks like this:
 
 ```dart
 import 'package:liquidart/liquidart.dart';
@@ -43,7 +43,7 @@ class TodoApp extends ApplicationChannel {
 ```
 
 ## Routing
-A [router](https://liquidart.aldrinsartfactory.com/documentation/http/routing/) determines which controller object should handle a request. The route specification syntax is a concise syntax to construct routes with variables and optional segments in a single statement.
+A [router](https://aldrinsartfactory.github.io/liquidart/http/routing/) determines which controller object should handle a request. The route specification syntax is a concise syntax to construct routes with variables and optional segments in a single statement.
 
 ```dart
 @override
@@ -71,7 +71,7 @@ Controller get entryPoint {
 
 ## Controllers
 
-[Controllers](https://liquidart.aldrinsartfactory.com/documentation/http/controller/) handle requests. A controller handles a request by overriding its handle method. This method either returns a response or a request. If a response is returned, that response is sent to the client. If the request is returned, the linked controller handles the request.
+[Controllers](https://aldrinsartfactory.github.io/liquidart/http/controller/) handle requests. A controller handles a request by overriding its handle method. This method either returns a response or a request. If a response is returned, that response is sent to the client. If the request is returned, the linked controller handles the request.
 
 ```dart
 class SecretKeyAuthorizer extends Controller {
@@ -92,7 +92,7 @@ All controllers execute their code in an exception handler. If an exception is t
 
 ### ResourceControllers
 
-[ResourceControllers](https://liquidart.aldrinsartfactory.com/documentation/http/resource_controller/) are the most often used controller. Each operation - e.g. `POST /projects`, `GET /projects` and `GET /projects/1` - is mapped to methods in a subclass. Parameters of those methods are annotated to bind the values of the request when the method is invoked.
+[ResourceControllers](https://aldrinsartfactory.github.io/liquidart/http/resource_controller/) are the most often used controller. Each operation - e.g. `POST /projects`, `GET /projects` and `GET /projects/1` - is mapped to methods in a subclass. Parameters of those methods are annotated to bind the values of the request when the method is invoked.
 
 ```dart
 import 'package:liquidart/liquidart.dart'
@@ -381,7 +381,7 @@ class WildfireChannel extends ApplicationChannel {
 
 ## Testing
 
-Liquidart tests start a local version of your application and execute requests. You write expectations on the responses. A [TestHarness](https://liquidart.aldrinsartfactory.com/documentation/testing/tests/) manages the starting and stopping of an application, and exposes a default `Agent` for executing requests. An `Agent` can be configured to have default headers, and multiple agents can be used within the same test.
+Liquidart tests start a local version of your application and execute requests. You write expectations on the responses. A [TestHarness](https://aldrinsartfactory.github.io/liquidart/testing/tests/) manages the starting and stopping of an application, and exposes a default `Agent` for executing requests. An `Agent` can be configured to have default headers, and multiple agents can be used within the same test.
 
 ```dart
 import 'harness/app.dart';
@@ -404,7 +404,7 @@ void main() {
 
 Liquidart's ORM uses PostgreSQL as its database. Before your tests run, Liquidart will create your application's database tables in a local PostgreSQL database. After the tests complete, it will delete those tables. This allows you to start with an empty database for each test suite as well as control exactly which records are in your database while testing, but without having to manage database schemas or use an mock implementation (e.g., SQLite).
 
-This behavior, and behavior for managing applications with an OAuth 2.0 provider, are available as [harness mixins](https://liquidart.aldrinsartfactory.com/documentation/testing/mixins/).
+This behavior, and behavior for managing applications with an OAuth 2.0 provider, are available as [harness mixins](https://aldrinsartfactory.github.io/liquidart/testing/mixins/).
 
 ### Documentation
 

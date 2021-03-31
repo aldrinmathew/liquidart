@@ -172,7 +172,7 @@ SELECT id, name FROM _question WHERE id = 1;
 The where method uses the *property selector* syntax. This syntax is a closure that takes an argument of the type being queried, and must return a property of that object. This creates an expression object that targets the selected property. By invoking methods like `equalTo` on this expression object, a boolean expression is added to the query.
 
 !!! tip "Property Selectors"
-    Many query configuration methods use the property selector syntax. Setting up a keyboard shortcut (called a Live Template in IntelliJ) to enter the syntax is beneficial. A downloadable settings configuration for IntelliJ exists [here](https://liquidart.aldrinsartfactory.com/documentation/intellij/) that includes this shortcut.
+    Many query configuration methods use the property selector syntax. Setting up a keyboard shortcut (called a Live Template in IntelliJ) to enter the syntax is beneficial. A downloadable settings configuration for IntelliJ exists [here](https://aldrinsartfactory.github.io/liquidart/intellij/) that includes this shortcut.
 
 The `fetchOne()` execution method will fetch a single object that fulfills all of the expressions applied to the query. If no database row meets the criteria, `null` is returned. Our controller returns a 404 Not Found response in that scenario.
 
@@ -258,7 +258,7 @@ Apply this migration file to our locally running `heroes` database with the foll
 liquidart db upgrade --connect postgres://heroes_user:password@localhost:5432/heroes
 ```
 
-Re-run your application with `liquidart serve`. Then, reload [http://liquidart-tutorial.stablekernel.io](http://liquidart-tutorial.stablekernel.io). Your dashboard of heroes and detail page for each will still show up - but this time, they are sourced from a database.
+Re-run your application with `liquidart serve`. Then, reload [http://aqueduct-tutorial.stablekernel.io](http://aqueduct-tutorial.stablekernel.io). Your dashboard of heroes and detail page for each will still show up - but this time, they are sourced from a database.
 
 !!! warning "ManagedObjects and Migration Scripts"
     In our migration's `seed()` method, we executed SQL queries instead of using the Liquidart ORM. *It is very important that you do not use* `Query<T>`, `ManagedObject<T>` or other elements of the Liquidart ORM in migration files. Migration files represent an ordered series of historical steps that describe your database schema. If you replay those steps (which is what executing a migration file does), you will end up with the same database schema every time. However, a `ManagedObject<T>` subclass changes over time - the definition of a managed object is not historical, it only represents the current point in time. Since a `ManagedObject<T>` subclass can change, using one in our migration file would mean that our migration file could change.
@@ -296,8 +296,8 @@ Notice that `name` is an *optional parameter* (it is surrounded by curly bracket
 
 !!! tip "ResourceController Binding"
 
-There is even more to bindings than we've shown (like automatically parsing bound values into types like int and DateTime). For more information, see [ResourceControllers](https://liquidart.aldrinsartfactory.com/documentation/http/resource_controller/).
+There is even more to bindings than we've shown (like automatically parsing bound values into types like int and DateTime). For more information, see [ResourceControllers](https://aldrinsartfactory.github.io/liquidart/http/resource_controller/).
 
 Binding query and header parameters in a operation method is a good way to make your code more intentional and avoid boilerplate parsing code. Liquidart is able to generate better documentation when using bindings.
 
-# [**Next Section: Storing Data**](https://liquidart.aldrinsartfactory.com/documentation/tutorial/storing-data/)
+# [**Next Section: Storing Data**](https://aldrinsartfactory.github.io/liquidart/tutorial/storing-data/)
