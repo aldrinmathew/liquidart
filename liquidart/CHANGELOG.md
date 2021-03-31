@@ -1,3 +1,6 @@
+## 4.0.0-b2
+- New version to correctly resolve liquidart_test dependency.
+
 ## 4.0.0-b1
 
 - Renamed and refactored project to Liquidart, since the Aqueduct project has been abandoned by StableKernel Team.

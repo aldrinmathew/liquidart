@@ -1,0 +1,24 @@
+<templateSet group="Liquidart">
+  <template name="bindheader" value="@HTTPHeader(&quot;$HEADER_NAME$&quot;) String $CAMEL_HEADER_NAME$" description="Header Binding" toReformat="false" toShortenFQNames="true">
+    <variable name="HEADER_NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="CAMEL_HEADER_NAME" expression="camelCase(HEADER_NAME)" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="DART" value="true" />
+    </context>
+  </template>
+  <template name="bindquery" value="@HTTPQuery(&quot;$QUERY_KEY$&quot;) String $CAMEL_QUERY_KEY$" description="Query Binding" toReformat="false" toShortenFQNames="true">
+    <variable name="QUERY_KEY" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="CAMEL_QUERY_KEY" expression="camelCase(QUERY_KEY)" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="DART" value="true" />
+    </context>
+  </template>
+  <template name="bindmethod" value="@http$HTTP_METHOD$&#10;Future&lt;Response&gt; $LOWERCASE_HTTP_METHOD$() async {&#10;  &#10;}" description="HTTP Method Binding" toReformat="false" toShortenFQNames="true">
+    <variable name="HTTP_METHOD" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="LOWERCASE_HTTP_METHOD" expression="camelCase(HTTP_METHOD)" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="DART" value="true" />
+      <option name="DART_STATEMENT" value="false" />
+    </context>
+  </template>
+</templateSet>

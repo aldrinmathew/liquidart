@@ -1,0 +1,5 @@
+Copy as HTML
+Dart
+YAML/Ansible support
+io.flutter
+mobi.hsz.idea.gitignore
