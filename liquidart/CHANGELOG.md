@@ -1,3 +1,11 @@
+## 4.0.0-b1
+
+- Renamed and refactored project to Liquidart, since the Aqueduct project has been abandoned by StableKernel Team.
+    - The refactoring is astonishingly dirty and clunky.
+    - Lot of commits to correct link errors and renaming nightmare and what not.
+    - Not even sure if the package runs well, at this point.
+- Added a new logo to the project, designed by Aldrin Mathew.
+
 ## 3.3.0-b1
 
 - Adds 'liquidart build' command that generates an executable binary of an Liquidart app, with some known issues

@@ -3,6 +3,7 @@ version: 4.0.0-b1
 description: A modern HTTP server application framework, ORM and OAuth2 provider with OpenAPI 3.0 integration. Foundation for REST, RPC or GraphQL services. Revival of the abandoned AQUEDUCT Project.
 homepage: https://liquidart.aldrinsartfactory.com
 repository: https://github.com/aldrinsartfactory/liquidart
+issue_tracker: https://github.com/aldrinsartfactory/liquidart/issues
 documentation: https://liquidart.aldrinsartfactory.com/documentation
 
 environment:
