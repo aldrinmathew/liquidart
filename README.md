@@ -1,8 +1,6 @@
-![Liquidart](https://s3.amazonaws.com/liquidart-collateral/liquidart.png)
+![Liquidart](/resources/liquidart.png)
 
-[![OSX/Linux Build Status](https://travis-ci.org/stablekernel/liquidart.svg?branch=master)](https://travis-ci.org/stablekernel/liquidart) [![Windows Build status](https://ci.appveyor.com/api/projects/status/l2uy4r0yguhg4pis?svg=true)](https://ci.appveyor.com/project/joeconwaystk/liquidart) [![codecov](https://codecov.io/gh/stablekernel/liquidart/branch/master/graph/badge.svg)](https://codecov.io/gh/stablekernel/liquidart) 
-
-[![Slack](https://slackliquidartsignup.herokuapp.com/badge.svg)](http://slackliquidartsignup.herokuapp.com/)
+[![OSX/Linux Build Status](https://travis-ci.org/stablekernel/aqueduct.svg?branch=master)](https://travis-ci.org/stablekernel/aqueduct) [![Windows Build status](https://ci.appveyor.com/api/projects/status/l2uy4r0yguhg4pis?svg=true)](https://ci.appveyor.com/project/joeconwaystk/aqueduct) [![codecov](https://codecov.io/gh/stablekernel/aqueduct/branch/master/graph/badge.svg)](https://codecov.io/gh/stablekernel/aqueduct) 
 
 Liquidart is a modern Dart HTTP server framework. The framework is composed of libraries for handling and routing HTTP requests, object-relational mapping (ORM), authentication and authorization (OAuth 2.0 provider) and documentation (OpenAPI). These libraries are used to build scalable REST APIs that run on the Dart VM.
 
