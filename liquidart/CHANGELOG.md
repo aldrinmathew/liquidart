@@ -1,4 +1,7 @@
 ## 4.0.1-b1
+- Changed Homepage link to Repository URL for now.
+
+## 4.0.1-b1
 - Corrected code to meet dart format specification
 - Corrected Homepage link
 
