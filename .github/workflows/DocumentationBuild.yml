@@ -1,4 +1,4 @@
-name: ci
+name: documentation_build
 on:
   push:
     branches:
