@@ -1,4 +1,4 @@
-## 4.0.1-b1
+## 4.0.1-b2
 - Changed Homepage link to Repository URL for now.
 
 ## 4.0.1-b1
