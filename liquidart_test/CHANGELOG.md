@@ -1,3 +1,7 @@
+## 2.0.0-b2
+- Bumped Version
+- Corrected Homepage, Respository and Documentation links.
+
 ## 2.0.0-b1
 - Changed name and refactored to liquidart_test
 
