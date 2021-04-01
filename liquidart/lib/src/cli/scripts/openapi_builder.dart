@@ -20,10 +20,12 @@ class OpenAPIBuilder extends Executable<Map<String, dynamic>> {
             : null,
         contactEmail = message["contactEmail"] as String,
         contactName = message["contactName"] as String,
-        contactURL =
-            message["contactURL"] != null ? Uri.parse(message["contactURL"] as String) : null,
-        licenseURL =
-            message["licenseURL"] != null ? Uri.parse(message["licenseURL"] as String) : null,
+        contactURL = message["contactURL"] != null
+            ? Uri.parse(message["contactURL"] as String)
+            : null,
+        licenseURL = message["licenseURL"] != null
+            ? Uri.parse(message["licenseURL"] as String)
+            : null,
         licenseName = message["licenseName"] as String,
         hosts = (message["hosts"] as List<String>)
                 ?.map((uri) => APIServerDescription(Uri.parse(uri)))
@@ -50,7 +52,8 @@ class OpenAPIBuilder extends Executable<Map<String, dynamic>> {
 
   @override
   Future<Map<String, dynamic>> execute() async {
-    final channels = RuntimeContext.current.runtimes.iterable.whereType<ChannelRuntime>();
+    final channels =
+        RuntimeContext.current.runtimes.iterable.whereType<ChannelRuntime>();
     if (channels.length != 1) {
       throw StateError(
           "Zero or more than one ApplicationChannel subclass found: ${channels.map((c) => "'${c.channelType}'").join(", ")}");
@@ -59,9 +62,11 @@ class OpenAPIBuilder extends Executable<Map<String, dynamic>> {
     try {
       var config = ApplicationOptions()..configurationFilePath = configPath;
 
-      final yaml = (loadYaml(pubspecContents) as Map<dynamic, dynamic>).cast<String, dynamic>();
+      final yaml = (loadYaml(pubspecContents) as Map<dynamic, dynamic>)
+          .cast<String, dynamic>();
 
-      var document = await Application.document(channels.first.channelType, config, yaml);
+      var document =
+          await Application.document(channels.first.channelType, config, yaml);
 
       document.servers = hosts;
       if (title != null) {
@@ -107,13 +112,15 @@ class OpenAPIBuilder extends Executable<Map<String, dynamic>> {
       }
 
       if (resolveRelativeUrls) {
-        final baseUri = document.servers?.first?.url ?? Uri.parse("http://localhost:8888");
+        final baseUri =
+            document.servers?.first?.url ?? Uri.parse("http://localhost:8888");
         document.components.securitySchemes.values?.forEach((scheme) {
           scheme.flows?.values?.forEach((flow) {
             if (flow.refreshURL != null && !flow.refreshURL.isAbsolute) {
               flow.refreshURL = baseUri.resolveUri(flow.refreshURL);
             }
-            if (flow.authorizationURL != null && !flow.authorizationURL.isAbsolute) {
+            if (flow.authorizationURL != null &&
+                !flow.authorizationURL.isAbsolute) {
               flow.authorizationURL = baseUri.resolveUri(flow.authorizationURL);
             }
             if (flow.tokenURL != null && !flow.tokenURL.isAbsolute) {
@@ -126,10 +133,13 @@ class OpenAPIBuilder extends Executable<Map<String, dynamic>> {
       return document.asMap();
     } on ConfigurationException catch (e) {
       return {
-        "error": "There was an issue loading the configuration file '${configPath}': ${e.message}"
+        "error":
+            "There was an issue loading the configuration file '${configPath}': ${e.message}"
       };
     } on ManagedDataModelError catch (e) {
-      return {"error": "There was an issue compiling a data model: ${e.message}"};
+      return {
+        "error": "There was an issue compiling a data model: ${e.message}"
+      };
     }
   }
 
@@ -143,7 +153,8 @@ class OpenAPIBuilder extends Executable<Map<String, dynamic>> {
       ];
 }
 
-Future<Map<String, dynamic>> documentProject(CLIProject project, CLIDocumentOptions options) async {
+Future<Map<String, dynamic>> documentProject(
+    CLIProject project, CLIDocumentOptions options) async {
   final variables = <String, dynamic>{
     "pubspec": project.projectSpecificationFile.readAsStringSync(),
     "hosts": options.hosts?.map((u) => u.toString())?.toList(),

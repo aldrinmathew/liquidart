@@ -40,8 +40,9 @@ class QueryPredicate {
   /// If [predicates] is null or empty, an empty predicate is returned. If [predicates] contains only
   /// one predicate, that predicate is returned.
   factory QueryPredicate.and(Iterable<QueryPredicate> predicates) {
-    var predicateList =
-        predicates?.where((p) => p?.format != null && p.format.isNotEmpty)?.toList();
+    var predicateList = predicates
+        ?.where((p) => p?.format != null && p.format.isNotEmpty)
+        ?.toList();
     if (predicateList == null) {
       return QueryPredicate.empty();
     }
@@ -59,8 +60,10 @@ class QueryPredicate {
     final allFormatStrings = [];
     final valueMap = <String, dynamic>{};
     for (var predicate in predicateList) {
-      final duplicateKeys =
-          predicate.parameters?.keys?.where((k) => valueMap.keys.contains(k))?.toList() ?? [];
+      final duplicateKeys = predicate.parameters?.keys
+              ?.where((k) => valueMap.keys.contains(k))
+              ?.toList() ??
+          [];
 
       if (duplicateKeys.isNotEmpty) {
         var fmt = predicate.format;

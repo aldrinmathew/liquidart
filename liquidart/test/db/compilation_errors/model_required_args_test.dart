@@ -13,7 +13,8 @@ void main() {
   });
 }
 
-class DefaultConstructorHasRequiredArgs extends ManagedObject<_ConstructorTableDef> {
+class DefaultConstructorHasRequiredArgs
+    extends ManagedObject<_ConstructorTableDef> {
   // ignore: avoid_unused_constructor_parameters
   DefaultConstructorHasRequiredArgs(int foo);
 }

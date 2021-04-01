@@ -2,9 +2,14 @@ import 'package:liquidart/liquidart.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test("Add Table to table definition with has- property in unique list throws exception", () {
+  test(
+      "Add Table to table definition with has- property in unique list throws exception",
+      () {
     try {
-      ManagedDataModel([MultiUniqueFailureRelationship, MultiUniqueFailureRelationshipInverse]);
+      ManagedDataModel([
+        MultiUniqueFailureRelationship,
+        MultiUniqueFailureRelationshipInverse
+      ]);
       expect(true, false);
     } on ManagedDataModelError catch (e) {
       expect(e.message, contains("declares 'a' as unique"));
@@ -12,7 +17,8 @@ void main() {
   });
 }
 
-class MultiUniqueFailureRelationship extends ManagedObject<_MultiUniqueFailureRelationship> {}
+class MultiUniqueFailureRelationship
+    extends ManagedObject<_MultiUniqueFailureRelationship> {}
 
 @Table.unique([Symbol('a'), Symbol('b')])
 class _MultiUniqueFailureRelationship {

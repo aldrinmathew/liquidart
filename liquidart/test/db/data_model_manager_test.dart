@@ -15,19 +15,22 @@ void main() {
       T();
       fail('unreachable');
     } on StateError catch (e) {
-      expect(e.toString(), contains("Did you forget to create a 'ManagedContext'?"));
+      expect(e.toString(),
+          contains("Did you forget to create a 'ManagedContext'?"));
     }
   });
 
   test("Can find entity creating managedobject", () {
-    ctx = ManagedContext(ManagedDataModel.fromCurrentMirrorSystem(), DefaultPersistentStore());
+    ctx = ManagedContext(
+        ManagedDataModel.fromCurrentMirrorSystem(), DefaultPersistentStore());
     final o = T();
     o.id = 1;
     expect(o.id, 1);
   });
 
   test("Close context destroys data model", () async {
-    ctx = ManagedContext(ManagedDataModel.fromCurrentMirrorSystem(), DefaultPersistentStore());
+    ctx = ManagedContext(
+        ManagedDataModel.fromCurrentMirrorSystem(), DefaultPersistentStore());
 
     final o = T();
     o.id = 1;
@@ -40,7 +43,8 @@ void main() {
       T();
       fail('unreachable');
     } on StateError catch (e) {
-      expect(e.toString(), contains("Did you forget to create a 'ManagedContext'?"));
+      expect(e.toString(),
+          contains("Did you forget to create a 'ManagedContext'?"));
     }
   });
 
@@ -61,7 +65,8 @@ void main() {
       T();
       fail('unreachable');
     } on StateError catch (e) {
-      expect(e.toString(), contains("Did you forget to create a 'ManagedContext'?"));
+      expect(e.toString(),
+          contains("Did you forget to create a 'ManagedContext'?"));
     }
   });
 }

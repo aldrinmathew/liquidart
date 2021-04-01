@@ -16,22 +16,26 @@ void main() {
     var req = Query<TestModel>(context)..values = m;
     var item = await req.insert();
 
-    req = Query<TestModel>(context)..predicate = QueryPredicate("id = @id", {"id": item.id});
+    req = Query<TestModel>(context)
+      ..predicate = QueryPredicate("id = @id", {"id": item.id});
     item = await req.fetchOne();
 
     expect(item.name, "Joe");
     expect(item.email, "a@a.com");
   });
 
-  test("Query with dynamic entity and mis-matched context throws exception", () async {
+  test("Query with dynamic entity and mis-matched context throws exception",
+      () async {
     context = await contextWithModels([TestModel]);
 
     var someOtherContext = ManagedContext(ManagedDataModel([]), null);
     try {
-      Query.forEntity(context.dataModel.entityForType(TestModel), someOtherContext);
+      Query.forEntity(
+          context.dataModel.entityForType(TestModel), someOtherContext);
       expect(true, false);
     } on StateError catch (e) {
-      expect(e.toString(), allOf([contains("'simple'"), contains("is from different context")]));
+      expect(e.toString(),
+          allOf([contains("'simple'"), contains("is from different context")]));
     }
   });
 
@@ -64,7 +68,8 @@ void main() {
     await req.insert();
 
     try {
-      req = Query<TestModel>(context)..returningProperties((t) => [t.id, t["foobar"]]);
+      req = Query<TestModel>(context)
+        ..returningProperties((t) => [t.id, t["foobar"]]);
       fail("unreachable");
     } on ArgumentError catch (e) {
       expect(
@@ -95,7 +100,8 @@ void main() {
       expect(result[i].email, "asc$i@a.com");
     }
 
-    req = Query<TestModel>(context)..sortBy((t) => t.id, QuerySortOrder.ascending);
+    req = Query<TestModel>(context)
+      ..sortBy((t) => t.id, QuerySortOrder.ascending);
     result = await req.fetch();
 
     int idIndex = 0;
@@ -131,7 +137,8 @@ void main() {
   test("Cannot sort by property that doesn't exist", () async {
     context = await contextWithModels([TestModel]);
     try {
-      Query<TestModel>(context).sortBy((u) => u["nonexisting"], QuerySortOrder.ascending);
+      Query<TestModel>(context)
+          .sortBy((u) => u["nonexisting"], QuerySortOrder.ascending);
       expect(true, false);
     } on ArgumentError catch (e) {
       expect(
@@ -218,11 +225,13 @@ void main() {
     await req.insert();
 
     try {
-      req = Query<TestModel>(context)..returningProperties((t) => [t.id, t["badkey"]]);
+      req = Query<TestModel>(context)
+        ..returningProperties((t) => [t.id, t["badkey"]]);
 
       fail("unreachable");
     } on ArgumentError catch (e) {
-      expect(e.toString(), contains("Property 'badkey' does not exist on 'TestModel'"));
+      expect(e.toString(),
+          contains("Property 'badkey' does not exist on 'TestModel'"));
     }
   });
 
@@ -244,10 +253,17 @@ void main() {
       await (Query<GenPost>(context)..values = p2).insert();
     }
 
-    var req = Query<GenPost>(context)..predicate = QueryPredicate("owner_id = @id", {"id": u1.id});
+    var req = Query<GenPost>(context)
+      ..predicate = QueryPredicate("owner_id = @id", {"id": u1.id});
     var res = await req.fetch();
     expect(res.length, 5);
-    expect(res.map((p) => p.text).where((text) => num.parse(text) % 2 == 0).toList().length, 5);
+    expect(
+        res
+            .map((p) => p.text)
+            .where((text) => num.parse(text) % 2 == 0)
+            .toList()
+            .length,
+        5);
 
     var query = Query<GenPost>(context);
     query.where((o) => o.owner).identifiedBy(u1.id);
@@ -256,12 +272,19 @@ void main() {
     GenUser user = res.first.owner;
     expect(user, isNotNull);
     expect(res.length, 5);
-    expect(res.map((p) => p.text).where((text) => num.parse(text) % 2 == 0).toList().length, 5);
+    expect(
+        res
+            .map((p) => p.text)
+            .where((text) => num.parse(text) % 2 == 0)
+            .toList()
+            .length,
+        5);
   });
 
   test("Fetch object with null reference", () async {
     context = await contextWithModels([GenUser, GenPost]);
-    var p1 = await (Query<GenPost>(context)..values = (GenPost()..text = "1")).insert();
+    var p1 = await (Query<GenPost>(context)..values = (GenPost()..text = "1"))
+        .insert();
 
     var req = Query<GenPost>(context);
     p1 = await req.fetchOne();
@@ -278,7 +301,8 @@ void main() {
     expect(result.id, greaterThan(0));
     expect(result.backing.contents["text"], isNull);
 
-    var fq = Query<Omit>(context)..predicate = QueryPredicate("id=@id", {"id": result.id});
+    var fq = Query<Omit>(context)
+      ..predicate = QueryPredicate("id=@id", {"id": result.id});
 
     var fResult = await fq.fetchOne();
     expect(fResult.id, result.id);
@@ -304,11 +328,13 @@ void main() {
 
       expect(true, false);
     } on StateError catch (e) {
-      expect(e.toString(), contains("'fetchOne' returned more than one row from 'GenUser'"));
+      expect(e.toString(),
+          contains("'fetchOne' returned more than one row from 'GenUser'"));
     }
   });
 
-  test("Including RelationshipInverse property can only be done by using name of property",
+  test(
+      "Including RelationshipInverse property can only be done by using name of property",
       () async {
     context = await contextWithModels([GenUser, GenPost]);
 
@@ -319,17 +345,20 @@ void main() {
           ..values.owner = u1)
         .insert();
 
-    var q = Query<GenPost>(context)..returningProperties((p) => [p.id, p.owner]);
+    var q = Query<GenPost>(context)
+      ..returningProperties((p) => [p.id, p.owner]);
 
     var result = await q.fetchOne();
     expect(result.owner.id, 1);
     expect(result.owner.backing.contents.length, 1);
 
     try {
-      q = Query<GenPost>(context)..returningProperties((p) => [p.id, p["owner_id"]]);
+      q = Query<GenPost>(context)
+        ..returningProperties((p) => [p.id, p["owner_id"]]);
       expect(true, false);
     } on ArgumentError catch (e) {
-      expect(e.toString(), contains("Property 'owner_id' does not exist on 'GenPost'"));
+      expect(e.toString(),
+          contains("Property 'owner_id' does not exist on 'GenPost'"));
     }
   });
 
@@ -342,7 +371,9 @@ void main() {
     expect(result.public, "x");
   });
 
-  test("When fetching valid enum value from db, is available as enum value and in where", () async {
+  test(
+      "When fetching valid enum value from db, is available as enum value and in where",
+      () async {
     context = await contextWithModels([EnumObject]);
 
     var q = Query<EnumObject>(context)..values.enumValues = EnumValues.abcd;
@@ -354,11 +385,13 @@ void main() {
     expect(result.enumValues, EnumValues.abcd);
     expect(result.asMap()["enumValues"], "abcd");
 
-    q = Query<EnumObject>(context)..where((o) => o.enumValues).equalTo(EnumValues.abcd);
+    q = Query<EnumObject>(context)
+      ..where((o) => o.enumValues).equalTo(EnumValues.abcd);
     result = await q.fetchOne();
     expect(result, isNotNull);
 
-    q = Query<EnumObject>(context)..where((o) => o.enumValues).equalTo(EnumValues.efgh);
+    q = Query<EnumObject>(context)
+      ..where((o) => o.enumValues).equalTo(EnumValues.efgh);
     result = await q.fetchOne();
     expect(result, isNull);
   });
@@ -378,7 +411,8 @@ void main() {
   test("When fetching invalid enum value from db, throws error", () async {
     context = await contextWithModels([EnumObject]);
 
-    await context.persistentStore.execute("INSERT INTO _enumobject (enumValues) VALUES ('foobar')");
+    await context.persistentStore
+        .execute("INSERT INTO _enumobject (enumValues) VALUES ('foobar')");
 
     try {
       var q = Query<EnumObject>(context);
@@ -397,7 +431,10 @@ void main() {
       Query<GenUser>(context).returningProperties((p) => [p.posts]);
       fail("unreachable");
     } on ArgumentError catch (e) {
-      expect(e.toString(), contains("Cannot select has-many or has-one relationship properties"));
+      expect(
+          e.toString(),
+          contains(
+              "Cannot select has-many or has-one relationship properties"));
     }
   });
 
@@ -413,7 +450,8 @@ void main() {
       expect(o.name, "bob");
     });
 
-    test("If object does not exist and type is specified, return null", () async {
+    test("If object does not exist and type is specified, return null",
+        () async {
       final o = await context.fetchObjectWithID<TestModel>(id + 1);
       expect(o, isNull);
     });
@@ -436,7 +474,8 @@ void main() {
       }
     });
 
-    test("If identifier type is not the same type as return type, throw exception with 404",
+    test(
+        "If identifier type is not the same type as return type, throw exception with 404",
         () async {
       final o = await context.fetchObjectWithID<TestModel>("not-an-int");
       expect(o, isNull);
@@ -507,7 +546,8 @@ class _Omit {
   String text;
 }
 
-class PrivateField extends ManagedObject<_PrivateField> implements _PrivateField {
+class PrivateField extends ManagedObject<_PrivateField>
+    implements _PrivateField {
   PrivateField() : super() {
     _private = "x";
   }

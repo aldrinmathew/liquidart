@@ -19,7 +19,8 @@ import 'managed.dart';
 ///          @Relate(#posts)
 ///          User user;
 ///        }
-class ManagedSet<InstanceType extends ManagedObject> extends Object with ListMixin<InstanceType> {
+class ManagedSet<InstanceType extends ManagedObject> extends Object
+    with ListMixin<InstanceType> {
   /// Creates an empty [ManagedSet].
   ManagedSet() {
     _innerValues = [];

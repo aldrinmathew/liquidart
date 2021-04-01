@@ -46,7 +46,8 @@ void main() {
 
     expect(doc.title, "FailsToDocument");
     expect(doc.description, contains("HttpServer"));
-    expect(doc.additionalPropertyPolicy, APISchemaAdditionalPropertyPolicy.freeForm);
+    expect(doc.additionalPropertyPolicy,
+        APISchemaAdditionalPropertyPolicy.freeForm);
   });
 
   test("Serializable can override static document method", () async {
@@ -56,7 +57,8 @@ void main() {
     expect(doc.properties["k"], isNotNull);
   });
 
-  test("Can bind a Serializable implementor to a resource controller method and it auto-documents",
+  test(
+      "Can bind a Serializable implementor to a resource controller method and it auto-documents",
       () async {
     final c = BoundBodyController();
     c.didAddToChannel();
@@ -66,7 +68,14 @@ void main() {
     final op = c.documentOperations(ctx, "/", APIPath.empty());
     await ctx.finalize();
 
-    expect(op["post"].requestBody.content["application/json"].schema.referenceURI.pathSegments.last,
+    expect(
+        op["post"]
+            .requestBody
+            .content["application/json"]
+            .schema
+            .referenceURI
+            .pathSegments
+            .last,
         "BoundBody");
   });
 }

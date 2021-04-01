@@ -13,7 +13,8 @@ class _InvalidTransientModel {
 }
 
 void main() {
-  test("Model with unsupported transient property type fails on compilation", () {
+  test("Model with unsupported transient property type fails on compilation",
+      () {
     try {
       ManagedDataModel([InvalidTransientModel]);
       expect(true, false);

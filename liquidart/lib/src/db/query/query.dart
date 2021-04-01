@@ -33,7 +33,8 @@ abstract class Query<InstanceType extends ManagedObject> {
           "Invalid context. The data model of 'context' does not contain '$InstanceType'.");
     }
 
-    return context.persistentStore.newQuery<InstanceType>(context, entity, values: values);
+    return context.persistentStore
+        .newQuery<InstanceType>(context, entity, values: values);
   }
 
   /// Creates a new [Query] without a static type.
@@ -54,7 +55,8 @@ abstract class Query<InstanceType extends ManagedObject> {
   /// Inserts a single [object] into the database managed by [context].
   ///
   /// This is equivalent to creating a [Query], assigning [object] to [values], and invoking [insert].
-  static Future<T> insertObject<T extends ManagedObject>(ManagedContext context, T object) {
+  static Future<T> insertObject<T extends ManagedObject>(
+      ManagedContext context, T object) {
     return context.insertObject(object);
   }
 
@@ -132,7 +134,8 @@ abstract class Query<InstanceType extends ManagedObject> {
   ///
   /// Note that internally, [pageBy] adds a matcher to [where] and adds a high-priority [sortBy].
   /// Adding multiple [pageBy]s to an instance has undefined behavior.
-  void pageBy<T>(T propertyIdentifier(InstanceType x), QuerySortOrder order, {T boundingValue});
+  void pageBy<T>(T propertyIdentifier(InstanceType x), QuerySortOrder order,
+      {T boundingValue});
 
   /// Configures this instance to sort its results by some property and order.
   ///
@@ -184,7 +187,8 @@ abstract class Query<InstanceType extends ManagedObject> {
   ///         final query = Query<Employee>()
   ///           ..where((e) => e.manager.name).equalTo("Sally");
   ///
-  QueryExpression<T, InstanceType> where<T>(T propertyIdentifier(InstanceType x));
+  QueryExpression<T, InstanceType> where<T>(
+      T propertyIdentifier(InstanceType x));
 
   /// Confirms that a query has no predicate before executing it.
   ///

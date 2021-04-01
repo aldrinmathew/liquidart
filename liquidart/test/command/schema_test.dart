@@ -11,7 +11,8 @@ void main() {
   // This group handles checking the tool itself,
   // not the behavior of creating the appropriate migration file given schemas
   setUp(() async {
-    cli = await CLIClient(CommandLineAgent(ProjectAgent.projectsDirectory)).createProject();
+    cli = await CLIClient(CommandLineAgent(ProjectAgent.projectsDirectory))
+        .createProject();
     await cli.agent.getDependencies(offline: true);
     cli.agent.addOrReplaceFile("lib/application_test.dart", """
 import 'package:liquidart/liquidart.dart';

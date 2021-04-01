@@ -15,7 +15,8 @@ class ManagedValidator {
   ///
   /// This method does not invoke [ManagedObject.validate] - any customization provided
   /// by a [ManagedObject] subclass that overrides this method will not be invoked.
-  static ValidationContext run(ManagedObject object, {Validating event = Validating.insert}) {
+  static ValidationContext run(ManagedObject object,
+      {Validating event = Validating.insert}) {
     final context = ValidationContext();
 
     object.entity.validators.forEach((validator) {
@@ -36,7 +37,8 @@ class ManagedValidator {
       if (validator.definition.type == ValidateType.present) {
         if (validator.property is ManagedRelationshipDescription) {
           final inner = object[validator.property.name] as ManagedObject;
-          if (inner == null || !inner.backing.contents.containsKey(inner.entity.primaryKey)) {
+          if (inner == null ||
+              !inner.backing.contents.containsKey(inner.entity.primaryKey)) {
             context.addError("key '${validator.property.name}' is required"
                 "for ${_getEventName(event)}s.");
           }
@@ -58,7 +60,8 @@ class ManagedValidator {
       } else {
         if (validator.property is ManagedRelationshipDescription) {
           final inner = object[validator.property.name] as ManagedObject;
-          if (inner == null || inner.backing.contents[inner.entity.primaryKey] == null) {
+          if (inner == null ||
+              inner.backing.contents[inner.entity.primaryKey] == null) {
             return;
           }
           contents = inner.backing.contents;

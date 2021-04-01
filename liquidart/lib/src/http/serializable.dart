@@ -12,7 +12,8 @@ abstract class Serializable {
   /// The returned [APISchemaObject] will be of type [APIType.object]. By default, each instance variable
   /// of the receiver's type will be a property of the return value.
   APISchemaObject documentSchema(APIDocumentContext context) {
-    return (RuntimeContext.current[runtimeType] as SerializableRuntime).documentSchema(context);
+    return (RuntimeContext.current[runtimeType] as SerializableRuntime)
+        .documentSchema(context);
   }
 
   /// Reads values from [object].
@@ -57,14 +58,16 @@ abstract class Serializable {
       if (reject?.contains(key) ?? false) {
         throw SerializableException(["invalid input key '$key'"]);
       }
-      if ((ignore?.contains(key) ?? false) || !(accept?.contains(key) ?? true)) {
+      if ((ignore?.contains(key) ?? false) ||
+          !(accept?.contains(key) ?? true)) {
         copy.remove(key);
       }
       stillRequired?.remove(key);
     });
 
     if (stillRequired?.isNotEmpty ?? false) {
-      throw SerializableException(["missing required input key(s): '${stillRequired.join(", ")}'"]);
+      throw SerializableException(
+          ["missing required input key(s): '${stillRequired.join(", ")}'"]);
     }
 
     readFromMap(copy);
@@ -95,8 +98,10 @@ class SerializableException implements HandlerException {
 
   @override
   Response get response {
-    return Response.badRequest(
-        body: {"error": "entity validation failed", "reasons": reasons ?? "undefined"});
+    return Response.badRequest(body: {
+      "error": "entity validation failed",
+      "reasons": reasons ?? "undefined"
+    });
   }
 
   @override

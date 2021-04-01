@@ -101,7 +101,8 @@ void main() {
      ---------------------
      */
 
-    test("Ascending from known data set edge, limited to inside data set", () async {
+    test("Ascending from known data set edge, limited to inside data set",
+        () async {
       // select * from t where id > 0 order by id asc limit 5;
       var req = Query<PageableTestModel>(context)
         ..pageBy((p) => p.id, QuerySortOrder.ascending, boundingValue: 0)
@@ -191,7 +192,8 @@ void main() {
       expect(res.length, 0);
     });
 
-    test("Descending from first element in data set to before data set", () async {
+    test("Descending from first element in data set to before data set",
+        () async {
       // select * from t where id < 1 order by id desc limit 10;
       var req = Query<PageableTestModel>(context)
         ..pageBy((p) => p.id, QuerySortOrder.descending, boundingValue: 1)
@@ -218,7 +220,9 @@ void main() {
       check([4, 3, 2, 1], res);
     });
 
-    test("Descending from outside end of data set to beginning edge of data set", () async {
+    test(
+        "Descending from outside end of data set to beginning edge of data set",
+        () async {
       // select * from t where id < 11 order by id desc limit 10;
       var req = Query<PageableTestModel>(context)
         ..pageBy((p) => p.id, QuerySortOrder.descending, boundingValue: 11)
@@ -227,7 +231,8 @@ void main() {
       check([10, 9, 8, 7, 6, 5, 4, 3, 2, 1], res);
     });
 
-    test("Descending from last element in data set to middle of data set", () async {
+    test("Descending from last element in data set to middle of data set",
+        () async {
       // select * from t where id < 10 order by id desc limit 5;
       var req = Query<PageableTestModel>(context)
         ..pageBy((p) => p.id, QuerySortOrder.descending, boundingValue: 10)
@@ -236,7 +241,8 @@ void main() {
       check([9, 8, 7, 6, 5], res);
     });
 
-    test("Descending from outside end of data set to middle of data set", () async {
+    test("Descending from outside end of data set to middle of data set",
+        () async {
       // select * from t where id < 11 order by id desc limit 5
       var req = Query<PageableTestModel>(context)
         ..pageBy((p) => p.id, QuerySortOrder.descending, boundingValue: 11)
@@ -275,7 +281,8 @@ void main() {
     };
 
     setUpAll(() async {
-      context = await contextWithModels([PageableTestModel, HasMany, BelongsTo]);
+      context =
+          await contextWithModels([PageableTestModel, HasMany, BelongsTo]);
       for (int i = 0; i < 10; i++) {
         var p = PageableTestModel()..value = "$i";
         await (Query<PageableTestModel>(context)..values = p).insert();
@@ -295,18 +302,23 @@ void main() {
         var _ = await req.fetch();
         expect(true, false);
       } on StateError catch (e) {
-        expect(e.toString(), contains("Bounding value for column 'value' has invalid type"));
+        expect(e.toString(),
+            contains("Bounding value for column 'value' has invalid type"));
       }
     });
 
     test("Page property doesn't exist throws error", () async {
       try {
         var _ = Query<PageableTestModel>(context)
-          ..pageBy((p) => p["foobar"], QuerySortOrder.ascending, boundingValue: "0");
+          ..pageBy((p) => p["foobar"], QuerySortOrder.ascending,
+              boundingValue: "0");
 
         expect(true, false);
       } on ArgumentError catch (e) {
-        expect(e.toString(), contains("Property 'foobar' does not exist on 'PageableTestModel'"));
+        expect(
+            e.toString(),
+            contains(
+                "Property 'foobar' does not exist on 'PageableTestModel'"));
       }
     });
 
@@ -321,16 +333,19 @@ void main() {
 
     test("Page by relationship fails", () async {
       try {
-        Query<HasMany>(context).pageBy((p) => p.objects, QuerySortOrder.ascending);
+        Query<HasMany>(context)
+            .pageBy((p) => p.objects, QuerySortOrder.ascending);
         expect(true, false);
       } on ArgumentError catch (e) {
-        expect(e.toString(), contains("Property 'objects' on 'HasMany' is a relationship"));
+        expect(e.toString(),
+            contains("Property 'objects' on 'HasMany' is a relationship"));
       }
     });
   });
 }
 
-class PageableTestModel extends ManagedObject<_PageableTestModel> implements _PageableTestModel {}
+class PageableTestModel extends ManagedObject<_PageableTestModel>
+    implements _PageableTestModel {}
 
 class _PageableTestModel {
   @primaryKey

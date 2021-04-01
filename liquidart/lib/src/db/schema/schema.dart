@@ -28,15 +28,19 @@ class Schema {
 
   /// Creates a deep copy of [otherSchema].
   Schema.from(Schema otherSchema) {
-    _tables = otherSchema?.tables?.map((table) => SchemaTable.from(table))?.toList() ?? [];
+    _tables = otherSchema?.tables
+            ?.map((table) => SchemaTable.from(table))
+            ?.toList() ??
+        [];
   }
 
   /// Creates a instance of this type from [map].
   ///
   /// [map] is typically created from [asMap].
   Schema.fromMap(Map<String, dynamic> map) {
-    _tables =
-        (map["tables"] as List<Map<String, dynamic>>).map((t) => SchemaTable.fromMap(t)).toList();
+    _tables = (map["tables"] as List<Map<String, dynamic>>)
+        .map((t) => SchemaTable.fromMap(t))
+        .toList();
   }
 
   /// Creates an empty schema.
@@ -76,7 +80,8 @@ class Schema {
   /// Sets [table]'s [SchemaTable.schema] to this instance.
   void addTable(SchemaTable table) {
     if (this[table.name] != null) {
-      throw SchemaException("Table ${table.name} already exists and cannot be added.");
+      throw SchemaException(
+          "Table ${table.name} already exists and cannot be added.");
     }
 
     _tableStorage.add(table);
@@ -85,7 +90,8 @@ class Schema {
 
   void replaceTable(SchemaTable existingTable, SchemaTable newTable) {
     if (!_tableStorage.contains(existingTable)) {
-      throw SchemaException("Table ${existingTable.name} does not exist and cannot be replaced.");
+      throw SchemaException(
+          "Table ${existingTable.name} does not exist and cannot be replaced.");
     }
 
     var index = _tableStorage.indexOf(existingTable);
@@ -131,7 +137,8 @@ class Schema {
   SchemaTable tableForName(String name) {
     var lowercaseName = name.toLowerCase();
 
-    return tables.firstWhere((t) => t.name.toLowerCase() == lowercaseName, orElse: () => null);
+    return tables.firstWhere((t) => t.name.toLowerCase() == lowercaseName,
+        orElse: () => null);
   }
 
   /// Emits this instance as a transportable [Map].
@@ -159,8 +166,9 @@ class SchemaDifference {
       }
     }
 
-    _differingTables.addAll(
-        actualSchema.tables.where((t) => expectedSchema[t.name] == null).map((unexpectedTable) {
+    _differingTables.addAll(actualSchema.tables
+        .where((t) => expectedSchema[t.name] == null)
+        .map((unexpectedTable) {
       return SchemaTableDifference(null, unexpectedTable);
     }));
   }
@@ -179,7 +187,8 @@ class SchemaDifference {
   /// Human-readable messages to describe differences between [expectedSchema] and [actualSchema].
   ///
   /// Empty is [hasDifferences] is false.
-  List<String> get errorMessages => _differingTables.expand((diff) => diff.errorMessages).toList();
+  List<String> get errorMessages =>
+      _differingTables.expand((diff) => diff.errorMessages).toList();
 
   /// The differences, if any, between tables in [expectedSchema] and [actualSchema].
   List<SchemaTableDifference> get tableDifferences => _differingTables;

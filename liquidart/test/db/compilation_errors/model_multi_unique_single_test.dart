@@ -9,12 +9,14 @@ void main() {
       ManagedDataModel([MultiUniqueFailureSingleElement]);
       expect(true, false);
     } on ManagedDataModelError catch (e) {
-      expect(e.message, contains("add 'Column(unique: true)' to declaration of 'a'"));
+      expect(e.message,
+          contains("add 'Column(unique: true)' to declaration of 'a'"));
     }
   });
 }
 
-class MultiUniqueFailureSingleElement extends ManagedObject<_MultiUniqueFailureSingleElement> {}
+class MultiUniqueFailureSingleElement
+    extends ManagedObject<_MultiUniqueFailureSingleElement> {}
 
 @Table.unique([Symbol('a')])
 class _MultiUniqueFailureSingleElement {

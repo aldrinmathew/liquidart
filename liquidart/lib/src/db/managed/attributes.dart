@@ -31,7 +31,8 @@ class Table {
   /// must be unique for the combined properties in [properties]. [properties] must contain symbolic names of
   /// properties declared in the table definition, and those properties must be either attributes
   /// or belongs-to relationship properties. See [Table] for example.
-  const Table.unique(List<Symbol> properties) : this(uniquePropertySet: properties);
+  const Table.unique(List<Symbol> properties)
+      : this(uniquePropertySet: properties);
 
   /// Each instance of the associated table definition is unique for these properties.
   ///

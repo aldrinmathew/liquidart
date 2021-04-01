@@ -42,13 +42,16 @@ void main() {
     expectResponse(await client.request("/level1-authorizer").get(), 200);
   });
 
-  test("When no Authorizer and method has scope, a 500 error is thrown", () async {
+  test("When no Authorizer and method has scope, a 500 error is thrown",
+      () async {
     // Log warning
     client.headers["authorization"] = "Bearer level1";
     expectResponse(await client.request("/no-authorizer").put(), 500);
   });
 
-  test("When no Authorizer and method does not have scope, request is successful", () async {
+  test(
+      "When no Authorizer and method does not have scope, request is successful",
+      () async {
     client.headers["authorization"] = "Bearer level1";
     expectResponse(await client.request("/no-authorizer").get(), 200);
   });
@@ -66,12 +69,16 @@ void main() {
         body: {"error": "insufficient_scope", "scope": "level1 level2"});
   });
 
-  test("If token has sufficient scope for method requiring multiple scopes, allow it", () async {
+  test(
+      "If token has sufficient scope for method requiring multiple scopes, allow it",
+      () async {
     client.headers["authorization"] = "Bearer level1 level2";
     expectResponse(await client.request("/level1-authorizer").delete(), 200);
   });
 
-  test("If token has sufficient scope for only ONE of required scopes, do not allow it", () async {
+  test(
+      "If token has sufficient scope for only ONE of required scopes, do not allow it",
+      () async {
     client.headers["authorization"] = "Bearer level1";
     expectResponse(await client.request("/level1-authorizer").delete(), 403,
         body: {"error": "insufficient_scope", "scope": "level1 level2"});
@@ -104,7 +111,10 @@ class Channel extends ApplicationChannel {
         .route("/level1-subscope-authorizer")
         .link(() => Authorizer.bearer(authServer, scopes: ["level1:subscope"]))
         .link(() => C1());
-    router.route("/authorizer").link(() => Authorizer.bearer(authServer)).link(() => C1());
+    router
+        .route("/authorizer")
+        .link(() => Authorizer.bearer(authServer))
+        .link(() => C1());
 
     return router;
   }

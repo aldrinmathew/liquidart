@@ -19,14 +19,15 @@ class EntityBuilder {
         metadata = firstMetadataOfType(getTableDefinitionForType(type)) {
     name = _getName();
 
-    entity = ManagedEntity(name, type, MirrorSystem.getName(tableDefinitionType.simpleName))
+    entity = ManagedEntity(
+        name, type, MirrorSystem.getName(tableDefinitionType.simpleName))
       ..validators = [];
 
     runtime = ManagedEntityRuntimeImpl(instanceType, entity);
 
     properties = _getProperties();
-    primaryKeyProperty =
-        properties.firstWhere((p) => p.column?.isPrimaryKey ?? false, orElse: () => null);
+    primaryKeyProperty = properties
+        .firstWhere((p) => p.column?.isPrimaryKey ?? false, orElse: () => null);
     if (primaryKeyProperty == null) {
       throw ManagedDataModelErrorImpl.noPrimaryKey(entity);
     }
@@ -48,14 +49,16 @@ class EntityBuilder {
 
   String get instanceTypeName => MirrorSystem.getName(instanceType.simpleName);
 
-  String get tableDefinitionTypeName => MirrorSystem.getName(tableDefinitionType.simpleName);
+  String get tableDefinitionTypeName =>
+      MirrorSystem.getName(tableDefinitionType.simpleName);
 
   void compile(List<EntityBuilder> entityBuilders) {
     properties.forEach((p) {
       p.compile(entityBuilders);
     });
 
-    uniquePropertySet = metadata?.uniquePropertySet?.map(MirrorSystem.getName)?.toList();
+    uniquePropertySet =
+        metadata?.uniquePropertySet?.map(MirrorSystem.getName)?.toList();
   }
 
   void validate(List<EntityBuilder> entityBuilders) {
@@ -72,7 +75,8 @@ class EntityBuilder {
     // Check that our unique property set is valid
     if (uniquePropertySet != null) {
       if (uniquePropertySet.isEmpty) {
-        throw ManagedDataModelErrorImpl.emptyEntityUniqueProperties(tableDefinitionTypeName);
+        throw ManagedDataModelErrorImpl.emptyEntityUniqueProperties(
+            tableDefinitionTypeName);
       } else if (uniquePropertySet.length == 1) {
         throw ManagedDataModelErrorImpl.singleEntityUniqueProperty(
             tableDefinitionTypeName, metadata.uniquePropertySet.first);
@@ -84,7 +88,8 @@ class EntityBuilder {
               tableDefinitionTypeName, Symbol(key));
         });
 
-        if (prop.isRelationship && prop.relationshipType != ManagedRelationshipType.belongsTo) {
+        if (prop.isRelationship &&
+            prop.relationshipType != ManagedRelationshipType.belongsTo) {
           throw ManagedDataModelErrorImpl.relationshipEntityUniqueProperty(
               tableDefinitionTypeName, Symbol(key));
         }
@@ -94,11 +99,15 @@ class EntityBuilder {
     // Check that relationships are unique, i.e. two Relates point to the same property
     properties.where((p) => p.isRelationship).forEach((p) {
       final relationshipsWithThisInverse = properties
-          .where((check) => check.isRelationship && check.relatedProperty == p.relatedProperty)
+          .where((check) =>
+              check.isRelationship &&
+              check.relatedProperty == p.relatedProperty)
           .toList();
       if (relationshipsWithThisInverse.length > 1) {
-        throw ManagedDataModelErrorImpl.duplicateInverse(tableDefinitionTypeName,
-            p.relatedProperty.name, relationshipsWithThisInverse.map((r) => r.name).toList());
+        throw ManagedDataModelErrorImpl.duplicateInverse(
+            tableDefinitionTypeName,
+            p.relatedProperty.name,
+            relationshipsWithThisInverse.map((r) => r.name).toList());
       }
     });
 
@@ -129,12 +138,14 @@ class EntityBuilder {
     entity.validators = [];
     entity.validators.addAll(attributes.values.expand((a) => a.validators));
     entity.validators.addAll(relationships.values.expand((a) => a.validators));
-    entity.uniquePropertySet = uniquePropertySet?.map((key) => entity.properties[key])?.toList();
+    entity.uniquePropertySet =
+        uniquePropertySet?.map((key) => entity.properties[key])?.toList();
   }
 
   PropertyBuilder getInverseOf(PropertyBuilder foreignKey) {
     final expectedSymbol = foreignKey.relate.inversePropertyName;
-    var finder = (PropertyBuilder p) => p.declaration.simpleName == expectedSymbol;
+    var finder =
+        (PropertyBuilder p) => p.declaration.simpleName == expectedSymbol;
     if (foreignKey.relate.isDeferred) {
       finder = (p) {
         final propertyType = p.getDeclarationType();
@@ -171,7 +182,8 @@ class EntityBuilder {
     }
 
     var declaredTableNameClass = classHierarchyForClass(tableDefinitionType)
-        .firstWhere((cm) => cm.staticMembers[#tableName] != null, orElse: () => null);
+        .firstWhere((cm) => cm.staticMembers[#tableName] != null,
+            orElse: () => null);
 
     if (declaredTableNameClass == null) {
       return tableDefinitionTypeName;
@@ -188,7 +200,9 @@ class EntityBuilder {
         .map((p) => PropertyBuilder(this, p))
         .toList();
 
-    return [transientProperties, persistentProperties].expand((l) => l).toList();
+    return [transientProperties, persistentProperties]
+        .expand((l) => l)
+        .toList();
   }
 
   Iterable<PropertyBuilder> _getTransientAttributes() {
@@ -207,7 +221,8 @@ class EntityBuilder {
 
     final out = <PropertyBuilder>[];
     attributes.forEach((prop) {
-      final complement = out.firstWhere((pb) => pb.name == prop.name, orElse: () => null);
+      final complement =
+          out.firstWhere((pb) => pb.name == prop.name, orElse: () => null);
       if (complement != null) {
         complement.serialize = const Serialize(input: true, output: true);
       } else {
@@ -223,7 +238,8 @@ class EntityBuilder {
         "Invalid instance type '$instanceType' '${reflectClass(instanceType).simpleName}' is not subclass of 'ManagedObject'.");
 
     return classHierarchyForClass(reflectClass(instanceType))
-        .firstWhere((cm) => !cm.superclass.isSubtypeOf(reflectType(ManagedObject)),
+        .firstWhere(
+            (cm) => !cm.superclass.isSubtypeOf(reflectType(ManagedObject)),
             orElse: () => throw ifNotFoundException)
         .typeArguments
         .first as ClassMirror;

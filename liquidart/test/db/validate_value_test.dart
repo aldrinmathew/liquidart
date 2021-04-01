@@ -34,7 +34,9 @@ void main() {
       expect(t.validate(forEvent: Validating.update).isValid, false);
     });
 
-    test("A primary key that isn't @primaryKey does not have Validate.constant()", () {
+    test(
+        "A primary key that isn't @primaryKey does not have Validate.constant()",
+        () {
       final t = NonDefaultPK()..id = 1;
       expect(t.validate(forEvent: Validating.insert).isValid, true);
       expect(t.validate(forEvent: Validating.update).isValid, true);
@@ -57,13 +59,17 @@ void main() {
       expect(fk.validate().isValid, true);
     });
 
-    test("If foreign key object doesn't contain primary key, validator is not run", () {
+    test(
+        "If foreign key object doesn't contain primary key, validator is not run",
+        () {
       final fk = FK();
       fk.parent = Parent();
       expect(fk.validate().isValid, true);
     });
 
-    test("If primary key has a validator, it is not run when evaluated as a foreign key", () {
+    test(
+        "If primary key has a validator, it is not run when evaluated as a foreign key",
+        () {
       final fk = FK();
       fk.parent = Parent()..id = 10;
       expect(fk.validate().isValid, true);
@@ -236,10 +242,12 @@ void main() {
       expect(fk.validate().isValid, false);
     });
 
-    test("If foreign key object doesn't contain primary key, validator fails", () {
+    test("If foreign key object doesn't contain primary key, validator fails",
+        () {
       final fk = PresenceBelongsTo()..present = PresenceHas();
       expect(fk.validate().isValid, false);
-      expect(fk.validate().errors.first, contains("PresenceBelongsTo.present.id"));
+      expect(
+          fk.validate().errors.first, contains("PresenceBelongsTo.present.id"));
     });
   });
 
@@ -346,7 +354,8 @@ void main() {
       expect(t.validate().isValid, false);
     });
 
-    test("ManagedObject can provide add'l validations by overriding validate", () async {
+    test("ManagedObject can provide add'l validations by overriding validate",
+        () async {
       var v = V()..aOrbButReallyOnlyA = "a";
       expect(v.validate().isValid, true);
       v.aOrbButReallyOnlyA = "b";
@@ -554,7 +563,8 @@ class _PresenceHas {
   ManagedSet<PresenceBelongsTo> present;
 }
 
-class PresenceBelongsTo extends ManagedObject<_PresenceBelongsTo> implements _PresenceBelongsTo {}
+class PresenceBelongsTo extends ManagedObject<_PresenceBelongsTo>
+    implements _PresenceBelongsTo {}
 
 class _PresenceBelongsTo {
   @primaryKey
@@ -574,7 +584,8 @@ class _AbsenceHas {
   ManagedSet<AbsenceBelongsTo> absent;
 }
 
-class AbsenceBelongsTo extends ManagedObject<_AbsenceBelongsTo> implements _AbsenceBelongsTo {}
+class AbsenceBelongsTo extends ManagedObject<_AbsenceBelongsTo>
+    implements _AbsenceBelongsTo {}
 
 class _AbsenceBelongsTo {
   @primaryKey
@@ -585,16 +596,21 @@ class _AbsenceBelongsTo {
   AbsenceHas absent;
 }
 
-class NonDefaultPK extends ManagedObject<_NonDefaultPK> implements _NonDefaultPK {}
+class NonDefaultPK extends ManagedObject<_NonDefaultPK>
+    implements _NonDefaultPK {}
 
 class _NonDefaultPK {
-  @Column(primaryKey: true, databaseType: ManagedPropertyType.bigInteger, autoincrement: true)
+  @Column(
+      primaryKey: true,
+      databaseType: ManagedPropertyType.bigInteger,
+      autoincrement: true)
   int id;
 
   String name;
 }
 
-class MultiValidate extends ManagedObject<_MultiValidate> implements _MultiValidate {}
+class MultiValidate extends ManagedObject<_MultiValidate>
+    implements _MultiValidate {}
 
 const validateReference = Validate.compare(lessThan: 100);
 
@@ -604,6 +620,9 @@ class _MultiValidate {
 
   @validateReference
   @Validate.compare(lessThan: 5)
-  @Column(validators: [Validate.compare(greaterThan: 3), Validate.compare(equalTo: 4)])
+  @Column(validators: [
+    Validate.compare(greaterThan: 3),
+    Validate.compare(equalTo: 4)
+  ])
   int canOnlyBe4;
 }

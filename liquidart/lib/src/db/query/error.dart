@@ -7,14 +7,17 @@ import 'query.dart';
 ///
 /// A suggested HTTP status code based on the type of exception will always be available.
 class QueryException<T> implements HandlerException {
-  QueryException(this.event, {this.message, this.underlyingException, this.offendingItems});
+  QueryException(this.event,
+      {this.message, this.underlyingException, this.offendingItems});
 
-  QueryException.input(this.message, this.offendingItems, {this.underlyingException})
+  QueryException.input(this.message, this.offendingItems,
+      {this.underlyingException})
       : event = QueryExceptionEvent.input;
   QueryException.transport(this.message, {this.underlyingException})
       : event = QueryExceptionEvent.transport,
         offendingItems = null;
-  QueryException.conflict(this.message, this.offendingItems, {this.underlyingException})
+  QueryException.conflict(this.message, this.offendingItems,
+      {this.underlyingException})
       : event = QueryExceptionEvent.conflict;
 
   final String message;
@@ -32,7 +35,8 @@ class QueryException<T> implements HandlerException {
     return Response(_getStatus(event), null, _getBody(message, offendingItems));
   }
 
-  static Map<String, String> _getBody(String message, List<String> offendingItems) {
+  static Map<String, String> _getBody(
+      String message, List<String> offendingItems) {
     var body = {
       "error": message ?? "query failed",
     };

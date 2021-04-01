@@ -7,9 +7,11 @@ import 'package:liquidart/src/cli/mixins/database_managing.dart';
 import 'package:liquidart/src/cli/mixins/project.dart';
 import 'package:liquidart/src/cli/scripts/migration_builder.dart';
 
-class CLIDatabaseGenerate extends CLICommand with CLIDatabaseManagingCommand, CLIProject {
+class CLIDatabaseGenerate extends CLICommand
+    with CLIDatabaseManagingCommand, CLIProject {
   @Option("name",
-      help: "Name of the generated migration. Automaticaly lower- and snakecased.",
+      help:
+          "Name of the generated migration. Automaticaly lower- and snakecased.",
       defaultsTo: "unnamed")
   String get migrationName {
     final String name = decode("name");
@@ -26,7 +28,9 @@ class CLIDatabaseGenerate extends CLICommand with CLIDatabaseManagingCommand, CL
 
     for (int i = 0; i < name.length; i++) {
       final char = String.fromCharCode(name.codeUnitAt(i));
-      final nextChar = i + 1 == name.length ? null : String.fromCharCode(name.codeUnitAt(i + 1));
+      final nextChar = i + 1 == name.length
+          ? null
+          : String.fromCharCode(name.codeUnitAt(i + 1));
 
       if (symbolRegex.hasMatch(char)) {
         continue;
@@ -57,12 +61,13 @@ class CLIDatabaseGenerate extends CLICommand with CLIDatabaseManagingCommand, CL
 
     if (existingMigrations.isNotEmpty) {
       versionNumber = existingMigrations.last.versionNumber + 1;
-      newMigrationFile = File.fromUri(migrationDirectory.uri
-          .resolve("${"$versionNumber".padLeft(8, "0")}_${migrationName}.migration.dart"));
+      newMigrationFile = File.fromUri(migrationDirectory.uri.resolve(
+          "${"$versionNumber".padLeft(8, "0")}_${migrationName}.migration.dart"));
     }
 
     final schema = await schemaByApplyingMigrationSources(projectMigrations);
-    final result = await generateMigrationFileForProject(this, schema, versionNumber);
+    final result =
+        await generateMigrationFileForProject(this, schema, versionNumber);
 
     displayInfo("The following ManagedObject<T> subclasses were found:");
     displayProgress("${result.tablesEvaluated.join(", ")}");
@@ -75,7 +80,8 @@ class CLIDatabaseGenerate extends CLICommand with CLIDatabaseManagingCommand, CL
 
     newMigrationFile.writeAsStringSync(result.source);
 
-    displayInfo("Created new migration file (version $versionNumber).", color: CLIColor.boldGreen);
+    displayInfo("Created new migration file (version $versionNumber).",
+        color: CLIColor.boldGreen);
     displayProgress("New file is located at ${newMigrationFile.path}");
 
     return 0;

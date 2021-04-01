@@ -14,7 +14,9 @@ void main() {
 
   setUpAll(() async {
     await CLIClient.activateCLI();
-    templateCli = await CLIClient(CommandLineAgent(ProjectAgent.projectsDirectory)).createProject();
+    templateCli =
+        await CLIClient(CommandLineAgent(ProjectAgent.projectsDirectory))
+            .createProject();
     await templateCli.agent.getDependencies(offline: true);
   });
 
@@ -36,8 +38,8 @@ void main() {
     await task.hasStarted;
 
     expect(
-        Directory.fromUri(
-                projectUnderTestCli.agent.workingDirectory.uri.resolve(".liquidart_spec/"))
+        Directory.fromUri(projectUnderTestCli.agent.workingDirectory.uri
+                .resolve(".liquidart_spec/"))
             .existsSync(),
         true);
 
@@ -48,8 +50,8 @@ void main() {
     task.process.stop(0);
     expect(await task.exitCode, 0);
     expect(
-        Directory.fromUri(
-                projectUnderTestCli.agent.workingDirectory.uri.resolve(".liquidart_spec/"))
+        Directory.fromUri(projectUnderTestCli.agent.workingDirectory.uri
+                .resolve(".liquidart_spec/"))
             .existsSync(),
         false);
   });

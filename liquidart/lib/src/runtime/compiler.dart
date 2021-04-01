@@ -34,16 +34,19 @@ class LiquidartCompiler extends Compiler {
 
   @override
   List<Uri> getUrisToResolve(BuildContext context) {
-    return context.context.getSubclassesOf(ManagedObject).map((c) => c.location.sourceUri).toList();
+    return context.context
+        .getSubclassesOf(ManagedObject)
+        .map((c) => c.location.sourceUri)
+        .toList();
   }
 
   @override
   void deflectPackage(Directory destinationDirectory) {
-    final libFile =
-        File.fromUri(destinationDirectory.uri.resolve("lib/").resolve("liquidart.dart"));
+    final libFile = File.fromUri(
+        destinationDirectory.uri.resolve("lib/").resolve("liquidart.dart"));
     final contents = libFile.readAsStringSync();
-    libFile.writeAsStringSync(
-        contents.replaceFirst("export 'package:liquidart/src/runtime/compiler.dart';", ""));
+    libFile.writeAsStringSync(contents.replaceFirst(
+        "export 'package:liquidart/src/runtime/compiler.dart';", ""));
   }
 
   @override
@@ -51,11 +54,15 @@ class LiquidartCompiler extends Compiler {
     if (context.forTests) {
       print("Copying liquidart_test...");
       copyDirectory(
-          src: context.sourceApplicationDirectory.uri.resolve("../").resolve("liquidart_test/"),
+          src: context.sourceApplicationDirectory.uri
+              .resolve("../")
+              .resolve("liquidart_test/"),
           dst: context.buildPackagesDirectory.uri.resolve("liquidart_test/"));
-      final targetPubspecFile = File.fromUri(context.buildDirectoryUri.resolve("pubspec.yaml"));
+      final targetPubspecFile =
+          File.fromUri(context.buildDirectoryUri.resolve("pubspec.yaml"));
       final pubspecContents = json.decode(targetPubspecFile.readAsStringSync());
-      pubspecContents["dev_dependencies"]["liquidart_test"]["path"] = "packages/liquidart_test";
+      pubspecContents["dev_dependencies"]["liquidart_test"]["path"] =
+          "packages/liquidart_test";
       pubspecContents["dependency_overrides"]["liquidart"] =
           pubspecContents["dependencies"]["liquidart"];
       targetPubspecFile.writeAsStringSync(json.encode(pubspecContents));

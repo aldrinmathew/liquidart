@@ -46,14 +46,19 @@ class AuthUtility {
   /// Note that [secret] is hashed with a randomly generated salt, and therefore cannot be retrieved
   /// later. The plain-text secret must be stored securely elsewhere.
   static AuthClient generateAPICredentialPair(String clientID, String secret,
-      {String redirectURI, int hashLength = 32, int hashRounds = 1000, Hash hashFunction}) {
+      {String redirectURI,
+      int hashLength = 32,
+      int hashRounds = 1000,
+      Hash hashFunction}) {
     if (secret == null) {
       return AuthClient.withRedirectURI(clientID, null, null, redirectURI);
     }
 
     final salt = generateRandomSalt(hashLength: hashLength);
     final hashed = generatePasswordHash(secret, salt,
-        hashRounds: hashRounds, hashLength: hashLength, hashFunction: hashFunction);
+        hashRounds: hashRounds,
+        hashLength: hashLength,
+        hashFunction: hashFunction);
 
     return AuthClient.withRedirectURI(clientID, hashed, salt, redirectURI);
   }

@@ -144,7 +144,8 @@ void main() {
       expect(o.document.data, {"innerKey": "value"});
     });
 
-    test("Can subscript top-level array and return indexed primitive", () async {
+    test("Can subscript top-level array and return indexed primitive",
+        () async {
       // [1, 2],
       var q = Query<Obj>(context)
         ..where((o) => o.id).equalTo(4)

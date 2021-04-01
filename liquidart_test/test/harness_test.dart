@@ -65,7 +65,6 @@ void main() {
       expect(harness.events.last.last, true);
       expect(harness.setupCount, 2);
       expect(harness.tearDownCount, 1);
-
     });
 
     test("agent is set prior to afterStart running", () async {
@@ -105,13 +104,11 @@ class HarnessSubclass extends TestHarness<Channel> {
 
   @override
   Future onSetUp() async {
-    setupCount ++;
+    setupCount++;
   }
 
   @override
   Future onTearDown() async {
-    tearDownCount ++;
+    tearDownCount++;
   }
-
-
 }

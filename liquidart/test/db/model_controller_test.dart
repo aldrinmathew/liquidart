@@ -100,7 +100,8 @@ class TestModelController extends QueryController<TestModel> {
         .expressions
         .firstWhere((expr) => expr.keyPath.path.first.name == "id")
         .expression as ComparisonExpression;
-    if (comparisonMatcher.operator != PredicateOperator.equalTo || comparisonMatcher.value != id) {
+    if (comparisonMatcher.operator != PredicateOperator.equalTo ||
+        comparisonMatcher.value != id) {
       statusCode = 400;
     }
 
@@ -129,7 +130,8 @@ class TestModelController extends QueryController<TestModel> {
         .expressions
         .firstWhere((expr) => expr.keyPath.path.first.name == "id")
         .expression as ComparisonExpression;
-    if (comparisonMatcher.operator != PredicateOperator.equalTo || comparisonMatcher.value != id) {
+    if (comparisonMatcher.operator != PredicateOperator.equalTo ||
+        comparisonMatcher.value != id) {
       statusCode = 400;
     }
 

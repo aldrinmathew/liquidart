@@ -20,9 +20,10 @@ class ApplicationServer {
   ///
   /// You should not need to invoke this method directly.
   ApplicationServer(this.channelType, this.options, this.identifier) {
-    channel = (RuntimeContext.current[channelType] as ChannelRuntime).instantiateChannel()
-      ..server = this
-      ..options = options;
+    channel = (RuntimeContext.current[channelType] as ChannelRuntime)
+        .instantiateChannel()
+          ..server = this
+          ..options = options;
   }
 
   /// The configuration this instance used to start its [channel].
@@ -73,7 +74,8 @@ class ApplicationServer {
     if (securityContext != null) {
       _requiresHTTPS = true;
 
-      server = await HttpServer.bindSecure(options.address, options.port, securityContext,
+      server = await HttpServer.bindSecure(
+          options.address, options.port, securityContext,
           requestClientCertificate: options.isUsingClientCertificate,
           v6Only: options.isIpv6Only,
           shared: shareHttpServer);

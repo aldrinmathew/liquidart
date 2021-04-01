@@ -16,7 +16,8 @@ void main() {
     });
 
     test("Insert an object that references an existing object", () async {
-      final parent = await Query.insertObject(context, SelfRef()..name = "parent");
+      final parent =
+          await Query.insertObject(context, SelfRef()..name = "parent");
 
       var q = Query<SelfRef>(context)
         ..values.name = "child"
@@ -33,7 +34,8 @@ void main() {
     });
 
     test("Update an object to reference itself", () async {
-      final parent = await Query.insertObject(context, SelfRef()..name = "self");
+      final parent =
+          await Query.insertObject(context, SelfRef()..name = "self");
 
       var q = Query<SelfRef>(context)
         ..where((s) => s.id).equalTo(parent.id)
@@ -65,7 +67,8 @@ void main() {
 
       q = Query<SelfRef>(context)
         ..where((s) => s.id).equalTo(parent.id)
-        ..join(set: (s) => s.children).sortBy((s) => s.name, QuerySortOrder.ascending);
+        ..join(set: (s) => s.children)
+            .sortBy((s) => s.name, QuerySortOrder.ascending);
       final all = await q.fetch();
       expect(all.map((s) => s.asMap()).toList(), [
         {
@@ -136,8 +139,10 @@ void main() {
             ..name = "x"
             ..parent = objs.first);
 
-      q = Query<SelfRef>(context)..sortBy((s) => s.name, QuerySortOrder.ascending);
-      final inner = q.join(set: (s) => s.children)..sortBy((s) => s.name, QuerySortOrder.ascending);
+      q = Query<SelfRef>(context)
+        ..sortBy((s) => s.name, QuerySortOrder.ascending);
+      final inner = q.join(set: (s) => s.children)
+        ..sortBy((s) => s.name, QuerySortOrder.ascending);
       inner.join(set: (s) => s.children);
 
       final all = await q.fetch();
@@ -222,7 +227,9 @@ void main() {
             ..parent = objs.first);
 
       q = Query<SelfRef>(context)..where((s) => s.id).equalTo(parent.id);
-      q.join(set: (s) => s.children).sortBy((s) => s.name, QuerySortOrder.ascending);
+      q
+          .join(set: (s) => s.children)
+          .sortBy((s) => s.name, QuerySortOrder.ascending);
 
       final all = await q.fetch();
       expect(all.map((s) => s.asMap()).toList(), [
@@ -269,7 +276,8 @@ void main() {
             ..name = "x"
             ..parent = objs.first);
 
-      q = Query<SelfRef>(context)..sortBy((s) => s.name, QuerySortOrder.ascending);
+      q = Query<SelfRef>(context)
+        ..sortBy((s) => s.name, QuerySortOrder.ascending);
       q.join(set: (s) => s.children).where((s) => s.name).greaterThan("b");
 
       final all = await q.fetch();
@@ -319,7 +327,8 @@ void main() {
       ]);
     });
 
-    test("Join with where clause on both the primary and joined table", () async {
+    test("Join with where clause on both the primary and joined table",
+        () async {
       var q = Query<SelfRef>(context)..values.name = "parent";
       final parent = await q.insert();
 
@@ -394,7 +403,8 @@ void main() {
         ..values.belongsToLeft = l1;
       await updateQuery.updateOne();
 
-      final q = Query<Left>(context)..join(object: (l) => l.right).join(object: (r) => r.left);
+      final q = Query<Left>(context)
+        ..join(object: (l) => l.right).join(object: (r) => r.left);
       final all = await q.fetch();
       expect(all.map((s) => s.asMap()).toList(), [
         {

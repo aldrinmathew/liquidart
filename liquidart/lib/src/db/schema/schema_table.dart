@@ -8,7 +8,8 @@ import 'schema.dart';
 /// Instances of this type contain the database-only details of a [ManagedEntity]. See also [Schema].
 class SchemaTable {
   /// Creates an instance of this type with a [name], [columns] and [uniqueColumnSetNames].
-  SchemaTable(this.name, List<SchemaColumn> columns, {List<String> uniqueColumnSetNames}) {
+  SchemaTable(this.name, List<SchemaColumn> columns,
+      {List<String> uniqueColumnSetNames}) {
     uniqueColumnSet = uniqueColumnSetNames;
     _columns = columns;
   }
@@ -24,7 +25,8 @@ class SchemaTable {
                 p.relationshipType == ManagedRelationshipType.belongsTo))
         .toList();
 
-    _columns = validProperties.map((p) => SchemaColumn.fromProperty(p)).toList();
+    _columns =
+        validProperties.map((p) => SchemaColumn.fromProperty(p)).toList();
 
     uniqueColumnSet = entity.uniquePropertySet?.map((p) => p.name)?.toList();
   }
@@ -44,8 +46,9 @@ class SchemaTable {
   /// This [map] is typically generated from [asMap];
   SchemaTable.fromMap(Map<String, dynamic> map) {
     name = map["name"] as String;
-    _columns =
-        (map["columns"] as List<Map<String, dynamic>>).map((c) => SchemaColumn.fromMap(c)).toList();
+    _columns = (map["columns"] as List<Map<String, dynamic>>)
+        .map((c) => SchemaColumn.fromMap(c))
+        .toList();
     uniqueColumnSet = (map["unique"] as List)?.cast();
   }
 
@@ -75,8 +78,9 @@ class SchemaTable {
   /// An unmodifiable list of [SchemaColumn]s in this table.
   List<SchemaColumn> get columns => List.unmodifiable(_columnStorage ?? []);
 
-  bool get hasForeignKeyInUniqueSet =>
-      columns.where((c) => c.isForeignKey).any((c) => uniqueColumnSet?.contains(c.name) ?? false);
+  bool get hasForeignKeyInUniqueSet => columns
+      .where((c) => c.isForeignKey)
+      .any((c) => uniqueColumnSet?.contains(c.name) ?? false);
 
   List<SchemaColumn> _columnStorage;
   List<String> _uniqueColumnSet;
@@ -144,7 +148,8 @@ class SchemaTable {
   /// Replaces [existingColumn] with [newColumn] in this table.
   void replaceColumn(SchemaColumn existingColumn, SchemaColumn newColumn) {
     if (!columns.contains(existingColumn)) {
-      throw SchemaException("Column ${existingColumn.name} does not exist on $name.");
+      throw SchemaException(
+          "Column ${existingColumn.name} does not exist on $name.");
     }
 
     var index = _columnStorage.indexOf(existingColumn);
@@ -159,7 +164,8 @@ class SchemaTable {
   /// with [name].
   SchemaColumn columnForName(String name) {
     var lowercaseName = name.toLowerCase();
-    return columns.firstWhere((col) => col.name.toLowerCase() == lowercaseName, orElse: () => null);
+    return columns.firstWhere((col) => col.name.toLowerCase() == lowercaseName,
+        orElse: () => null);
   }
 
   /// Returns portable representation of this table.
@@ -183,7 +189,8 @@ class SchemaTableDifference {
   SchemaTableDifference(this.expectedTable, this.actualTable) {
     if (expectedTable != null && actualTable != null) {
       for (var expectedColumn in expectedTable.columns) {
-        final actualColumn = actualTable != null ? actualTable[expectedColumn.name] : null;
+        final actualColumn =
+            actualTable != null ? actualTable[expectedColumn.name] : null;
         if (actualColumn == null) {
           _differingColumns.add(SchemaColumnDifference(expectedColumn, null));
         } else {
@@ -194,12 +201,14 @@ class SchemaTableDifference {
         }
       }
 
-      _differingColumns.addAll(
-          actualTable.columns.where((t) => expectedTable[t.name] == null).map((unexpectedColumn) {
+      _differingColumns.addAll(actualTable.columns
+          .where((t) => expectedTable[t.name] == null)
+          .map((unexpectedColumn) {
         return SchemaColumnDifference(null, unexpectedColumn);
       }));
 
-      uniqueSetDifference = SchemaTableUniqueSetDifference(expectedTable, actualTable);
+      uniqueSetDifference =
+          SchemaTableUniqueSetDifference(expectedTable, actualTable);
     }
   }
 
@@ -229,9 +238,13 @@ class SchemaTableDifference {
   /// Human-readable list of differences between [expectedTable] and [actualTable].
   List<String> get errorMessages {
     if (expectedTable == null && actualTable != null) {
-      return ["Table '$actualTable' should NOT exist, but is created by migration files."];
+      return [
+        "Table '$actualTable' should NOT exist, but is created by migration files."
+      ];
     } else if (expectedTable != null && actualTable == null) {
-      return ["Table '$expectedTable' should exist, but it is NOT created by migration files."];
+      return [
+        "Table '$expectedTable' should exist, but it is NOT created by migration files."
+      ];
     }
 
     var diffs = _differingColumns.expand((diff) => diff.errorMessages).toList();
@@ -244,21 +257,25 @@ class SchemaTableDifference {
 
   List<SchemaColumn> get columnsToAdd {
     return _differingColumns
-        .where((diff) => diff.expectedColumn == null && diff.actualColumn != null)
+        .where(
+            (diff) => diff.expectedColumn == null && diff.actualColumn != null)
         .map((diff) => diff.actualColumn)
         .toList();
   }
 
   List<SchemaColumn> get columnsToRemove {
     return _differingColumns
-        .where((diff) => diff.expectedColumn != null && diff.actualColumn == null)
+        .where(
+            (diff) => diff.expectedColumn != null && diff.actualColumn == null)
         .map((diff) => diff.expectedColumn)
         .toList();
   }
 
   List<SchemaColumnDifference> get columnsToModify {
     return _differingColumns
-        .where((columnDiff) => columnDiff.expectedColumn != null && columnDiff.actualColumn != null)
+        .where((columnDiff) =>
+            columnDiff.expectedColumn != null &&
+            columnDiff.actualColumn != null)
         .toList();
   }
 
@@ -267,7 +284,8 @@ class SchemaTableDifference {
 
 /// Difference between two [SchemaTable.uniqueColumnSet]s.
 class SchemaTableUniqueSetDifference {
-  SchemaTableUniqueSetDifference(SchemaTable expectedTable, SchemaTable actualTable)
+  SchemaTableUniqueSetDifference(
+      SchemaTable expectedTable, SchemaTable actualTable)
       : expectedColumnNames = expectedTable.uniqueColumnSet ?? [],
         actualColumnNames = actualTable.uniqueColumnSet ?? [],
         _tableName = actualTable.name;

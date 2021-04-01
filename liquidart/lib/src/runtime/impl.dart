@@ -52,13 +52,16 @@ class ChannelRuntimeImpl extends ChannelRuntime implements SourceCompiler {
   }
 
   @override
-  Iterable<APIComponentDocumenter> getDocumentableChannelComponents(ApplicationChannel channel) {
+  Iterable<APIComponentDocumenter> getDocumentableChannelComponents(
+      ApplicationChannel channel) {
     final documenter = reflectType(APIComponentDocumenter);
     return type.declarations.values
         .whereType<VariableMirror>()
-        .where((member) => !member.isStatic && member.type.isAssignableTo(documenter))
+        .where((member) =>
+            !member.isStatic && member.type.isAssignableTo(documenter))
         .map((dm) {
-      return reflect(channel).getField(dm.simpleName).reflectee as APIComponentDocumenter;
+      return reflect(channel).getField(dm.simpleName).reflectee
+          as APIComponentDocumenter;
     }).where((o) => o != null);
   }
 
@@ -66,8 +69,9 @@ class ChannelRuntimeImpl extends ChannelRuntime implements SourceCompiler {
   String compile(BuildContext ctx) {
     final className = MirrorSystem.getName(type.simpleName);
     final originalFileUri = type.location.sourceUri.toString();
-    final globalInitBody =
-        hasGlobalInitializationMethod ? "await $className.initializeApplication(config);" : "";
+    final globalInitBody = hasGlobalInitializationMethod
+        ? "await $className.initializeApplication(config);"
+        : "";
 
     return """
 import 'dart:async';    
@@ -121,27 +125,30 @@ class ChannelRuntimeImpl extends ChannelRuntime {
 }
 
 void isolateServerEntryPoint(ApplicationInitialServerMessage params) {
-  final channelSourceLibrary = currentMirrorSystem().libraries[params.streamLibraryURI];
-  final channelType =
-      channelSourceLibrary.declarations[Symbol(params.streamTypeName)] as ClassMirror;
+  final channelSourceLibrary =
+      currentMirrorSystem().libraries[params.streamLibraryURI];
+  final channelType = channelSourceLibrary
+      .declarations[Symbol(params.streamTypeName)] as ClassMirror;
 
   final runtime = ChannelRuntimeImpl(channelType);
 
-  final server = ApplicationIsolateServer(
-      runtime.channelType, params.configuration, params.identifier, params.parentMessagePort,
+  final server = ApplicationIsolateServer(runtime.channelType,
+      params.configuration, params.identifier, params.parentMessagePort,
       logToConsole: params.logToConsole);
 
   server.start(shareHttpServer: true);
 }
 
-class ControllerRuntimeImpl extends ControllerRuntime implements SourceCompiler {
+class ControllerRuntimeImpl extends ControllerRuntime
+    implements SourceCompiler {
   ControllerRuntimeImpl(this.type) {
     if (type.isSubclassOf(reflectClass(ResourceController))) {
       resourceController = ResourceControllerRuntimeImpl(type);
     }
 
     if (isMutable && !type.isAssignableTo(reflectType(Recyclable))) {
-      throw StateError("Invalid controller '${MirrorSystem.getName(type.simpleName)}'. "
+      throw StateError(
+          "Invalid controller '${MirrorSystem.getName(type.simpleName)}'. "
           "Controllers must not have setters and all fields must be marked as final, or it must implement 'Recyclable'.");
     }
   }
@@ -156,8 +163,8 @@ class ControllerRuntimeImpl extends ControllerRuntime implements SourceCompiler 
     // We have a whitelist for a few things declared in controller that can't be final.
     final whitelist = ['policy=', '_nextController='];
     final members = type.instanceMembers;
-    final fieldKeys =
-        type.instanceMembers.keys.where((sym) => !whitelist.contains(MirrorSystem.getName(sym)));
+    final fieldKeys = type.instanceMembers.keys
+        .where((sym) => !whitelist.contains(MirrorSystem.getName(sym)));
     return fieldKeys.any((key) => members[key].isSetter);
   }
 
@@ -199,9 +206,11 @@ class SerializableRuntimeImpl extends SerializableRuntime {
   APISchemaObject documentSchema(APIDocumentContext context) {
     final mirror = type;
 
-    final obj = APISchemaObject.object({})..title = MirrorSystem.getName(mirror.simpleName);
+    final obj = APISchemaObject.object({})
+      ..title = MirrorSystem.getName(mirror.simpleName);
     try {
-      for (final property in mirror.declarations.values.whereType<VariableMirror>()) {
+      for (final property
+          in mirror.declarations.values.whereType<VariableMirror>()) {
         final propName = MirrorSystem.getName(property.simpleName);
         obj.properties[propName] = documentVariable(context, property);
       }
@@ -214,14 +223,16 @@ class SerializableRuntimeImpl extends SerializableRuntime {
     return obj;
   }
 
-  static APISchemaObject documentVariable(APIDocumentContext context, VariableMirror mirror) {
+  static APISchemaObject documentVariable(
+      APIDocumentContext context, VariableMirror mirror) {
     APISchemaObject object = documentType(context, mirror.type)
       ..title = MirrorSystem.getName(mirror.simpleName);
 
     return object;
   }
 
-  static APISchemaObject documentType(APIDocumentContext context, TypeMirror type) {
+  static APISchemaObject documentType(
+      APIDocumentContext context, TypeMirror type) {
     if (type.isAssignableTo(reflectType(int))) {
       return APISchemaObject.integer();
     } else if (type.isAssignableTo(reflectType(double))) {
@@ -233,21 +244,24 @@ class SerializableRuntimeImpl extends SerializableRuntime {
     } else if (type.isAssignableTo(reflectType(DateTime))) {
       return APISchemaObject.string(format: "date-time");
     } else if (type.isAssignableTo(reflectType(List))) {
-      return APISchemaObject.array(ofSchema: documentType(context, type.typeArguments.first));
+      return APISchemaObject.array(
+          ofSchema: documentType(context, type.typeArguments.first));
     } else if (type.isAssignableTo(reflectType(Map))) {
       if (!type.typeArguments.first.isAssignableTo(reflectType(String))) {
         throw ArgumentError("Unsupported type 'Map' with non-string keys.");
       }
       return APISchemaObject()
         ..type = APIType.object
-        ..additionalPropertySchema = documentType(context, type.typeArguments.last);
+        ..additionalPropertySchema =
+            documentType(context, type.typeArguments.last);
     } else if (type.isAssignableTo(reflectType(Serializable))) {
-      final instance =
-          (type as ClassMirror).newInstance(const Symbol(''), []).reflectee as Serializable;
+      final instance = (type as ClassMirror)
+          .newInstance(const Symbol(''), []).reflectee as Serializable;
       return instance.documentSchema(context);
     }
 
-    throw ArgumentError("Unsupported type '${MirrorSystem.getName(type.simpleName)}' "
+    throw ArgumentError(
+        "Unsupported type '${MirrorSystem.getName(type.simpleName)}' "
         "for 'APIComponentDocumenter.documentType'.");
   }
 }

@@ -28,11 +28,13 @@ class App extends ApplicationChannel {
 
   @override
   Future prepare() async {
-    final config = AppConfiguration.fromFile(File(options.configurationFilePath));
+    final config =
+        AppConfiguration.fromFile(File(options.configurationFilePath));
     final db = config.database;
     final persistentStore = PostgreSQLPersistentStore.fromConnectionInfo(
         db.username, db.password, db.host, db.port, db.databaseName);
-    context = ManagedContext(ManagedDataModel.fromCurrentMirrorSystem(), persistentStore);
+    context = ManagedContext(
+        ManagedDataModel.fromCurrentMirrorSystem(), persistentStore);
 
     authServer = AuthServer(ManagedAuthDelegate(context));
   }
@@ -74,7 +76,8 @@ class UserController extends ResourceController {
   @Operation.post()
   Future<Response> createUser(@Bind.body() User user) async {
     if (user.username == null || user.password == null) {
-      return Response.badRequest(body: {"error": "username and password required."});
+      return Response.badRequest(
+          body: {"error": "username and password required."});
     }
 
     final salt = AuthUtility.generateRandomSalt();
@@ -87,8 +90,11 @@ class UserController extends ResourceController {
       ..values.email = user.username;
 
     final u = await query.insert();
-    final token = await authServer.authenticate(u.username, query.values.password,
-        request.authorization.credentials.username, request.authorization.credentials.password);
+    final token = await authServer.authenticate(
+        u.username,
+        query.values.password,
+        request.authorization.credentials.username,
+        request.authorization.credentials.password);
 
     return AuthController.tokenResponse(token);
   }
@@ -100,7 +106,8 @@ class AppConfiguration extends Configuration {
   DatabaseConfiguration database;
 }
 
-class User extends ManagedObject<_User> implements _User, ManagedAuthResourceOwner<_User> {
+class User extends ManagedObject<_User>
+    implements _User, ManagedAuthResourceOwner<_User> {
   @Serialize(input: true, output: false)
   String password;
 }

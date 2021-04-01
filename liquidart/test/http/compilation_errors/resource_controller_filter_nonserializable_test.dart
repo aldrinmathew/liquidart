@@ -18,7 +18,8 @@ void main() {
 
 class FilterNonSerializable extends ResourceController {
   @Operation.post()
-  Future<Response> get1(@Bind.body(ignore: ["id"]) Map<String, dynamic> a) async {
+  Future<Response> get1(
+      @Bind.body(ignore: ["id"]) Map<String, dynamic> a) async {
     return Response.ok(null);
   }
 }

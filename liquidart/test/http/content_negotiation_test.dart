@@ -31,8 +31,11 @@ void main() {
     expect(request.acceptsContentType(ContentType.binary), true);
   });
 
-  test("Two implicitly equal q-values order is defined by their position in request", () async {
-    final request = await clientServer.getWithTypes(["text/plain", "text/html"]);
+  test(
+      "Two implicitly equal q-values order is defined by their position in request",
+      () async {
+    final request =
+        await clientServer.getWithTypes(["text/plain", "text/html"]);
     expect(
         request.acceptableContentTypes
             .any((ct) => ct.primaryType == "text" && ct.subType == "plain"),
@@ -47,8 +50,11 @@ void main() {
     expect(request.acceptsContentType(ContentType.binary), false);
   });
 
-  test("Two explicitly equal q-values order is defined by their position in request", () async {
-    final request = await clientServer.getWithTypes(["text/plain; q=1.0", "text/html; q=1.0"]);
+  test(
+      "Two explicitly equal q-values order is defined by their position in request",
+      () async {
+    final request = await clientServer
+        .getWithTypes(["text/plain; q=1.0", "text/html; q=1.0"]);
 
     expect(
         request.acceptableContentTypes.first.primaryType == "text" &&
@@ -65,7 +71,8 @@ void main() {
   });
 
   test("Q-value with explicit 1 (not 1.0) is interpreted as 1.0", () async {
-    final request = await clientServer.getWithTypes(["text/plain; q=1.0", "text/html; q=1"]);
+    final request = await clientServer
+        .getWithTypes(["text/plain; q=1.0", "text/html; q=1"]);
     expect(
         request.acceptableContentTypes.first.primaryType == "text" &&
             request.acceptableContentTypes.first.subType == "plain",
@@ -80,7 +87,8 @@ void main() {
     expect(request.acceptsContentType(ContentType.binary), false);
   });
 
-  test("Two equal q-values but primary type is * prefers to other type", () async {
+  test("Two equal q-values but primary type is * prefers to other type",
+      () async {
     final request = await clientServer.getWithTypes(["*/*", "text/html"]);
     expect(
         request.acceptableContentTypes.first.primaryType == "text" &&
@@ -113,8 +121,11 @@ void main() {
   });
 
   test("Sorted by q-value if all content-types are fully defined", () async {
-    final request = await clientServer
-        .getWithTypes(["text/plain; q=0.4", "text/html; q=0.8", "application/json; charset=utf-8"]);
+    final request = await clientServer.getWithTypes([
+      "text/plain; q=0.4",
+      "text/html; q=0.8",
+      "application/json; charset=utf-8"
+    ]);
 
     expect(
         request.acceptableContentTypes.first.primaryType == "application" &&
@@ -165,7 +176,8 @@ class ClientServer {
       if (contentTypeStrings.isEmpty) {
         req.headers.set(HttpHeaders.acceptHeader, "");
       } else {
-        req.headers.add(HttpHeaders.acceptHeader, contentTypeStrings.join(", "));
+        req.headers
+            .add(HttpHeaders.acceptHeader, contentTypeStrings.join(", "));
       }
     }
 

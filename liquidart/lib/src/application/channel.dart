@@ -81,7 +81,8 @@ abstract class ApplicationChannel implements APIComponentDocumenter {
   /// reference a private key and certificate file, this value is derived from that information. You may override
   /// this method to provide an alternative means to creating a [SecurityContext].
   SecurityContext get securityContext {
-    if (options?.certificateFilePath == null || options?.privateKeyFilePath == null) {
+    if (options?.certificateFilePath == null ||
+        options?.privateKeyFilePath == null) {
       return null;
     }
 
@@ -139,7 +140,8 @@ abstract class ApplicationChannel implements APIComponentDocumenter {
   /// If you do override this method, you must call the super implementation.
   @mustCallSuper
   Future close() async {
-    logger.fine("ApplicationChannel(${server.identifier}).close: closing messageHub");
+    logger.fine(
+        "ApplicationChannel(${server.identifier}).close: closing messageHub");
     await messageHub.close();
   }
 
@@ -169,7 +171,8 @@ abstract class ApplicationChannel implements APIComponentDocumenter {
 
     doc.paths = root.documentPaths(context);
 
-    doc.info = APIInfo(projectSpec["name"] as String, projectSpec["version"] as String,
+    doc.info = APIInfo(
+        projectSpec["name"] as String, projectSpec["version"] as String,
         description: projectSpec["description"] as String);
 
     await context.finalize();
@@ -215,8 +218,10 @@ abstract class ApplicationChannel implements APIComponentDocumenter {
 ///         });
 class ApplicationMessageHub extends Stream<dynamic> implements Sink<dynamic> {
   final Logger _logger = Logger("liquidart");
-  final StreamController<dynamic> _outboundController = StreamController<dynamic>();
-  final StreamController<dynamic> _inboundController = StreamController<dynamic>.broadcast();
+  final StreamController<dynamic> _outboundController =
+      StreamController<dynamic>();
+  final StreamController<dynamic> _inboundController =
+      StreamController<dynamic>.broadcast();
 
   /// Adds a listener for messages from other hubs.
   ///
@@ -230,7 +235,8 @@ class ApplicationMessageHub extends Stream<dynamic> implements Sink<dynamic> {
           {Function onError, void onDone(), bool cancelOnError = false}) =>
       _inboundController.stream.listen(onData,
           onError: onError ??
-              (err, StackTrace st) => _logger.severe("ApplicationMessageHub error", err, st),
+              (err, StackTrace st) =>
+                  _logger.severe("ApplicationMessageHub error", err, st),
           onDone: onDone,
           cancelOnError: cancelOnError);
 
@@ -261,7 +267,8 @@ class ApplicationMessageHub extends Stream<dynamic> implements Sink<dynamic> {
 }
 
 abstract class ChannelRuntime {
-  Iterable<APIComponentDocumenter> getDocumentableChannelComponents(ApplicationChannel channel);
+  Iterable<APIComponentDocumenter> getDocumentableChannelComponents(
+      ApplicationChannel channel);
 
   Type get channelType;
 

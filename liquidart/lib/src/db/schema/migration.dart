@@ -54,13 +54,15 @@ abstract class Migration {
   /// to a database after this migration version is executed.
   Future seed();
 
-  static String sourceForSchemaUpgrade(Schema existingSchema, Schema newSchema, int version,
+  static String sourceForSchemaUpgrade(
+      Schema existingSchema, Schema newSchema, int version,
       {List<String> changeList}) {
     final diff = existingSchema.differenceFrom(newSchema);
-    final source = SchemaBuilder.fromDifference(null, diff, changeList: changeList)
-        .commands
-        .map((line) => "\t\t$line")
-        .join("\n");
+    final source =
+        SchemaBuilder.fromDifference(null, diff, changeList: changeList)
+            .commands
+            .map((line) => "\t\t$line")
+            .join("\n");
 
     return """
 import 'dart:async';

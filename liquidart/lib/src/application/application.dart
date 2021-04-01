@@ -93,7 +93,8 @@ class Application<T extends ApplicationChannel> {
       await _runtime.runGlobalInitialization(options);
 
       for (var i = 0; i < numberOfInstances; i++) {
-        final supervisor = await _spawn(this, options, i + 1, logger, isolateStartupTimeout,
+        final supervisor = await _spawn(
+            this, options, i + 1, logger, isolateStartupTimeout,
             logToConsole: consoleLogging);
         supervisors.add(supervisor);
         await supervisor.resume();
@@ -153,8 +154,8 @@ class Application<T extends ApplicationChannel> {
   /// Creates an [APIDocument] from an [ApplicationChannel].
   ///
   /// This method is called by the `liquidart document` CLI.
-  static Future<APIDocument> document(
-      Type type, ApplicationOptions config, Map<String, dynamic> projectSpec) async {
+  static Future<APIDocument> document(Type type, ApplicationOptions config,
+      Map<String, dynamic> projectSpec) async {
     final runtime = RuntimeContext.current[type] as ChannelRuntime;
 
     await runtime.runGlobalInitialization(config);
@@ -170,8 +171,12 @@ class Application<T extends ApplicationChannel> {
     return doc;
   }
 
-  Future<ApplicationIsolateSupervisor> _spawn(Application application, ApplicationOptions config,
-      int identifier, Logger logger, Duration startupTimeout,
+  Future<ApplicationIsolateSupervisor> _spawn(
+      Application application,
+      ApplicationOptions config,
+      int identifier,
+      Logger logger,
+      Duration startupTimeout,
       {bool logToConsole = false}) async {
     final receivePort = ReceivePort();
 
@@ -182,9 +187,11 @@ class Application<T extends ApplicationChannel> {
     final initialMessage = ApplicationInitialServerMessage(
         typeName, libraryUri, config, identifier, receivePort.sendPort,
         logToConsole: logToConsole);
-    final isolate = await Isolate.spawn(entryPoint, initialMessage, paused: true);
+    final isolate =
+        await Isolate.spawn(entryPoint, initialMessage, paused: true);
 
-    return ApplicationIsolateSupervisor(application, isolate, receivePort, identifier, logger,
+    return ApplicationIsolateSupervisor(
+        application, isolate, receivePort, identifier, logger,
         startupTimeout: startupTimeout);
   }
 }

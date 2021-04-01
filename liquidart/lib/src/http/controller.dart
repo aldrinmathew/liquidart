@@ -57,7 +57,8 @@ abstract class Linkable {
 ///
 /// Subclasses must implement [handle] to respond to, modify or forward requests.
 /// This class must be subclassed. [Router] and [ResourceController] are common subclasses.
-abstract class Controller implements APIComponentDocumenter, APIOperationDocumenter, Linkable {
+abstract class Controller
+    implements APIComponentDocumenter, APIOperationDocumenter, Linkable {
   /// Returns a stacktrace and additional details about how the request's processing in the HTTP response.
   ///
   /// By default, this is false. During debugging, setting this to true can help debug Liquidart applications
@@ -220,7 +221,8 @@ abstract class Controller implements APIComponentDocumenter, APIOperationDocumen
   /// Note: If [caughtValue]'s implements [HandlerException], this method is not called.
   ///
   /// If you override this method, it must not throw.
-  Future handleError(Request request, dynamic caughtValue, StackTrace trace) async {
+  Future handleError(
+      Request request, dynamic caughtValue, StackTrace trace) async {
     if (caughtValue is HTTPStreamingException) {
       logger.severe("${request.toDebugString(includeHeaders: true)}",
           caughtValue.underlyingException, caughtValue.trace);
@@ -240,11 +242,13 @@ abstract class Controller implements APIComponentDocumenter, APIOperationDocumen
             }
           : null;
 
-      final response = Response.serverError(body: body)..contentType = ContentType.json;
+      final response = Response.serverError(body: body)
+        ..contentType = ContentType.json;
 
       await _sendResponse(request, response, includeCORSHeaders: true);
 
-      logger.severe("${request.toDebugString(includeHeaders: true)}", caughtValue, trace);
+      logger.severe(
+          "${request.toDebugString(includeHeaders: true)}", caughtValue, trace);
     } catch (e) {
       logger.severe("Failed to send response, draining request. Reason: $e");
       // ignore: unawaited_futures
@@ -313,7 +317,8 @@ abstract class Controller implements APIComponentDocumenter, APIOperationDocumen
     return controllerToDictatePolicy?.receive(req);
   }
 
-  Future _sendResponse(Request request, Response response, {bool includeCORSHeaders = false}) {
+  Future _sendResponse(Request request, Response response,
+      {bool includeCORSHeaders = false}) {
     if (includeCORSHeaders) {
       applyCORSHeadersIfNecessary(request, response);
     }

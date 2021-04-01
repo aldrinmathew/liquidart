@@ -62,7 +62,8 @@ class CLIClient {
     if (dstDirectory.existsSync()) {
       dstDirectory.deleteSync(recursive: true);
     }
-    CommandLineAgent.copyDirectory(src: agent.workingDirectory.uri, dst: dstUri);
+    CommandLineAgent.copyDirectory(
+        src: agent.workingDirectory.uri, dst: dstUri);
     return CLIClient(ProjectAgent.existing(dstUri));
   }
 
@@ -71,7 +72,9 @@ class CLIClient {
   }
 
   Future<CLIClient> createProject(
-      {String name = "application_test", String template, bool offline = true}) async {
+      {String name = "application_test",
+      String template,
+      bool offline = true}) async {
     if (template == null) {
       final client = CLIClient(ProjectAgent(name, dependencies: {
         "liquidart": {"path": "../.."}
@@ -121,11 +124,13 @@ class TestChannel extends ApplicationChannel {
     await run("create", args);
     print("$output");
 
-    return CLIClient(ProjectAgent.existing(ProjectAgent.projectsDirectory.uri.resolve("$name/")));
+    return CLIClient(ProjectAgent.existing(
+        ProjectAgent.projectsDirectory.uri.resolve("$name/")));
   }
 
   Future<int> executeMigrations(
-      {String connectString = "postgres://dart:dart@localhost:5432/dart_test"}) async {
+      {String connectString =
+          "postgres://dart:dart@localhost:5432/dart_test"}) async {
     final res = await run("db", ["upgrade", "--connect", connectString]);
     if (res != 0) {
       print("executeMigrations failed: $output");
@@ -138,15 +143,18 @@ class TestChannel extends ApplicationChannel {
       defaultMigrationDirectory.createSync();
     } catch (_) {}
 
-    final currentNumberOfMigrations =
-        defaultMigrationDirectory.listSync().where((e) => e.path.endsWith("migration.dart")).length;
+    final currentNumberOfMigrations = defaultMigrationDirectory
+        .listSync()
+        .where((e) => e.path.endsWith("migration.dart"))
+        .length;
 
     final files = <File>[];
     for (var i = 1; i < schemas.length; i++) {
-      var source = Migration.sourceForSchemaUpgrade(schemas[i - 1], schemas[i], i);
+      var source =
+          Migration.sourceForSchemaUpgrade(schemas[i - 1], schemas[i], i);
 
-      var file = File.fromUri(
-          defaultMigrationDirectory.uri.resolve("${i + currentNumberOfMigrations}.migration.dart"));
+      var file = File.fromUri(defaultMigrationDirectory.uri
+          .resolve("${i + currentNumberOfMigrations}.migration.dart"));
       file.writeAsStringSync(source);
       files.add(file);
     }
@@ -201,7 +209,8 @@ class TestChannel extends ApplicationChannel {
         if (elapsed > 60000) {
           Directory.current = saved;
           t.cancel();
-          task._processStarted.completeError(TimeoutException("Timed out after 30 seconds"));
+          task._processStarted
+              .completeError(TimeoutException("Timed out after 30 seconds"));
         }
       }
     });

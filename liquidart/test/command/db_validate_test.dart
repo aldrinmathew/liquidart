@@ -12,7 +12,9 @@ void main() {
   CLIClient projectUnderTestCli;
 
   setUpAll(() async {
-    templateCli = await CLIClient(CommandLineAgent(ProjectAgent.projectsDirectory)).createProject();
+    templateCli =
+        await CLIClient(CommandLineAgent(ProjectAgent.projectsDirectory))
+            .createProject();
     await templateCli.agent.getDependencies(offline: true);
   });
 
@@ -59,9 +61,11 @@ class _TestObject {
     var res = await projectUnderTestCli.run("db", ["generate"]);
     expect(res, 0);
 
-    projectUnderTestCli.agent.modifyFile("migrations/00000001_initial.migration.dart", (contents) {
+    projectUnderTestCli.agent
+        .modifyFile("migrations/00000001_initial.migration.dart", (contents) {
       const upgradeLocation = "upgrade()";
-      final nextLine = contents.indexOf("\n", contents.indexOf(upgradeLocation));
+      final nextLine =
+          contents.indexOf("\n", contents.indexOf(upgradeLocation));
       return contents.replaceRange(nextLine, nextLine + 1, """
         database.createTable(SchemaTable(\"foo\", []));
         """);
@@ -72,13 +76,17 @@ class _TestObject {
     expect(projectUnderTestCli.output, contains("Validation failed"));
   });
 
-  test("Validating runs all migrations in directory and checks the total product", () async {
+  test(
+      "Validating runs all migrations in directory and checks the total product",
+      () async {
     var res = await projectUnderTestCli.run("db", ["generate"]);
     expect(res, 0);
 
-    projectUnderTestCli.agent.modifyFile("migrations/00000001_initial.migration.dart", (contents) {
+    projectUnderTestCli.agent
+        .modifyFile("migrations/00000001_initial.migration.dart", (contents) {
       const upgradeLocation = "upgrade()";
-      final nextLine = contents.indexOf("\n", contents.indexOf(upgradeLocation));
+      final nextLine =
+          contents.indexOf("\n", contents.indexOf(upgradeLocation));
       return contents.replaceRange(nextLine, nextLine + 1, """
         database.createTable(SchemaTable(\"foo\", []));
         """);
@@ -91,9 +99,11 @@ class _TestObject {
     res = await projectUnderTestCli.run("db", ["generate"]);
     expect(res, 0);
 
-    var secondMigrationFile = File.fromUri(projectUnderTestCli.defaultMigrationDirectory.uri
+    var secondMigrationFile = File.fromUri(projectUnderTestCli
+        .defaultMigrationDirectory.uri
         .resolve("00000002_unnamed.migration.dart"));
-    expect(secondMigrationFile.readAsStringSync(), contains("database.deleteTable(\"foo\")"));
+    expect(secondMigrationFile.readAsStringSync(),
+        contains("database.deleteTable(\"foo\")"));
 
     res = await projectUnderTestCli.run("db", ["validate"]);
     expect(res, 0);

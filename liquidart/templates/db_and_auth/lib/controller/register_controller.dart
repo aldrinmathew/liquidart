@@ -11,7 +11,8 @@ class RegisterController extends ResourceController {
   Future<Response> createUser(@Bind.body() User user) async {
     // Check for required parameters before we spend time hashing
     if (user.username == null || user.password == null) {
-      return Response.badRequest(body: {"error": "username and password required."});
+      return Response.badRequest(
+          body: {"error": "username and password required."});
     }
 
     user
@@ -21,8 +22,11 @@ class RegisterController extends ResourceController {
     final query = Query<User>(context)..values = user;
 
     final u = await query.insert();
-    final token = await authServer.authenticate(user.username, user.password,
-        request.authorization.credentials.username, request.authorization.credentials.password);
+    final token = await authServer.authenticate(
+        user.username,
+        user.password,
+        request.authorization.credentials.username,
+        request.authorization.credentials.password);
 
     final response = AuthController.tokenResponse(token);
     final newBody = u.asMap()..["authorization"] = response.body;
@@ -33,8 +37,8 @@ class RegisterController extends ResourceController {
   Map<String, APIResponse> documentOperationResponses(
       APIDocumentContext context, Operation operation) {
     return {
-      "200": APIResponse.schema(
-          "User successfully registered.", context.schema.getObject("UserRegistration")),
+      "200": APIResponse.schema("User successfully registered.",
+          context.schema.getObject("UserRegistration")),
       "400": APIResponse.schema("Error response", APISchemaObject.freeForm())
     };
   }

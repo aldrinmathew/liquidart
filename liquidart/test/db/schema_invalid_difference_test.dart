@@ -4,11 +4,13 @@ import 'package:test/test.dart';
 void main() {
   test("Cannot change type", () {
     final original = Schema([
-      SchemaTable("_u", [SchemaColumn("id", ManagedType.integer, isPrimaryKey: true)]),
+      SchemaTable(
+          "_u", [SchemaColumn("id", ManagedType.integer, isPrimaryKey: true)]),
     ]);
 
     final dest = Schema.from(original)
-      ..tableForName("_u").columnForName("id").type = ManagedPropertyType.doublePrecision;
+      ..tableForName("_u").columnForName("id").type =
+          ManagedPropertyType.doublePrecision;
 
     try {
       SchemaDifference(original, dest);
@@ -20,7 +22,8 @@ void main() {
 
   test("Cannot change relatedTable", () {
     final original = Schema([
-      SchemaTable("_u", [SchemaColumn("id", ManagedType.integer, isPrimaryKey: true)]),
+      SchemaTable(
+          "_u", [SchemaColumn("id", ManagedType.integer, isPrimaryKey: true)]),
       SchemaTable("_t", [
         SchemaColumn("id", ManagedType.integer, isPrimaryKey: true),
         SchemaColumn.relationship("_u_id", ManagedType.integer,
@@ -29,7 +32,8 @@ void main() {
     ]);
 
     final dest = Schema.from(original)
-      ..addTable(SchemaTable("_v", [SchemaColumn("id", ManagedType.integer, isPrimaryKey: true)]))
+      ..addTable(SchemaTable(
+          "_v", [SchemaColumn("id", ManagedType.integer, isPrimaryKey: true)]))
       ..tableForName("_t").columnForName("_u_id").relatedTableName = "_v";
 
     try {
@@ -42,12 +46,14 @@ void main() {
 
   test("Cannot change primary key property", () {
     final original = Schema([
-      SchemaTable("_u", [SchemaColumn("id", ManagedType.integer, isPrimaryKey: true)]),
+      SchemaTable(
+          "_u", [SchemaColumn("id", ManagedType.integer, isPrimaryKey: true)]),
     ]);
 
     final dest = Schema.from(original)
-      ..tableForName("_u")
-          .addColumn(SchemaColumn("replacement", ManagedPropertyType.integer, isPrimaryKey: true))
+      ..tableForName("_u").addColumn(SchemaColumn(
+          "replacement", ManagedPropertyType.integer,
+          isPrimaryKey: true))
       ..tableForName("_u").columnForName("id").isPrimaryKey = false;
 
     try {
@@ -68,19 +74,26 @@ void main() {
     ]);
 
     try {
-      SchemaDifference(original,
-          Schema.from(original)..tableForName("_u").columnForName("auto").autoincrement = false);
+      SchemaDifference(
+          original,
+          Schema.from(original)
+            ..tableForName("_u").columnForName("auto").autoincrement = false);
       fail('unreachable');
     } on SchemaException catch (e) {
-      expect(e.toString(), contains("Cannot change autoincrement behavior of '_u.auto'"));
+      expect(e.toString(),
+          contains("Cannot change autoincrement behavior of '_u.auto'"));
     }
 
     try {
-      SchemaDifference(original,
-          Schema.from(original)..tableForName("_u").columnForName("not_auto").autoincrement = true);
+      SchemaDifference(
+          original,
+          Schema.from(original)
+            ..tableForName("_u").columnForName("not_auto").autoincrement =
+                true);
       fail('unreachable');
     } on SchemaException catch (e) {
-      expect(e.toString(), contains("Cannot change autoincrement behavior of '_u.not_auto'"));
+      expect(e.toString(),
+          contains("Cannot change autoincrement behavior of '_u.not_auto'"));
     }
   });
 
@@ -96,7 +109,8 @@ void main() {
       SchemaDifference(
           original,
           Schema.from(original)
-            ..tableForName("_u").columnForName("i").type = ManagedPropertyType.string);
+            ..tableForName("_u").columnForName("i").type =
+                ManagedPropertyType.string);
       fail('unreachable');
     } on SchemaException catch (e) {
       expect(e.toString(), contains("Cannot change type of '_u.i'"));

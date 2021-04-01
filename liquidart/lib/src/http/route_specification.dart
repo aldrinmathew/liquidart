@@ -10,11 +10,15 @@ class RouteSpecification {
   /// The [patternString] must be stripped of any optionals.
   RouteSpecification(String patternString) {
     segments = _splitPathSegments(patternString);
-    variableNames = segments.where((e) => e.isVariable).map((e) => e.variableName).toList();
+    variableNames =
+        segments.where((e) => e.isVariable).map((e) => e.variableName).toList();
   }
 
-  static List<RouteSpecification> specificationsForRoutePattern(String routePattern) {
-    return _pathsFromRoutePattern(routePattern).map((path) => RouteSpecification(path)).toList();
+  static List<RouteSpecification> specificationsForRoutePattern(
+      String routePattern) {
+    return _pathsFromRoutePattern(routePattern)
+        .map((path) => RouteSpecification(path))
+        .toList();
   }
 
   /// A list of this specification's [RouteSegment]s.

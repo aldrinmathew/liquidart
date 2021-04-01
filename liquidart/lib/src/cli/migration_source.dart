@@ -30,7 +30,12 @@ class MigrationSource {
   }
 
   Map<String, dynamic> asMap() {
-    return {"originalName": originalName, "name": name, "source": source, "uri": uri};
+    return {
+      "originalName": originalName,
+      "name": name,
+      "source": source,
+      "uri": uri
+    };
   }
 
   static String combine(List<MigrationSource> sources) {

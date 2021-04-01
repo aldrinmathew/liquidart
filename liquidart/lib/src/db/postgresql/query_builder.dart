@@ -9,7 +9,8 @@ import 'row_instantiator.dart';
 
 class PostgresQueryBuilder extends TableBuilder {
   PostgresQueryBuilder(PostgresQuery query) : super(query) {
-    (query.valueMap ?? query.values?.backing?.contents).forEach(addColumnValueBuilder);
+    (query.valueMap ?? query.values?.backing?.contents)
+        .forEach(addColumnValueBuilder);
 
     columnValueBuilders.forEach((cv) {
       variables[cv.sqlColumnName(withPrefix: valueKeyPrefix)] = cv.value;
@@ -39,7 +40,8 @@ class PostgresQueryBuilder extends TableBuilder {
   void addColumnValueBuilder(String key, dynamic value) {
     final builder = _createColumnValueBuilder(key, value);
     columnValueBuilders.add(builder);
-    variables[builder.sqlColumnName(withPrefix: valueKeyPrefix)] = builder.value;
+    variables[builder.sqlColumnName(withPrefix: valueKeyPrefix)] =
+        builder.value;
   }
 
   List<T> instancesForRows<T extends ManagedObject>(List<List<dynamic>> rows) {
@@ -61,7 +63,8 @@ class PostgresQueryBuilder extends TableBuilder {
 
       if (value != null) {
         if (value is ManagedObject || value is Map) {
-          return ColumnValueBuilder(this, property, value[property.destinationEntity.primaryKey]);
+          return ColumnValueBuilder(
+              this, property, value[property.destinationEntity.primaryKey]);
         }
 
         throw ArgumentError("Invalid query. Column '$key' in "
@@ -80,7 +83,8 @@ class PostgresQueryBuilder extends TableBuilder {
   String get sqlColumnsAndValuesToUpdate {
     return columnValueBuilders.map((m) {
       final columnName = m.sqlColumnName();
-      final variableName = m.sqlColumnName(withPrefix: "@$valueKeyPrefix", withTypeSuffix: true);
+      final variableName =
+          m.sqlColumnName(withPrefix: "@$valueKeyPrefix", withTypeSuffix: true);
       return "$columnName=$variableName";
     }).join(",");
   }
@@ -91,7 +95,8 @@ class PostgresQueryBuilder extends TableBuilder {
 
   String get sqlValuesToInsert {
     return columnValueBuilders
-        .map((c) => c.sqlColumnName(withTypeSuffix: true, withPrefix: "@$valueKeyPrefix"))
+        .map((c) => c.sqlColumnName(
+            withTypeSuffix: true, withPrefix: "@$valueKeyPrefix"))
         .join(",");
   }
 
@@ -104,7 +109,8 @@ class PostgresQueryBuilder extends TableBuilder {
   String get sqlOrderBy {
     var allSorts = List<ColumnSortBuilder>.from(columnSortBuilders);
 
-    var nestedSorts = returning.whereType<TableBuilder>().expand((m) => m.columnSortBuilders);
+    var nestedSorts =
+        returning.whereType<TableBuilder>().expand((m) => m.columnSortBuilders);
     allSorts.addAll(nestedSorts);
 
     if (allSorts.isEmpty) {

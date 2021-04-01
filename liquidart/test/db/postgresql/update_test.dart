@@ -35,7 +35,8 @@ void main() {
     expect(result.emailAddress, "2@a.com");
   });
 
-  test("Updating non-nullable property to null gives error that specifies the offending property",
+  test(
+      "Updating non-nullable property to null gives error that specifies the offending property",
       () async {
     context = await contextWithModels([TestModel]);
 
@@ -215,7 +216,8 @@ void main() {
     expect(response, isNull);
   });
 
-  test("updateOne throws exception if it updated more than one object", () async {
+  test("updateOne throws exception if it updated more than one object",
+      () async {
     context = await contextWithModels([TestModel]);
 
     var m = TestModel()
@@ -238,7 +240,8 @@ void main() {
       var _ = await req.updateOne();
       expect(true, false);
     } on StateError catch (e) {
-      expect(e.toString(), contains("'updateOne' modified more than one row in '_TestModel'"));
+      expect(e.toString(),
+          contains("'updateOne' modified more than one row in '_TestModel'"));
     }
   });
 
@@ -263,7 +266,10 @@ void main() {
       var _ = await req.update();
       expect(true, false);
     } on StateError catch (e) {
-      expect(e.message, contains("Query is either update or delete query with no WHERE clause"));
+      expect(
+          e.message,
+          contains(
+              "Query is either update or delete query with no WHERE clause"));
     }
   });
 
@@ -290,7 +296,9 @@ void main() {
     expect(res.map((tm) => tm.name), everyElement("Fred"));
   });
 
-  test("Attempted update that will cause conflict throws appropriate QueryException", () async {
+  test(
+      "Attempted update that will cause conflict throws appropriate QueryException",
+      () async {
     context = await contextWithModels([TestModel]);
 
     var objects = [

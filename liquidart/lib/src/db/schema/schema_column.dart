@@ -261,7 +261,8 @@ class SchemaColumnDifference {
   SchemaColumnDifference(this.expectedColumn, this.actualColumn) {
     if (actualColumn != null && expectedColumn != null) {
       if (actualColumn.isPrimaryKey != expectedColumn.isPrimaryKey) {
-        throw SchemaException("Cannot change primary key of '${expectedColumn.table.name}'");
+        throw SchemaException(
+            "Cannot change primary key of '${expectedColumn.table.name}'");
       }
 
       if (actualColumn.relatedColumnName != expectedColumn.relatedColumnName) {
@@ -284,34 +285,35 @@ class SchemaColumnDifference {
             "Cannot change autoincrement behavior of '${expectedColumn.table.name}.${expectedColumn.name}'");
       }
 
-      if (expectedColumn.name?.toLowerCase() != actualColumn.name?.toLowerCase()) {
-        _differingProperties
-            .add(_PropertyDifference("name", expectedColumn.name, actualColumn.name));
+      if (expectedColumn.name?.toLowerCase() !=
+          actualColumn.name?.toLowerCase()) {
+        _differingProperties.add(_PropertyDifference(
+            "name", expectedColumn.name, actualColumn.name));
       }
 
       if (expectedColumn.isIndexed != actualColumn.isIndexed) {
-        _differingProperties.add(
-            _PropertyDifference("isIndexed", expectedColumn.isIndexed, actualColumn.isIndexed));
+        _differingProperties.add(_PropertyDifference(
+            "isIndexed", expectedColumn.isIndexed, actualColumn.isIndexed));
       }
 
       if (expectedColumn.isUnique != actualColumn.isUnique) {
-        _differingProperties
-            .add(_PropertyDifference("isUnique", expectedColumn.isUnique, actualColumn.isUnique));
+        _differingProperties.add(_PropertyDifference(
+            "isUnique", expectedColumn.isUnique, actualColumn.isUnique));
       }
 
       if (expectedColumn.isNullable != actualColumn.isNullable) {
-        _differingProperties.add(
-            _PropertyDifference("isNullable", expectedColumn.isNullable, actualColumn.isNullable));
+        _differingProperties.add(_PropertyDifference(
+            "isNullable", expectedColumn.isNullable, actualColumn.isNullable));
       }
 
       if (expectedColumn.defaultValue != actualColumn.defaultValue) {
-        _differingProperties.add(_PropertyDifference(
-            "defaultValue", expectedColumn.defaultValue, actualColumn.defaultValue));
+        _differingProperties.add(_PropertyDifference("defaultValue",
+            expectedColumn.defaultValue, actualColumn.defaultValue));
       }
 
       if (expectedColumn.deleteRule != actualColumn.deleteRule) {
-        _differingProperties.add(
-            _PropertyDifference("deleteRule", expectedColumn.deleteRule, actualColumn.deleteRule));
+        _differingProperties.add(_PropertyDifference(
+            "deleteRule", expectedColumn.deleteRule, actualColumn.deleteRule));
       }
     }
   }
@@ -347,7 +349,8 @@ class SchemaColumnDifference {
     }
 
     return _differingProperties.map((property) {
-      return property.getErrorMessage(expectedColumn.table.name, expectedColumn.name);
+      return property.getErrorMessage(
+          expectedColumn.table.name, expectedColumn.name);
     }).toList();
   }
 

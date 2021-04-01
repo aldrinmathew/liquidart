@@ -23,7 +23,8 @@ class _MissingInverse1 {
   MissingInverseWrongSymbol inverse;
 }
 
-class MissingInverseWrongSymbol extends ManagedObject<_MissingInverseWrongSymbol> {}
+class MissingInverseWrongSymbol
+    extends ManagedObject<_MissingInverseWrongSymbol> {}
 
 class _MissingInverseWrongSymbol {
   @primaryKey

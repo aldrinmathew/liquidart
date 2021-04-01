@@ -2,7 +2,8 @@ import 'package:liquidart/liquidart.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test("Add Table to table definition with empty unique list throws exception", () {
+  test("Add Table to table definition with empty unique list throws exception",
+      () {
     try {
       ManagedDataModel([MultiUniqueFailureNoElement]);
       expect(true, false);
@@ -12,7 +13,8 @@ void main() {
   });
 }
 
-class MultiUniqueFailureNoElement extends ManagedObject<_MultiUniqueFailureNoElement> {}
+class MultiUniqueFailureNoElement
+    extends ManagedObject<_MultiUniqueFailureNoElement> {}
 
 @Table.unique([])
 class _MultiUniqueFailureNoElement {

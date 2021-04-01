@@ -30,7 +30,8 @@ void main() {
       () async {
     await projectUnderTestCli.run("document", ["client"]);
 
-    final clientContents = projectUnderTestCli.agent.getFile("client.html")?.readAsStringSync();
+    final clientContents =
+        projectUnderTestCli.agent.getFile("client.html")?.readAsStringSync();
     expect(clientContents, contains('spec: {"openapi":"3.0.0"'));
     expect(
         clientContents,
@@ -38,15 +39,20 @@ void main() {
             '<script src="https://unpkg.com/swagger-ui-dist@3.12.1/swagger-ui-bundle.js"></script>'));
 
     // make sure auth urls were replaced
-    expect(clientContents, contains('"authorizationUrl":"http://localhost:8888/auth/form"'));
-    expect(clientContents, contains('"tokenUrl":"http://localhost:8888/auth/token"'));
-    expect(clientContents, contains('"refreshUrl":"http://localhost:8888/auth/token"'));
+    expect(clientContents,
+        contains('"authorizationUrl":"http://localhost:8888/auth/form"'));
+    expect(clientContents,
+        contains('"tokenUrl":"http://localhost:8888/auth/token"'));
+    expect(clientContents,
+        contains('"refreshUrl":"http://localhost:8888/auth/token"'));
   });
 
   test("Replace relative urls with provided server", () async {
-    await projectUnderTestCli.run("document", ["client", "--host", "https://server.com/v1/"]);
+    await projectUnderTestCli
+        .run("document", ["client", "--host", "https://server.com/v1/"]);
 
-    final clientContents = projectUnderTestCli.agent.getFile("client.html")?.readAsStringSync();
+    final clientContents =
+        projectUnderTestCli.agent.getFile("client.html")?.readAsStringSync();
     expect(clientContents, contains('spec: {"openapi":"3.0.0"'));
     expect(
         clientContents,
@@ -54,6 +60,7 @@ void main() {
             '<script src="https://unpkg.com/swagger-ui-dist@3.12.1/swagger-ui-bundle.js"></script>'));
 
     // make sure auth urls were replaced
-    expect(clientContents, contains('"authorizationUrl":"https://server.com/v1/auth/form"'));
+    expect(clientContents,
+        contains('"authorizationUrl":"https://server.com/v1/auth/form"'));
   });
 }

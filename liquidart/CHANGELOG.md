@@ -1,3 +1,7 @@
+## 4.0.1-b1
+- Corrected code to meet dart format specification
+- Corrected Homepage link
+
 ## 4.0.0-b2
 - Updated Package Code and Documentation Links.
 - Refactored and formatted all code to meet pub.dev publishing guidelines.

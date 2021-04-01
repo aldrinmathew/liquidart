@@ -15,7 +15,9 @@ class App extends ApplicationChannel {
   @override
   Controller get entryPoint {
     final router = Router();
-    router.route("/example").linkFunction((req) async => Response.ok({"key": "value"}));
+    router
+        .route("/example")
+        .linkFunction((req) async => Response.ok({"key": "value"}));
     return router;
   }
 }

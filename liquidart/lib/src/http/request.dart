@@ -119,7 +119,8 @@ class Request implements RequestOrResponse {
 
         _cachedAcceptableTypes = contentTypes;
       } catch (_) {
-        throw Response.badRequest(body: {"error": "accept header is malformed"});
+        throw Response.badRequest(
+            body: {"error": "accept header is malformed"});
       }
     }
     return _cachedAcceptableTypes;
@@ -256,8 +257,8 @@ class Request implements RequestOrResponse {
     });
 
     if (liquidartResponse.cachePolicy != null) {
-      response.headers
-          .add(HttpHeaders.cacheControlHeader, liquidartResponse.cachePolicy.headerValue);
+      response.headers.add(HttpHeaders.cacheControlHeader,
+          liquidartResponse.cachePolicy.headerValue);
     }
 
     if (body == null) {
@@ -265,11 +266,13 @@ class Request implements RequestOrResponse {
       return response.close();
     }
 
-    response.headers.add(HttpHeaders.contentTypeHeader, liquidartResponse.contentType.toString());
+    response.headers.add(HttpHeaders.contentTypeHeader,
+        liquidartResponse.contentType.toString());
 
     if (body is List<int>) {
       if (compressionType.value != null) {
-        response.headers.add(HttpHeaders.contentEncodingHeader, compressionType.value);
+        response.headers
+            .add(HttpHeaders.contentEncodingHeader, compressionType.value);
       }
       response.headers.add(HttpHeaders.contentLengthHeader, body.length);
 
@@ -278,9 +281,11 @@ class Request implements RequestOrResponse {
       return response.close();
     } else if (body is Stream) {
       // Otherwise, body is stream
-      final bodyStream = _responseBodyStream(liquidartResponse, compressionType);
+      final bodyStream =
+          _responseBodyStream(liquidartResponse, compressionType);
       if (compressionType.value != null) {
-        response.headers.add(HttpHeaders.contentEncodingHeader, compressionType.value);
+        response.headers
+            .add(HttpHeaders.contentEncodingHeader, compressionType.value);
       }
       response.headers.add(HttpHeaders.transferEncodingHeader, "chunked");
       response.bufferOutput = liquidartResponse.bufferOutput;
@@ -295,20 +300,23 @@ class Request implements RequestOrResponse {
     throw StateError("Invalid response body. Could not encode.");
   }
 
-  List<int> _responseBodyBytes(Response resp, _Reference<String> compressionType) {
+  List<int> _responseBodyBytes(
+      Response resp, _Reference<String> compressionType) {
     if (resp.body == null) {
       return null;
     }
 
     Codec<dynamic, List<int>> codec;
     if (resp.encodeBody) {
-      codec = CodecRegistry.defaultInstance.codecForContentType(resp.contentType);
+      codec =
+          CodecRegistry.defaultInstance.codecForContentType(resp.contentType);
     }
 
     // todo(joeconwaystk): Set minimum threshold on number of bytes needed to perform gzip, do not gzip otherwise.
     // There isn't a great way of doing this that I can think of except splitting out gzip from the fused codec,
     // have to measure the value of fusing vs the cost of gzipping smaller data.
-    var canGzip = CodecRegistry.defaultInstance.isContentTypeCompressable(resp.contentType) &&
+    var canGzip = CodecRegistry.defaultInstance
+            .isContentTypeCompressable(resp.contentType) &&
         _acceptsGzipResponseBody;
 
     if (codec == null) {
@@ -333,13 +341,16 @@ class Request implements RequestOrResponse {
     return codec.encode(resp.body);
   }
 
-  Stream<List<int>> _responseBodyStream(Response resp, _Reference<String> compressionType) {
+  Stream<List<int>> _responseBodyStream(
+      Response resp, _Reference<String> compressionType) {
     Codec<dynamic, List<int>> codec;
     if (resp.encodeBody) {
-      codec = CodecRegistry.defaultInstance.codecForContentType(resp.contentType);
+      codec =
+          CodecRegistry.defaultInstance.codecForContentType(resp.contentType);
     }
 
-    var canGzip = CodecRegistry.defaultInstance.isContentTypeCompressable(resp.contentType) &&
+    var canGzip = CodecRegistry.defaultInstance
+            .isContentTypeCompressable(resp.contentType) &&
         _acceptsGzipResponseBody;
     if (codec == null) {
       if (resp.body is! Stream<List<int>>) {
@@ -397,7 +408,8 @@ class Request implements RequestOrResponse {
       builder.write("${raw.uri} ");
     }
     if (includeElapsedTime && respondDate != null) {
-      builder.write("${respondDate.difference(receivedDate).inMilliseconds}ms ");
+      builder
+          .write("${respondDate.difference(receivedDate).inMilliseconds}ms ");
     }
     if (includeStatusCode) {
       builder.write("${raw.response.statusCode} ");

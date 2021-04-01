@@ -68,7 +68,8 @@ class _ChildObject {
   RootObject parent;
 }
 
-class GrandChildObject extends ManagedObject<_GrandChildObject> implements _GrandChildObject {
+class GrandChildObject extends ManagedObject<_GrandChildObject>
+    implements _GrandChildObject {
   GrandChildObject();
   GrandChildObject.withCounter() {
     value1 = counter;
@@ -100,7 +101,8 @@ class _GrandChildObject {
   ChildObject parent;
 }
 
-class OtherRootObject extends ManagedObject<_OtherRootObject> implements _OtherRootObject {
+class OtherRootObject extends ManagedObject<_OtherRootObject>
+    implements _OtherRootObject {
   OtherRootObject();
   OtherRootObject.withCounter() {
     value1 = counter;
@@ -128,7 +130,8 @@ class _OtherRootObject {
   ManagedSet<RootJoinObject> join;
 }
 
-class RootJoinObject extends ManagedObject<_RootJoinObject> implements _RootJoinObject {
+class RootJoinObject extends ManagedObject<_RootJoinObject>
+    implements _RootJoinObject {
   @override
   bool operator ==(dynamic other) {
     return id == other.cid;

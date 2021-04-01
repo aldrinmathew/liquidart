@@ -27,7 +27,8 @@ class CLIAuthAddClient extends CLICommand
   String get redirectUri => decode("redirect-uri");
 
   @Option("hash-function",
-      help: "Hash function to apply when hashing secret. Must match AuthServer.hashFunction.",
+      help:
+          "Hash function to apply when hashing secret. Must match AuthServer.hashFunction.",
       defaultsTo: "sha256",
       allowed: ["sha256", "sha1", "md5"])
   Hash get hashFunction {
@@ -45,12 +46,14 @@ class CLIAuthAddClient extends CLICommand
   }
 
   @Option("hash-rounds",
-      help: "Number of hash rounds to apply to secret. Must match AuthServer.hashRounds.",
+      help:
+          "Number of hash rounds to apply to secret. Must match AuthServer.hashRounds.",
       defaultsTo: "1000")
   int get hashRounds => decode("hash-rounds");
 
   @Option("hash-length",
-      help: "Length in bytes of secret key after hashing. Must match AuthServer.hashLength.",
+      help:
+          "Length in bytes of secret key after hashing. Must match AuthServer.hashLength.",
       defaultsTo: "32")
   int get hashLength => decode("hash-length");
 
@@ -87,7 +90,8 @@ class CLIAuthAddClient extends CLICommand
 
     var managedCredentials = ManagedAuthClient.fromClient(credentials);
 
-    final query = Query<ManagedAuthClient>(context)..values = managedCredentials;
+    final query = Query<ManagedAuthClient>(context)
+      ..values = managedCredentials;
 
     try {
       await query.insert();

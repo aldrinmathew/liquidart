@@ -9,7 +9,8 @@ void main() {
   tearDownAll(Logger("liquidart").clearListeners);
 
   group("Failures", () {
-    test("Application start fails and logs appropriate message if request stream doesn't open",
+    test(
+        "Application start fails and logs appropriate message if request stream doesn't open",
         () async {
       var crashingApp = Application<CrashChannel>();
 
@@ -36,7 +37,9 @@ void main() {
       await crashingApp.stop();
     });
 
-    test("Application that fails to open because port is bound fails gracefully", () async {
+    test(
+        "Application that fails to open because port is bound fails gracefully",
+        () async {
       var server = await HttpServer.bind(InternetAddress.anyIPv4, 8888);
       server.listen((req) {});
 
@@ -53,7 +56,8 @@ void main() {
       await server.close(force: true);
     });
 
-    test("Isolate timeout kills application when first isolate fails", () async {
+    test("Isolate timeout kills application when first isolate fails",
+        () async {
       var timeoutApp = Application<TimeoutChannel>()
         ..isolateStartupTimeout = const Duration(seconds: 4)
         ..options.context = {"timeout1": 10};
@@ -69,7 +73,9 @@ void main() {
       print("-- test completes");
     });
 
-    test("Isolate timeout kills application when first isolate succeeds, but next fails", () async {
+    test(
+        "Isolate timeout kills application when first isolate succeeds, but next fails",
+        () async {
       var timeoutApp = Application<TimeoutChannel>()
         ..isolateStartupTimeout = const Duration(seconds: 4)
         ..options.context = {"timeout2": 10};

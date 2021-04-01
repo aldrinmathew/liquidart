@@ -29,8 +29,8 @@ Future main(List<String> args) async {
         .listSync(recursive: true)
         .whereType<File>()
         .where((f) => f.path.endsWith("_test.dart"))
-        .where(
-            (f) => blacklist.every((blacklistFunction) => blacklistFunction(f.uri.path) == false))
+        .where((f) => blacklist.every(
+            (blacklistFunction) => blacklistFunction(f.uri.path) == false))
         .toList();
   }
   var remainingCounter = testFiles.length;
@@ -53,7 +53,8 @@ Future main(List<String> args) async {
 
     print("${makePrompt()} Running tests derived from ${f.path}...");
     final result = await Process.start("dart", ["test/main_test.dart"],
-        workingDirectory: ctx.buildDirectoryUri.toFilePath(windows: Platform.isWindows),
+        workingDirectory:
+            ctx.buildDirectoryUri.toFilePath(windows: Platform.isWindows),
         environment: {
           'LIQUIDART_CI_DIR_LOCATION': Directory.current.uri
               .resolve("../")
@@ -74,7 +75,8 @@ Future main(List<String> args) async {
     }
 
     final elapsed = DateTime.now().difference(currentTime);
-    print("${makePrompt()} (${elapsed.inSeconds}s) Completed tests derived from ${f.path}.");
+    print(
+        "${makePrompt()} (${elapsed.inSeconds}s) Completed tests derived from ${f.path}.");
     await bm.clean();
     remainingCounter--;
   }

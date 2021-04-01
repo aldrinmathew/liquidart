@@ -21,20 +21,26 @@ class Response implements RequestOrResponse {
   }
 
   /// Represents a 200 response.
-  Response.ok(dynamic body, {Map<String, dynamic> headers}) : this(HttpStatus.ok, headers, body);
+  Response.ok(dynamic body, {Map<String, dynamic> headers})
+      : this(HttpStatus.ok, headers, body);
 
   /// Represents a 201 response.
   ///
   /// The [location] is a URI that is added as the Location header.
-  Response.created(String location, {dynamic body, Map<String, dynamic> headers})
-      : this(HttpStatus.created, _headersWith(headers, {HttpHeaders.locationHeader: location}),
+  Response.created(String location,
+      {dynamic body, Map<String, dynamic> headers})
+      : this(
+            HttpStatus.created,
+            _headersWith(headers, {HttpHeaders.locationHeader: location}),
             body);
 
   /// Represents a 202 response.
-  Response.accepted({Map<String, dynamic> headers}) : this(HttpStatus.accepted, headers, null);
+  Response.accepted({Map<String, dynamic> headers})
+      : this(HttpStatus.accepted, headers, null);
 
   /// Represents a 204 response.
-  Response.noContent({Map<String, dynamic> headers}) : this(HttpStatus.noContent, headers, null);
+  Response.noContent({Map<String, dynamic> headers})
+      : this(HttpStatus.noContent, headers, null);
 
   /// Represents a 304 response.
   ///
@@ -95,7 +101,8 @@ class Response implements RequestOrResponse {
     if (initialResponseBody is Serializable) {
       serializedBody = initialResponseBody.asMap();
     } else if (initialResponseBody is List<Serializable>) {
-      serializedBody = initialResponseBody.map((value) => value.asMap()).toList();
+      serializedBody =
+          initialResponseBody.map((value) => value.asMap()).toList();
     }
 
     _body = serializedBody ?? initialResponseBody;
@@ -169,7 +176,8 @@ class Response implements RequestOrResponse {
       return ContentType.parse(inHeaders);
     }
 
-    throw StateError("Invalid content-type response header. Is not 'String' or 'ContentType'.");
+    throw StateError(
+        "Invalid content-type response header. Is not 'String' or 'ContentType'.");
   }
 
   set contentType(ContentType t) {

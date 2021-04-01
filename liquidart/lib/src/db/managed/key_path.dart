@@ -3,7 +3,8 @@ import 'package:liquidart/src/db/managed/managed.dart';
 class KeyPath {
   KeyPath(ManagedPropertyDescription root) : path = [root];
 
-  KeyPath.byRemovingFirstNKeys(KeyPath original, int offset) : path = original.path.sublist(offset);
+  KeyPath.byRemovingFirstNKeys(KeyPath original, int offset)
+      : path = original.path.sublist(offset);
 
   KeyPath.byAddingKey(KeyPath original, ManagedPropertyDescription key)
       : path = List.from(original.path)..add(key);

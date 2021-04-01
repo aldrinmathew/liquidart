@@ -21,7 +21,8 @@ void main() {
     expect(authHeader, startsWith("Bearer"));
 
     final q = Query<ManagedAuthToken>(harness.context)
-      ..where((o) => o.accessToken).equalTo((authHeader as String).substring(7));
+      ..where((o) => o.accessToken)
+          .equalTo((authHeader as String).substring(7));
     final token = await q.fetchOne();
     expect(token.client.id, "id");
   });
@@ -39,7 +40,8 @@ void main() {
     expect(authHeader, startsWith("Bearer"));
 
     final q = Query<ManagedAuthToken>(harness.context)
-      ..where((o) => o.accessToken).equalTo((authHeader as String).substring(7));
+      ..where((o) => o.accessToken)
+          .equalTo((authHeader as String).substring(7));
     final token = await q.fetchOne();
     expect(token.client.id, "confidential-id");
   });
@@ -146,7 +148,6 @@ class HarnessSubclass extends TestHarness<Channel>
 
   @override
   ManagedContext get context => channel.context;
-
 
   @override
   Future onSetUp() async {

@@ -30,7 +30,8 @@ void main() {
     });
 
     test("Request is enqueued and immediately available", () async {
-      await testClient.get("/hello", query: {"foo": "bar"}, headers: {"X": "Y"});
+      await testClient
+          .get("/hello", query: {"foo": "bar"}, headers: {"X": "Y"});
 
       final serverRequest = await server.next();
       expect(serverRequest.method, "GET");
@@ -205,5 +206,4 @@ Future spawnFunc(List pair) async {
   final testClient = Agent.onPort(4000);
   sleep(Duration(seconds: delay));
   await testClient.request(path).get().catchError((_) => null);
-
 }

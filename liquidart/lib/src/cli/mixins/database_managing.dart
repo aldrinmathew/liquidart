@@ -28,7 +28,8 @@ abstract class CLIDatabaseManagingCommand implements CLICommand, CLIProject {
       final pattern = RegExp(r"^[0-9]+[_a-zA-Z0-9]*\.migration\.dart$");
       final sources = migrationDirectory
           .listSync()
-          .where((fse) => fse is File && pattern.hasMatch(fse.uri.pathSegments.last))
+          .where((fse) =>
+              fse is File && pattern.hasMatch(fse.uri.pathSegments.last))
           .map((fse) => MigrationSource.fromFile(fse.absolute.uri))
           .toList();
 
@@ -49,7 +50,8 @@ abstract class CLIDatabaseManagingCommand implements CLICommand, CLIProject {
           "Replaying versions: ${sources.map((f) => f.versionNumber.toString()).join(", ")}...");
     }
 
-    final schemaMap = await IsolateExecutor.run(SchemaBuilderExecutable.input(sources, fromSchema),
+    final schemaMap = await IsolateExecutor.run(
+        SchemaBuilderExecutable.input(sources, fromSchema),
         packageConfigURI: packageConfigUri,
         imports: SchemaBuilderExecutable.imports,
         additionalContents: MigrationSource.combine(sources),

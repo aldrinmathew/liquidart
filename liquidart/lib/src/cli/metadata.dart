@@ -6,7 +6,11 @@ abstract class Argument {
 
 class Flag implements Argument {
   const Flag(this.name,
-      {this.abbr, this.help, this.defaultsTo = false, this.negatable = true, this.hide = false});
+      {this.abbr,
+      this.help,
+      this.defaultsTo = false,
+      this.negatable = true,
+      this.hide = false});
 
   final String name;
   final String abbr;
@@ -18,7 +22,11 @@ class Flag implements Argument {
   @override
   void addToParser(args.ArgParser parser) {
     parser.addFlag(name,
-        abbr: abbr, help: help, defaultsTo: defaultsTo, negatable: negatable, hide: hide);
+        abbr: abbr,
+        help: help,
+        defaultsTo: defaultsTo,
+        negatable: negatable,
+        hide: hide);
   }
 }
 

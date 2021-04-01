@@ -7,7 +7,8 @@ import 'page.dart';
 import 'query.dart';
 import 'sort_descriptor.dart';
 
-abstract class QueryMixin<InstanceType extends ManagedObject> implements Query<InstanceType> {
+abstract class QueryMixin<InstanceType extends ManagedObject>
+    implements Query<InstanceType> {
   @override
   int offset = 0;
 
@@ -38,13 +39,16 @@ abstract class QueryMixin<InstanceType extends ManagedObject> implements Query<I
 
   List<KeyPath> get propertiesToFetch =>
       _propertiesToFetch ??
-      entity.defaultProperties.map((k) => KeyPath(entity.properties[k])).toList();
+      entity.defaultProperties
+          .map((k) => KeyPath(entity.properties[k]))
+          .toList();
 
   @override
   InstanceType get values {
     if (_valueObject == null) {
       _valueObject = entity.instanceOf() as InstanceType;
-      _valueObject.backing = ManagedBuilderBacking.from(_valueObject.entity, _valueObject.backing);
+      _valueObject.backing =
+          ManagedBuilderBacking.from(_valueObject.entity, _valueObject.backing);
     }
     return _valueObject;
   }
@@ -56,14 +60,17 @@ abstract class QueryMixin<InstanceType extends ManagedObject> implements Query<I
       return;
     }
 
-    _valueObject = entity.instanceOf(backing: ManagedBuilderBacking.from(entity, obj.backing));
+    _valueObject = entity.instanceOf(
+        backing: ManagedBuilderBacking.from(entity, obj.backing));
   }
 
   @override
-  QueryExpression<T, InstanceType> where<T>(T propertyIdentifier(InstanceType x)) {
+  QueryExpression<T, InstanceType> where<T>(
+      T propertyIdentifier(InstanceType x)) {
     final properties = entity.identifyProperties(propertyIdentifier);
     if (properties.length != 1) {
-      throw ArgumentError("Invalid property selector. Must reference a single property only.");
+      throw ArgumentError(
+          "Invalid property selector. Must reference a single property only.");
     }
 
     final expr = QueryExpression<T, InstanceType>(properties.first);
@@ -80,9 +87,11 @@ abstract class QueryMixin<InstanceType extends ManagedObject> implements Query<I
   }
 
   @override
-  void pageBy<T>(T propertyIdentifier(InstanceType x), QuerySortOrder order, {T boundingValue}) {
+  void pageBy<T>(T propertyIdentifier(InstanceType x), QuerySortOrder order,
+      {T boundingValue}) {
     final attribute = entity.identifyAttribute(propertyIdentifier);
-    pageDescriptor = QueryPage(order, attribute.name, boundingValue: boundingValue);
+    pageDescriptor =
+        QueryPage(order, attribute.name, boundingValue: boundingValue);
   }
 
   @override
@@ -125,7 +134,8 @@ abstract class QueryMixin<InstanceType extends ManagedObject> implements Query<I
   Query<T> _createSubquery<T extends ManagedObject>(
       ManagedRelationshipDescription fromRelationship) {
     if (subQueries?.containsKey(fromRelationship) ?? false) {
-      throw StateError("Invalid query. Cannot join same property more than once.");
+      throw StateError(
+          "Invalid query. Cannot join same property more than once.");
     }
 
     // Ensure we don't cyclically join

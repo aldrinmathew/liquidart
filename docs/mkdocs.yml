@@ -5,19 +5,11 @@ copyright: Original documentation of Liquidart (previously Aqueduct) written by 
 repo_url: https://github.com/aldrinsartfactory/liquidart/
 theme:
   name: material
-  logo: logo.png
+  logo: images/logo.png
   font:
     text: Roboto
     code: Fira Code
   palette:
-    # Light mode
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: indigo
-      accent: blue
-      toggle:
-        icon: material/weather-sunny
-        name: Switch to dark mode
     # Dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
@@ -26,6 +18,14 @@ theme:
       toggle:
         icon: material/weather-night
         name: Switch to light mode
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
   features:
     - navigation.instant
     - navigation.tracking

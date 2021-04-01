@@ -64,10 +64,12 @@ import 'http.dart';
 /// Bindings will automatically parse values into other types and validate that requests have the desired values. See [Bind] for all possible bindings and https://aldrinsartfactory.github.io/liquidart/http/resource_controller/ for more details.
 ///
 /// To access the request directly, use [request]. Note that the [Request.body] of [request] will be decoded prior to invoking an operation method.
-abstract class ResourceController extends Controller implements Recyclable<Null> {
+abstract class ResourceController extends Controller
+    implements Recyclable<Null> {
   ResourceController() {
     _runtime =
-        (RuntimeContext.current.runtimes[runtimeType] as ControllerRuntime)?.resourceController;
+        (RuntimeContext.current.runtimes[runtimeType] as ControllerRuntime)
+            ?.resourceController;
   }
 
   @override
@@ -153,15 +155,18 @@ abstract class ResourceController extends Controller implements Recyclable<Null>
   /// this method. When overriding this method, call the superclass' implementation and add the additional parameters
   /// to the returned list before returning the combined list.
   @mustCallSuper
-  List<APIParameter> documentOperationParameters(APIDocumentContext context, Operation operation) {
-    return _runtime.documenter?.documentOperationParameters(this, context, operation);
+  List<APIParameter> documentOperationParameters(
+      APIDocumentContext context, Operation operation) {
+    return _runtime.documenter
+        ?.documentOperationParameters(this, context, operation);
   }
 
   /// Returns a documented summary for [operation].
   ///
   /// By default, this method returns null and the summary is derived from documentation comments
   /// above the operation method. You may override this method to manually add a summary to an operation.
-  String documentOperationSummary(APIDocumentContext context, Operation operation) {
+  String documentOperationSummary(
+      APIDocumentContext context, Operation operation) {
     return null;
   }
 
@@ -169,7 +174,8 @@ abstract class ResourceController extends Controller implements Recyclable<Null>
   ///
   /// By default, this method returns null and the description is derived from documentation comments
   /// above the operation method. You may override this method to manually add a description to an operation.
-  String documentOperationDescription(APIDocumentContext context, Operation operation) {
+  String documentOperationDescription(
+      APIDocumentContext context, Operation operation) {
     return null;
   }
 
@@ -178,8 +184,10 @@ abstract class ResourceController extends Controller implements Recyclable<Null>
   /// If an operation method binds an [Bind.body] argument or accepts form data, this method returns a [APIRequestBody]
   /// that describes the bound body type. You may override this method to take an alternative approach or to augment the
   /// automatically generated request body documentation.
-  APIRequestBody documentOperationRequestBody(APIDocumentContext context, Operation operation) {
-    return _runtime.documenter?.documentOperationRequestBody(this, context, operation);
+  APIRequestBody documentOperationRequestBody(
+      APIDocumentContext context, Operation operation) {
+    return _runtime.documenter
+        ?.documentOperationRequestBody(this, context, operation);
   }
 
   /// Returns a map of possible responses for [operation].
@@ -198,7 +206,8 @@ abstract class ResourceController extends Controller implements Recyclable<Null>
   /// defined by this controller in the same tag. You may override this method
   /// to provide additional tags. You should call the superclass' implementation to retain
   /// the controller grouping tag.
-  List<String> documentOperationTags(APIDocumentContext context, Operation operation) {
+  List<String> documentOperationTags(
+      APIDocumentContext context, Operation operation) {
     final tag = "$runtimeType".replaceAll("Controller", "");
     return [tag];
   }
@@ -237,11 +246,17 @@ abstract class ResourceController extends Controller implements Recyclable<Null>
       }
     }
 
-    final operation =
-        _runtime.getOperationRuntime(request.raw.method, request.path.variables.keys.toList());
+    final operation = _runtime.getOperationRuntime(
+        request.raw.method, request.path.variables.keys.toList());
     if (operation == null) {
-      throw Response(405,
-          {"Allow": _allowedMethodsForPathVariables(request.path.variables.keys).join(", ")}, null);
+      throw Response(
+          405,
+          {
+            "Allow":
+                _allowedMethodsForPathVariables(request.path.variables.keys)
+                    .join(", ")
+          },
+          null);
     }
 
     if (operation.scopes != null) {
@@ -274,11 +289,13 @@ abstract class ResourceController extends Controller implements Recyclable<Null>
       try {
         return f();
       } on ArgumentError catch (e) {
-        errors.add("${e.message as String} for ${p.locationName} value '${p.name}'");
+        errors.add(
+            "${e.message as String} for ${p.locationName} value '${p.name}'");
       }
       return null;
     };
-    final checkIfMissingRequiredAndEmitErrorIfSo = (ResourceControllerParameter p, dynamic v) {
+    final checkIfMissingRequiredAndEmitErrorIfSo =
+        (ResourceControllerParameter p, dynamic v) {
       if (v == null && p.isRequired) {
         if (p.location == BindingType.body) {
           errors.add("missing required ${p.locationName}");

@@ -18,9 +18,11 @@ class CLIDocumentClient extends CLICommand with CLIProject, CLIDocumentOptions {
     final file = File("client.html");
     file.writeAsStringSync(source);
 
-    displayInfo("OpenAPI client for application '${doc["info"]["title"]}' successfully created.",
+    displayInfo(
+        "OpenAPI client for application '${doc["info"]["title"]}' successfully created.",
         color: CLIColor.boldGreen);
-    displayProgress("Configured to connect to '${doc["servers"].first["url"]}'.");
+    displayProgress(
+        "Configured to connect to '${doc["servers"].first["url"]}'.");
     displayProgress("Open '${file.absolute.path}' in your browser.");
 
     return 0;

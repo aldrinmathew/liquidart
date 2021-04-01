@@ -8,7 +8,8 @@ import 'package:liquidart/src/utilities/sourcify.dart';
 import 'package:meta/meta.dart';
 import 'package:runtime/runtime.dart';
 
-class ManagedEntityRuntimeImpl extends ManagedEntityRuntime implements SourceCompiler {
+class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
+    implements SourceCompiler {
   ManagedEntityRuntimeImpl(this.instanceType, this.entity);
 
   final ClassMirror instanceType;
@@ -18,7 +19,8 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime implements SourceCom
 
   @override
   ManagedObject instanceOfImplementation({ManagedBacking backing}) {
-    final object = instanceType.newInstance(const Symbol(""), []).reflectee as ManagedObject;
+    final object = instanceType.newInstance(const Symbol(""), []).reflectee
+        as ManagedObject;
     if (backing != null) {
       object.backing = backing;
     }
@@ -26,14 +28,17 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime implements SourceCom
   }
 
   @override
-  void setTransientValueForKey(ManagedObject object, String key, dynamic value) {
+  void setTransientValueForKey(
+      ManagedObject object, String key, dynamic value) {
     reflect(object).setField(Symbol(key), value);
   }
 
   @override
   ManagedSet setOfImplementation(Iterable<dynamic> objects) {
-    final type = reflectType(ManagedSet, [instanceType.reflectedType]) as ClassMirror;
-    return type.newInstance(const Symbol("fromDynamic"), [objects]).reflectee as ManagedSet;
+    final type =
+        reflectType(ManagedSet, [instanceType.reflectedType]) as ClassMirror;
+    return type.newInstance(const Symbol("fromDynamic"), [objects]).reflectee
+        as ManagedSet;
   }
 
   @override
@@ -66,12 +71,13 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime implements SourceCom
   }
 
   @override
-  dynamic dynamicConvertFromPrimitiveValue(ManagedPropertyDescription property, dynamic value) {
+  dynamic dynamicConvertFromPrimitiveValue(
+      ManagedPropertyDescription property, dynamic value) {
     return runtimeCast(value, reflectType(property.type.type));
   }
 
-  List<String> _getValidatorConstructionFromAnnotation(
-      BuildContext buildCtx, Annotation annotation, ManagedPropertyDescription property,
+  List<String> _getValidatorConstructionFromAnnotation(BuildContext buildCtx,
+      Annotation annotation, ManagedPropertyDescription property,
       {@required List<Uri> importUris}) {
     // For every annotation, grab the name of the type and find the corresponding type mirror in our list of type mirrors.
     // Documentation mismatch: `annotation.name.name` is NOT the class name, it is the entire constructor name.
@@ -86,10 +92,12 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime implements SourceCom
       // and import the file where the const constructor is declared.
       importUris?.add(annotation.element.source.uri);
       return [annotation.toSource().substring(1)];
-    } else if (mirrorOfAnnotationType?.isSubtypeOf(reflectType(Column)) ?? false) {
+    } else if (mirrorOfAnnotationType?.isSubtypeOf(reflectType(Column)) ??
+        false) {
       // This is a direct column constructor and potentially has instances of Validate in its constructor
       // We should be able to navigate the unresolved AST to copy this text.
-      return _getConstructorSourcesFromColumnArgList(annotation.arguments, importUris: importUris)
+      return _getConstructorSourcesFromColumnArgList(annotation.arguments,
+                  importUris: importUris)
               ?.map((c) => c)
               ?.toList() ??
           [];
@@ -102,24 +110,29 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime implements SourceCom
       }
 
       final type = (element as PropertyAccessorElement).variable.type;
-      final isSubclassOrInstanceOfValidate = buildCtx.context.getSubclassesOf(Validate).any(
-              (subclass) =>
+      final isSubclassOrInstanceOfValidate = buildCtx.context
+              .getSubclassesOf(Validate)
+              .any((subclass) =>
                   MirrorSystem.getName(subclass.simpleName) ==
                   type.getDisplayString(withNullability: false)) ||
           type.getDisplayString(withNullability: false) == "Validate";
-      final isInstanceOfColumn = type.getDisplayString(withNullability: false) == "Column";
+      final isInstanceOfColumn =
+          type.getDisplayString(withNullability: false) == "Column";
 
       if (isSubclassOrInstanceOfValidate) {
         importUris.add(annotation.element.source.uri);
         return [annotation.toSource().substring(1)];
       } else if (isInstanceOfColumn) {
-        final originatingLibrary = element.session.getParsedLibraryByElement(element.library);
+        final originatingLibrary =
+            element.session.getParsedLibraryByElement(element.library);
         final elementDeclaration = originatingLibrary
-            .getElementDeclaration((element as PropertyAccessorElement).variable)
+            .getElementDeclaration(
+                (element as PropertyAccessorElement).variable)
             .node as VariableDeclaration;
 
         return _getConstructorSourcesFromColumnArgList(
-                    (elementDeclaration.initializer as MethodInvocation).argumentList,
+                    (elementDeclaration.initializer as MethodInvocation)
+                        .argumentList,
                     importUris: importUris)
                 ?.map((c) => c)
                 ?.toList() ??
@@ -129,23 +142,27 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime implements SourceCom
     return [];
   }
 
-  String _getValidators(BuildContext context, ManagedPropertyDescription property,
+  String _getValidators(
+      BuildContext context, ManagedPropertyDescription property,
       {@required List<Uri> importUris}) {
     // For the property we are looking at, grab all of its annotations from the analyzer.
     // We also have all of the instances created by these annotations available in some
     // way or another in the [property].
     final fieldAnnotations = context.getAnnotationsFromField(
-        EntityBuilder.getTableDefinitionForType(property.entity.instanceType).reflectedType,
+        EntityBuilder.getTableDefinitionForType(property.entity.instanceType)
+            .reflectedType,
         property.name);
 
     final constructorInvocations = fieldAnnotations
-        .map((annotation) => _getValidatorConstructionFromAnnotation(context, annotation, property,
+        .map((annotation) => _getValidatorConstructionFromAnnotation(
+            context, annotation, property,
             importUris: importUris))
         .expand((i) => i)
         .toList();
 
     if (property.type?.isEnumerated ?? false) {
-      final enumeratedValues = property.type.enumerationMap.values.map(sourcifyValue).join(",");
+      final enumeratedValues =
+          property.type.enumerationMap.values.map(sourcifyValue).join(",");
       constructorInvocations.add('Validate.oneOf([$enumeratedValues])');
     }
 
@@ -169,7 +186,8 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime implements SourceCom
       {@required List<Uri> importUris}) {
     final expression = argList.arguments
         .whereType<NamedExpression>()
-        .firstWhere((c) => c.name.label.name == "validators", orElse: () => null)
+        .firstWhere((c) => c.name.label.name == "validators",
+            orElse: () => null)
         ?.expression as ListLiteral;
     if (expression == null) {
       return null;
@@ -198,7 +216,9 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime implements SourceCom
       return "null";
     }
 
-    final elementStr = type.elements == null ? "null" : _getManagedTypeInstantiator(type.elements);
+    final elementStr = type.elements == null
+        ? "null"
+        : _getManagedTypeInstantiator(type.elements);
 
     final enumStr = type.enumerationMap == null
         ? "null"
@@ -213,11 +233,13 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime implements SourceCom
   String _getDefaultValueLiteral(ManagedAttributeDescription attribute) {
     final value = attribute.defaultValue;
     return sourcifyValue(value,
-        onError: "The default value for '${attribute.entity.instanceType}.${attribute.name}' "
+        onError:
+            "The default value for '${attribute.entity.instanceType}.${attribute.name}' "
             "contains both double and single quotes");
   }
 
-  String _getAttributeInstantiator(BuildContext ctx, ManagedAttributeDescription attribute,
+  String _getAttributeInstantiator(
+      BuildContext ctx, ManagedAttributeDescription attribute,
       {@required List<Uri> importUris}) {
     final transienceStr = attribute.isTransient
         ? "Serialize(input: ${attribute.transientStatus.isAvailableAsInput}, output: ${attribute.transientStatus.isAvailableAsOutput})"
@@ -241,7 +263,8 @@ ManagedAttributeDescription.make<${attribute.declaredType}>(entity, '${attribute
     """;
   }
 
-  String _getRelationshipInstantiator(BuildContext ctx, ManagedRelationshipDescription relationship,
+  String _getRelationshipInstantiator(
+      BuildContext ctx, ManagedRelationshipDescription relationship,
       {@required List<Uri> importUris}) {
     return """
 ManagedRelationshipDescription.make<${relationship.declaredType}>(
@@ -260,7 +283,8 @@ ManagedRelationshipDescription.make<${relationship.declaredType}>(
     """;
   }
 
-  String _getEntityConstructor(BuildContext context, {@required List<Uri> importUris}) {
+  String _getEntityConstructor(BuildContext context,
+      {@required List<Uri> importUris}) {
     final attributesStr = entity.attributes.keys.map((name) {
       return "'$name': ${_getAttributeInstantiator(context, entity.attributes[name], importUris: importUris)}";
     }).join(", ");
@@ -269,11 +293,14 @@ ManagedRelationshipDescription.make<${relationship.declaredType}>(
     entity.properties.forEach((str, val) {
       final sourcifiedKey = sourcifyValue(str);
       symbolMapBuffer.write("Symbol($sourcifiedKey): $sourcifiedKey,");
-      symbolMapBuffer.write("Symbol(${sourcifyValue("$str=")}): $sourcifiedKey,");
+      symbolMapBuffer
+          .write("Symbol(${sourcifyValue("$str=")}): $sourcifiedKey,");
     });
 
     final tableDef =
-        EntityBuilder.getTableDefinitionForType(entity.instanceType).reflectedType.toString();
+        EntityBuilder.getTableDefinitionForType(entity.instanceType)
+            .reflectedType
+            .toString();
 
     return """() {    
 final entity = ManagedEntity('${entity.tableName}', ${entity.instanceType}, ${sourcifyValue(tableDef)});
@@ -316,7 +343,8 @@ return entity
     entity.properties.forEach((k, v) {
       if (v is ManagedAttributeDescription) {
         if (v.isTransient) {
-          if (v.type.kind == ManagedPropertyType.list || v.type.kind == ManagedPropertyType.map) {
+          if (v.type.kind == ManagedPropertyType.list ||
+              v.type.kind == ManagedPropertyType.map) {
             buf.writeln("""
             if (property.name == '$k') { return RuntimeContext.current.coerce<${v.type.type}>(value); } 
             """);
@@ -325,7 +353,8 @@ return entity
       }
     });
 
-    buf.writeln("throw StateError('unknown state in _getDynamicConvertFromPrimitiveValueImpl');");
+    buf.writeln(
+        "throw StateError('unknown state in _getDynamicConvertFromPrimitiveValueImpl');");
     return buf.toString();
   }
 
@@ -364,7 +393,8 @@ return entity.symbolMap[Symbol(symbolName)];
         ? "null"
         : "[${entity.uniquePropertySet.map((u) => "'${u.name}'").join(",")}].map((k) => entity.properties[k]).toList()";
 
-    final entityConstructor = _getEntityConstructor(ctx, importUris: importUris);
+    final entityConstructor =
+        _getEntityConstructor(ctx, importUris: importUris);
 
     // Need to import any relationships types and metadata types
     // todo: limit import of importUris to only show symbols required to replicate metadata

@@ -33,11 +33,14 @@ void main() {
 
   group("Project naming", () {
     test("Appropriately named project gets created correctly", () async {
-      final res = await cli.run("create", ["test_project", "--offline", "--stacktrace"]);
+      final res = await cli
+          .run("create", ["test_project", "--offline", "--stacktrace"]);
       expect(res, 0);
 
       expect(
-          Directory.fromUri(cli.agent.workingDirectory.uri.resolve("test_project/")).existsSync(),
+          Directory.fromUri(
+                  cli.agent.workingDirectory.uri.resolve("test_project/"))
+              .existsSync(),
           true);
     });
 
@@ -57,7 +60,9 @@ void main() {
       expect(cli.output, contains("snake_case"));
 
       expect(
-          Directory.fromUri(cli.agent.workingDirectory.uri.resolve("test_project/")).existsSync(),
+          Directory.fromUri(
+                  cli.agent.workingDirectory.uri.resolve("test_project/"))
+              .existsSync(),
           false);
     });
 
@@ -68,7 +73,9 @@ void main() {
       expect(cli.output, contains("snake_case"));
 
       expect(
-          Directory.fromUri(cli.agent.workingDirectory.uri.resolve("test_project/")).existsSync(),
+          Directory.fromUri(
+                  cli.agent.workingDirectory.uri.resolve("test_project/"))
+              .existsSync(),
           false);
     });
 
@@ -93,17 +100,19 @@ void main() {
       }
     });
 
-    test("Template gets generated from local path, project points to it", () async {
+    test("Template gets generated from local path, project points to it",
+        () async {
       var res = await cli.run("create", ["test_project", "--offline"]);
       expect(res, 0);
 
-      var liquidartLocationString =
-          File.fromUri(cli.agent.workingDirectory.uri.resolve("test_project/").resolve(".packages"))
-              .readAsStringSync()
-              .split("\n")
-              .firstWhere((p) => p.startsWith("liquidart:"))
-              .split("liquidart:")
-              .last;
+      var liquidartLocationString = File.fromUri(cli.agent.workingDirectory.uri
+              .resolve("test_project/")
+              .resolve(".packages"))
+          .readAsStringSync()
+          .split("\n")
+          .firstWhere((p) => p.startsWith("liquidart:"))
+          .split("liquidart:")
+          .last;
 
       var path = path_lib.normalize(path_lib.fromUri(liquidartLocationString));
       expect(path, path_lib.join(Directory.current.path, "lib"));
@@ -119,17 +128,22 @@ void main() {
     final liquidartVersion = Version.parse("${liquidartPubspec["version"]}");
 
     for (var template in templates) {
-      test("Templates can use 'this' version of Liquidart in their dependencies", () {
+      test(
+          "Templates can use 'this' version of Liquidart in their dependencies",
+          () {
         var projectDir = Directory("templates/$template/");
         var pubspec = File.fromUri(projectDir.uri.resolve("pubspec.yaml"));
         var contents = loadYaml(pubspec.readAsStringSync());
-        final projectVersionConstraint =
-            VersionConstraint.parse(contents["dependencies"]["liquidart"] as String);
+        final projectVersionConstraint = VersionConstraint.parse(
+            contents["dependencies"]["liquidart"] as String);
         expect(projectVersionConstraint.allows(liquidartVersion), true);
       });
 
       test("Tests run on template generated from local path", () async {
-        expect(await cli.run("create", ["test_project", "-t", template, "--offline"]), 0);
+        expect(
+            await cli
+                .run("create", ["test_project", "-t", template, "--offline"]),
+            0);
 
         final cmd = Platform.isWindows ? "pub.bat" : "pub";
         var res = Process.runSync(cmd, ["run", "test", "-j", "1"],

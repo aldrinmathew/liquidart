@@ -10,7 +10,8 @@ import 'package:yaml/yaml.dart';
 import 'package:path/path.dart' as path_lib;
 
 abstract class CLIProject implements CLICommand {
-  @Option("directory", abbr: "d", help: "Project directory to execute command in")
+  @Option("directory",
+      abbr: "d", help: "Project directory to execute command in")
   Directory get projectDirectory {
     if (_projectDirectory == null) {
       String dir = decode("directory");
@@ -38,7 +39,8 @@ abstract class CLIProject implements CLICommand {
     return _pubspec;
   }
 
-  File get projectSpecificationFile => File.fromUri(projectDirectory.uri.resolve("pubspec.yaml"));
+  File get projectSpecificationFile =>
+      File.fromUri(projectDirectory.uri.resolve("pubspec.yaml"));
 
   Uri get packageConfigUri => projectDirectory.uri.resolve(".packages");
 
@@ -54,7 +56,8 @@ abstract class CLIProject implements CLICommand {
       }
 
       final lockFileContents = loadYaml(lockFile.readAsStringSync()) as Map;
-      final projectVersion = lockFileContents["packages"]["liquidart"]["version"] as String;
+      final projectVersion =
+          lockFileContents["packages"]["liquidart"]["version"] as String;
       _projectVersion = Version.parse(projectVersion);
     }
 
@@ -85,7 +88,8 @@ abstract class CLIProject implements CLICommand {
       }
 
       if (projectVersion?.major != toolVersion.major) {
-        throw CLIException("CLI version is incompatible with project liquidart version.",
+        throw CLIException(
+            "CLI version is incompatible with project liquidart version.",
             instructions: [
               "Install liquidart@${projectVersion?.toString()} or upgrade your project to liquidart${toolVersion.toString()}."
             ]);
@@ -101,7 +105,8 @@ abstract class CLIProject implements CLICommand {
         imports: GetChannelExecutable.importsForPackage(libraryName),
         logHandler: displayProgress);
     if (name == null) {
-      throw CLIException("No ApplicationChannel subclass found in $packageName/$libraryName");
+      throw CLIException(
+          "No ApplicationChannel subclass found in $packageName/$libraryName");
     }
 
     return name;

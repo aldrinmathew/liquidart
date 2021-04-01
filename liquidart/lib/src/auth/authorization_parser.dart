@@ -19,13 +19,15 @@ class AuthorizationBearerParser extends AuthorizationParser<String> {
   @override
   String parse(String authorizationHeader) {
     if (authorizationHeader == null) {
-      throw AuthorizationParserException(AuthorizationParserExceptionReason.missing);
+      throw AuthorizationParserException(
+          AuthorizationParserExceptionReason.missing);
     }
 
     final matcher = RegExp("Bearer (.+)");
     final match = matcher.firstMatch(authorizationHeader);
     if (match == null) {
-      throw AuthorizationParserException(AuthorizationParserExceptionReason.malformed);
+      throw AuthorizationParserException(
+          AuthorizationParserExceptionReason.malformed);
     }
     return match[1];
   }
@@ -46,7 +48,8 @@ class AuthBasicCredentials {
 }
 
 /// Parses a Basic Authorization header.
-class AuthorizationBasicParser extends AuthorizationParser<AuthBasicCredentials> {
+class AuthorizationBasicParser
+    extends AuthorizationParser<AuthBasicCredentials> {
   const AuthorizationBasicParser();
 
   /// Returns a [AuthBasicCredentials] containing the username and password
@@ -58,26 +61,31 @@ class AuthorizationBasicParser extends AuthorizationParser<AuthBasicCredentials>
   @override
   AuthBasicCredentials parse(String authorizationHeader) {
     if (authorizationHeader == null) {
-      throw AuthorizationParserException(AuthorizationParserExceptionReason.missing);
+      throw AuthorizationParserException(
+          AuthorizationParserExceptionReason.missing);
     }
 
     final matcher = RegExp("Basic (.+)");
     final match = matcher.firstMatch(authorizationHeader);
     if (match == null) {
-      throw AuthorizationParserException(AuthorizationParserExceptionReason.malformed);
+      throw AuthorizationParserException(
+          AuthorizationParserExceptionReason.malformed);
     }
 
     final base64String = match[1];
     String decodedCredentials;
     try {
-      decodedCredentials = String.fromCharCodes(const Base64Decoder().convert(base64String));
+      decodedCredentials =
+          String.fromCharCodes(const Base64Decoder().convert(base64String));
     } catch (e) {
-      throw AuthorizationParserException(AuthorizationParserExceptionReason.malformed);
+      throw AuthorizationParserException(
+          AuthorizationParserExceptionReason.malformed);
     }
 
     final splitCredentials = decodedCredentials.split(":");
     if (splitCredentials.length != 2) {
-      throw AuthorizationParserException(AuthorizationParserExceptionReason.malformed);
+      throw AuthorizationParserException(
+          AuthorizationParserExceptionReason.malformed);
     }
 
     return AuthBasicCredentials()
