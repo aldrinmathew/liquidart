@@ -14,23 +14,21 @@ theme:
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       primary: blue
-      accent: cyan
+      accent: purple
       toggle:
         icon: material/weather-night
         name: Switch to light mode
     # Light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: indigo
-      accent: blue
+      primary: blue
+      accent: purple
       toggle:
         icon: material/weather-sunny
         name: Switch to dark mode
   features:
     - navigation.instant
     - navigation.tracking
-    - navigation.sections
-    - navigation.expand
 markdown_extensions:
   - admonition
 nav:
@@ -43,3 +41,4 @@ nav:
   - Tutorial :
     - 1. Getting Started : tutorial/getting_started.md
     - 2. Reading from a Database: tutorial/executing_queries.md
+    - 3. Storing Data in a Database: tutorial/storing_data.md
