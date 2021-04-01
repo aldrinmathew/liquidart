@@ -25,7 +25,7 @@ Install the `liquidart` command line tool by running the following command in yo
 pub global activate liquidart
 ```
 
-!!! warning
+!!! warning "PATH Warning"
     If you get warning text about your PATH, make sure to read it before moving on.
 
 ## Creating a Project

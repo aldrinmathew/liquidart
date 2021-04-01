@@ -115,7 +115,7 @@ Controller get entryPoint {
 
 Now that we've 'injected' this context into our `HeroesController` constructor, each `HeroesController` can execute database queries.
 
-!!! Service Objects and Dependency Injection
+!!! info "Service Objects and Dependency Injection"
     Our context is an example of a *service object*. A service encapsulates logic and state into a single object that can be reused in multiple controllers. A typical service object accesses another server, like a database or another REST API. Some service objects may simply provide a simplified interface to a complex process, like applying transforms to an image. Services are passed in a controller's constructor; this is called *dependency injection*. Unlike many frameworks, Liquidart does not require a complex dependency injection framework; this is because you write the code to create instances of your controllers and can pass whatever you like in their constructor.
 
 ## Executing Queries

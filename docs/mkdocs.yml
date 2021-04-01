@@ -42,3 +42,5 @@ nav:
     - 1. Getting Started : tutorial/getting_started.md
     - 2. Reading from a Database: tutorial/executing_queries.md
     - 3. Storing Data in a Database: tutorial/storing_data.md
+    - 4. Configuration and Testing: tutorial/writing_tests.md
+    # - 5. Authentication and Authorization: tutorial/oauth2.md

@@ -6,7 +6,7 @@ In the previous exercise, we loaded some heroes into the database our applicatio
 
 The [HTTP specification](https://tools.ietf.org/html/rfc7231) defines the concept of a *resource*. A resource can be anything - a hero, a bank account, a light switch in your home, a temperature sensor in Antarctica, etc. Some of these things are physical objects (the light switch), and some are digital - and they are all resources. An HTTP server application is an interface to these resources; a client requests that something be done with a resource, and the server finds a way to get it done.
 
-Resources are identified with a URI. A URI *universally identifies* a resource: it has the address of a server to connect to, and a path that identifies the resource on that server. When writing Aqueduct applications, we don't care much about the server part of a URL - the internet figures out that part. What we do care about is the path of the URL - like `/heroes`.
+Resources are identified with a URI. A URI *universally identifies* a resource: it has the address of a server to connect to, and a path that identifies the resource on that server. When writing Liquidart applications, we don't care much about the server part of a URL - the internet figures out that part. What we do care about is the path of the URL - like `/heroes`.
 
 An application uses the URL path to determine which resource the request wants to work with. Right now, our application works with hero resources. A request with the path `/heroes/1` wants to do something with an individual hero (that is identified by the number 1). A request with the path `/heroes` will act on the entire collection of heroes.
 
@@ -24,7 +24,7 @@ We'll start by adding behavior that allows for new heroes to be inserted into th
 
 ```json
 {
-  "name": "Master of Aqueducts"
+  "name": "Master of Liquidarts"
 }
 ```
 
