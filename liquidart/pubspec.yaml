@@ -1,5 +1,5 @@
 name: liquidart
-version: 5.0.0-b1
+version: 5.0.0-b2
 description: A modern HTTP server application framework, ORM and OAuth2 provider with OpenAPI 3.0 integration. Foundation for REST, RPC or GraphQL services. Revival of the AQUEDUCT Project.
 homepage: https://github.com/aldrinsartfactory/liquidart
 repository: https://github.com/aldrinsartfactory/liquidart
@@ -31,7 +31,7 @@ dev_dependencies:
   test: ^1.16.8
   http: ^0.13.1
   cli_agent: ^2.0.0-b1
-  liquidart_test: ^2.0.0-b1
+  liquidart_test: ^3.0.0-b1
     # path: ../liquidart_test
 
 executables:
