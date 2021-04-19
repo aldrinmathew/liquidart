@@ -6,47 +6,47 @@ import 'package:test/test.dart';
 
 void main() {
   group("Default harness", () {
-    TestHarness<Channel> harness;
+    TestHarness<Channel>? harness;
 
     setUp(() {
       harness = TestHarness<Channel>();
     });
 
     tearDown(() async {
-      await harness?.stop();
+      await harness!.stop();
     });
 
     test("options are used by application", () async {
-      harness.options.context["key"] = "value";
-      await harness.start();
+      harness!.options.context["key"] = "value";
+      await harness!.start();
 
       // default value
-      expect(harness.channel.options.configurationFilePath, "config.src.yaml");
+      expect(harness!.channel.options!.configurationFilePath, "config.src.yaml");
 
       // provided value
-      expect(harness.channel.options.context, {"key": "value"});
+      expect(harness!.channel.options!.context, {"key": "value"});
     });
 
     test(
         "Can start app in test mode and make a request to it with defaultClient",
         () async {
-      await harness.start();
-      expectResponse(await harness.agent.request("endpoint").get(), 200,
+      await harness!.start();
+      expectResponse(await harness!.agent!.request("endpoint").get(), 200,
           body: {"key": "value"});
-      expect(harness.application.isRunning, true);
+      expect(harness!.application.isRunning, true);
     });
 
     test("Can stop and restart an application", () async {
-      await harness.start();
-      expectResponse(await harness.agent.request("endpoint").get(), 200,
+      await harness!.start();
+      expectResponse(await harness!.agent!.request("endpoint").get(), 200,
           body: {"key": "value"});
-      expect(harness.application.isRunning, true);
-      await harness.stop();
-      expect(harness.application, isNull);
-      await harness.start();
-      expectResponse(await harness.agent.request("endpoint").get(), 200,
+      expect(harness!.application.isRunning, true);
+      await harness!.stop();
+      expect(harness!.application, isNull);
+      await harness!.start();
+      expectResponse(await harness!.agent!.request("endpoint").get(), 200,
           body: {"key": "value"});
-      expect(harness.application.isRunning, true);
+      expect(harness!.application.isRunning, true);
     });
   });
 

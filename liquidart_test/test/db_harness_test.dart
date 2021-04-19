@@ -9,7 +9,7 @@ void main() {
 
   test("afterStart that invokes resetData sets up database and invokes seed",
       () async {
-    final q = Query<Model>(harness.channel.context);
+    final q = Query<Model>(harness.channel.context!);
     final results = await q.fetch();
     expect(results.map((m) => m.name).toList(), ["bob"]);
   });
@@ -17,10 +17,10 @@ void main() {
   test(
       "Calling resetData clears persistent data but retains schema and seeded data",
       () async {
-    final q = Query<Model>(harness.channel.context)
+    final q = Query<Model>(harness.channel.context!)
       ..sortBy((o) => o.name, QuerySortOrder.ascending);
 
-    await Query.insertObject(harness.channel.context, Model()..name = "fred");
+    await Query.insertObject(harness.channel.context!, Model()..name = "fred");
     expect((await q.fetch()).map((m) => m.name).toList(), ["bob", "fred"]);
 
     await harness.resetData();
@@ -29,7 +29,7 @@ void main() {
 }
 
 class Channel extends ApplicationChannel {
-  ManagedContext context;
+  ManagedContext? context;
 
   @override
   Future prepare() async {
@@ -43,7 +43,7 @@ class Channel extends ApplicationChannel {
   Controller get entryPoint {
     final router = Router();
     router.route("/endpoint").linkFunction((req) async {
-      final q = Query<Model>(context);
+      final q = Query<Model>(context!);
       return Response.ok(await q.fetch());
     });
     return router;
@@ -62,14 +62,14 @@ class HarnessSubclass extends TestHarness<Channel> with TestHarnessORMMixin {
   }
 
   @override
-  ManagedContext get context => channel.context;
+  ManagedContext get context => channel.context!;
 }
 
 class _Model {
   @primaryKey
-  int id;
+  int? id;
 
-  String name;
+  String? name;
 }
 
 class Model extends ManagedObject<_Model> implements _Model {}

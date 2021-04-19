@@ -16,6 +16,7 @@ class TestResponse {
   /// The HTTP body of the response.
   ///
   /// The body is guaranteed to be decoded prior to accessing it. You do
+  // ignore: comment_references
   /// not need to invoke [TestResponseBody.decode] or any of its asynchronous
   /// decoding methods.
   final TestResponseBody body;
@@ -71,18 +72,18 @@ class TestResponseBody extends BodyDecoder {
   TestResponseBody(HttpClientResponse response)
       : _response = response,
         super(response) {
-    _hasContent = (response.headers.contentLength ?? 0) > 0 ||
+    _hasContent = (response.headers.contentLength) > 0 ||
         response.headers.chunkedTransferEncoding;
   }
 
   final HttpClientResponse _response;
-  bool _hasContent;
+  bool? _hasContent;
 
   @override
-  ContentType get contentType => _response.headers.contentType;
+  ContentType get contentType => _response.headers.contentType!;
 
   @override
-  bool get isEmpty => !_hasContent;
+  bool get isEmpty => !_hasContent!;
 
   @override
   String toString() {

@@ -1,3 +1,7 @@
+## 3.0.0-b1
+- Migrated to Null Safety
+- Minor Code Refactors
+
 ## 2.0.0-b2
 - Bumped Version
 - Corrected Homepage, Respository and Documentation links.

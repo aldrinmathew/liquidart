@@ -13,11 +13,11 @@ class HTTPBodyMatcher extends Matcher {
     }
   }
 
-  Matcher contentMatcher;
+  Matcher? contentMatcher;
 
   @override
   bool matches(dynamic item, Map matchState) {
-    if (!contentMatcher.matches(item, matchState)) {
+    if (!contentMatcher!.matches(item, matchState)) {
       return false;
     }
 
@@ -37,7 +37,7 @@ class HTTPBodyMatcher extends Matcher {
       Map matchState, bool verbose) {
     mismatchDescription.add("the body differs for the following reasons:\n");
 
-    contentMatcher.describeMismatch(
+    contentMatcher!.describeMismatch(
         item, mismatchDescription, matchState, verbose);
 
     return mismatchDescription;

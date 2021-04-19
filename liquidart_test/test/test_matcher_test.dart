@@ -53,10 +53,10 @@ void main() {
     final DateTime xTimestamp = DateTime.parse("1984-08-04T00:00:00Z");
     final DateTime xDate = DateTime.parse("1981-08-04T00:00:00Z");
 
-    HttpServer server;
+    HttpServer? server;
     setUpAll(() async {
       server = await HttpServer.bind(InternetAddress.loopbackIPv4, 4000);
-      server.listen((req) {
+      server!.listen((req) {
         req.response.statusCode = 200;
 
         if (req.uri.query.contains("timestamp")) {
@@ -72,7 +72,7 @@ void main() {
     });
 
     tearDownAll(() async {
-      await server?.close(force: true);
+      await server!.close(force: true);
     });
 
     test("Ensure existence of some headers", () async {
@@ -163,12 +163,12 @@ void main() {
       expect(
           response,
           hasHeaders({
-            "x-timestamp": isAfter(xTimestamp.subtract(Duration(seconds: 10)))
+            "x-timestamp": isAfter(xTimestamp.subtract(const Duration(seconds: 10)))
           }));
       expect(
           response,
           hasHeaders({
-            "x-timestamp": isBefore(xTimestamp.add(Duration(seconds: 10)))
+            "x-timestamp": isBefore(xTimestamp.add(const Duration(seconds: 10)))
           }));
       expect(response,
           hasHeaders({"x-timestamp": isBeforeOrSameMomentAs(xTimestamp)}));
@@ -176,7 +176,7 @@ void main() {
           response,
           hasHeaders({
             "x-timestamp":
-                isBeforeOrSameMomentAs(xTimestamp.add(Duration(seconds: 10)))
+                isBeforeOrSameMomentAs(xTimestamp.add(const Duration(seconds: 10)))
           }));
       expect(response,
           hasHeaders({"x-timestamp": isAfterOrSameMomentAs(xTimestamp)}));
@@ -184,7 +184,7 @@ void main() {
           response,
           hasHeaders({
             "x-timestamp": isAfterOrSameMomentAs(
-                xTimestamp.subtract(Duration(seconds: 10)))
+                xTimestamp.subtract(const Duration(seconds: 10)))
           }));
       expect(response, hasHeaders({"x-timestamp": isSameMomentAs(xTimestamp)}));
 
@@ -192,12 +192,12 @@ void main() {
         expect(
             response,
             hasHeaders({
-              "x-timestamp": isAfter(xTimestamp.add(Duration(seconds: 10)))
+              "x-timestamp": isAfter(xTimestamp.add(const Duration(seconds: 10)))
             }));
       },
           allOf([
             contains(
-                "must be after ${xTimestamp.add(Duration(seconds: 10)).toIso8601String()}")
+                "must be after ${xTimestamp.add(const Duration(seconds: 10)).toIso8601String()}")
           ]));
 
       expectFailureFor(() {
@@ -205,12 +205,12 @@ void main() {
             response,
             hasHeaders({
               "x-timestamp":
-                  isBefore(xTimestamp.subtract(Duration(seconds: 10)))
+                  isBefore(xTimestamp.subtract(const Duration(seconds: 10)))
             }));
       },
           allOf([
             contains(
-                "must be before ${xTimestamp.subtract(Duration(seconds: 10)).toIso8601String()}")
+                "must be before ${xTimestamp.subtract(const Duration(seconds: 10)).toIso8601String()}")
           ]));
 
       expectFailureFor(() {
@@ -218,12 +218,12 @@ void main() {
             response,
             hasHeaders({
               "x-timestamp": isBeforeOrSameMomentAs(
-                  xTimestamp.subtract(Duration(seconds: 10)))
+                  xTimestamp.subtract(const Duration(seconds: 10)))
             }));
       },
           allOf([
             contains(
-                "must be before or same moment as ${xTimestamp.subtract(Duration(seconds: 10)).toIso8601String()}")
+                "must be before or same moment as ${xTimestamp.subtract(const Duration(seconds: 10)).toIso8601String()}")
           ]));
 
       expectFailureFor(() {
@@ -231,12 +231,12 @@ void main() {
             response,
             hasHeaders({
               "x-timestamp":
-                  isAfterOrSameMomentAs(xTimestamp.add(Duration(seconds: 10)))
+                  isAfterOrSameMomentAs(xTimestamp.add(const Duration(seconds: 10)))
             }));
       },
           allOf([
             contains(
-                "must be after or same moment as ${xTimestamp.add(Duration(seconds: 10)).toIso8601String()}")
+                "must be after or same moment as ${xTimestamp.add(const Duration(seconds: 10)).toIso8601String()}")
           ]));
 
       expectFailureFor(() {
@@ -244,12 +244,12 @@ void main() {
             response,
             hasHeaders({
               "x-timestamp":
-                  isSameMomentAs(xTimestamp.add(Duration(seconds: 10)))
+                  isSameMomentAs(xTimestamp.add(const Duration(seconds: 10)))
             }));
       },
           allOf([
             contains(
-                "must be same moment as ${xTimestamp.add(Duration(seconds: 10)).toIso8601String()}")
+                "must be same moment as ${xTimestamp.add(const Duration(seconds: 10)).toIso8601String()}")
           ]));
     });
 
@@ -269,7 +269,7 @@ void main() {
     });
 
     tearDown(() async {
-      await server?.close();
+      await server.close();
     });
 
     test("Can match empty body", () async {
@@ -336,7 +336,7 @@ void main() {
     });
 
     tearDownAll(() async {
-      await server?.close();
+      await server.close();
     });
 
     test("List of terms", () async {
@@ -456,7 +456,7 @@ void main() {
     });
 
     tearDownAll(() async {
-      await server?.close();
+      await server.close();
     });
 
     test("Succeeds on fully specificed spec", () async {

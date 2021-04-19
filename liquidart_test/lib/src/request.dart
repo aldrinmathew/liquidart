@@ -10,8 +10,9 @@ part of liquidart_test.client;
 class TestRequest {
   TestRequest._(this._client);
 
-  HttpClient _client;
-  Uri _baseUrl;
+  // ignore: prefer_final_fields
+  HttpClient? _client;
+  Uri? _baseUrl;
 
   /// The base URL of the request.
   ///
@@ -19,14 +20,14 @@ class TestRequest {
   /// when this request is executed.
   ///
   /// This property is set to [Agent.baseURL] of the creating agent.
-  set baseURL(String baseURL) {
-    _baseUrl = Uri.parse(baseURL);
+  set baseURL(String? baseURL) {
+    _baseUrl = Uri.parse(baseURL!);
   }
 
-  String get baseURL => _baseUrl.toString();
+  String? get baseURL => _baseUrl.toString();
 
   /// The path of the request; will be appended to [baseURL].
-  String path;
+  String? path;
 
   /// The Content-Type that [body] should be encoded in.
   ///
@@ -40,7 +41,7 @@ class TestRequest {
   /// Prior to execution, [body] will be encoded according to its [contentType] codec in [CodecRegistry].
   ///
   /// To disable encoded, set [encodeBody] to false: [body] must be a [List<int>] when encoding is disabled.
-  dynamic body;
+  dynamic? body;
 
   /// Whether or not [body] should be encoded according to [contentType].
   ///
@@ -70,12 +71,12 @@ class TestRequest {
     }
 
     var actualPath = path;
-    while (actualPath.startsWith("/")) {
+    while (actualPath!.startsWith("/")) {
       actualPath = actualPath.substring(1);
     }
 
-    var url = _baseUrl.resolve(actualPath).toString();
-    if ((query?.length ?? 0) > 0) {
+    var url = _baseUrl!.resolve(actualPath).toString();
+    if (query.isNotEmpty) {
       final pairs = query.keys.map((key) {
         final val = query[key];
         if (val == null || val == true) {
@@ -166,16 +167,16 @@ class TestRequest {
           "Cannot set 'body' when using HTTP '${method.toUpperCase()}'.");
     }
 
-    final request = await _client.openUrl(method.toUpperCase(), uri);
+    final request = await _client!.openUrl(method.toUpperCase(), uri);
 
-    headers?.forEach((headerKey, headerValue) {
-      request.headers.add(headerKey, headerValue);
+    headers.forEach((headerKey, headerValue) {
+      request.headers.add(headerKey, headerValue as Object);
     });
 
     if (body != null) {
       final bytes = _bodyBytes;
       request.headers.contentType = contentType;
-      request.headers.contentLength = bytes.length;
+      request.headers.contentLength = bytes!.length;
       request.add(bytes);
     }
 
@@ -188,7 +189,7 @@ class TestRequest {
     return response;
   }
 
-  List<int> get _bodyBytes {
+  List<int>? get _bodyBytes {
     if (body == null) {
       return null;
     }

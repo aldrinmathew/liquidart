@@ -40,7 +40,7 @@ class TestHarness<T extends ApplicationChannel> {
   /// this value is the application that is currently running.
   ///
   /// After [tearDown], this value becomes null.
-  Application<T> get application => _application;
+  Application<T> get application => _application!;
 
   /// The channel of the running application.
   ///
@@ -48,7 +48,7 @@ class TestHarness<T extends ApplicationChannel> {
   T get channel => application.channel;
 
   /// The default [Agent] that makes requests to the application being tested.
-  Agent agent;
+  Agent? agent;
 
   /// Application options for the application being tested.
   ///
@@ -59,7 +59,7 @@ class TestHarness<T extends ApplicationChannel> {
     ..port = 0
     ..configurationFilePath = "config.src.yaml";
 
-  Application<T> _application;
+  Application<T>? _application;
 
   /// Installs this handler to automatically start before tests begin running,
   ///
@@ -120,7 +120,7 @@ class TestHarness<T extends ApplicationChannel> {
   ///
   /// Prefer to use [install] instead of calling this method manually.
   Future stop() async {
-    await application?.stop();
+    await application.stop();
     _application = null;
   }
 

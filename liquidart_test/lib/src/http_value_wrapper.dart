@@ -41,17 +41,17 @@ class HTTPValueMatcherWrapper extends Matcher {
     };
 
     try {
-      return onSuccess(num.parse(item as String));
+      return onSuccess(num.parse(item));
       // ignore: empty_catches
     } on FormatException {}
 
     try {
-      return onSuccess(HttpDate.parse(item as String));
+      return onSuccess(HttpDate.parse(item));
       // ignore: empty_catches
     } on FormatException {} on HttpException {}
 
     try {
-      return onSuccess(DateTime.parse(item as String));
+      return onSuccess(DateTime.parse(item));
       // ignore: empty_catches
     } on FormatException {}
 
