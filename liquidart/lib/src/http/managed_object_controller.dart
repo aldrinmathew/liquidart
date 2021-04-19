@@ -62,7 +62,7 @@ class ManagedObjectController<InstanceType extends ManagedObject>
     return "/$name/[:id]";
   }
 
-  Query<InstanceType> _query;
+  Query<InstanceType>? _query;
 
   /// Executed prior to a fetch by ID query.
   ///
@@ -92,12 +92,12 @@ class ManagedObjectController<InstanceType extends ManagedObject>
 
   @Operation.get("id")
   Future<Response> getObject(@Bind.path("id") String id) async {
-    var primaryKey = _query.entity.primaryKey;
+    var primaryKey = _query!.entity.primaryKey;
     final parsedIdentifier =
-        _getIdentifierFromPath(id, _query.entity.properties[primaryKey]);
-    _query.where((o) => o[primaryKey]).equalTo(parsedIdentifier);
+        _getIdentifierFromPath(id, _query!.entity.properties[primaryKey]!);
+    _query!.where((o) => o[primaryKey!]).equalTo(parsedIdentifier);
 
-    _query = await willFindObjectWithQuery(_query);
+    _query = await willFindObjectWithQuery(_query!);
 
     var result = await _query?.fetchOne();
 
@@ -127,12 +127,12 @@ class ManagedObjectController<InstanceType extends ManagedObject>
 
   @Operation.post()
   Future<Response> createObject() async {
-    final instance = _query.entity.instanceOf() as InstanceType;
-    instance.readFromMap(request.body.as());
-    _query.values = instance;
+    final instance = _query!.entity.instanceOf() as InstanceType;
+    instance.readFromMap(request!.body!.as());
+    _query!.values = instance;
 
-    _query = await willInsertObjectWithQuery(_query);
-    var result = await _query?.insert();
+    _query = await willInsertObjectWithQuery(_query!);
+    var result = await _query!.insert();
 
     return didInsertObject(result);
   }
@@ -163,14 +163,14 @@ class ManagedObjectController<InstanceType extends ManagedObject>
 
   @Operation.delete("id")
   Future<Response> deleteObject(@Bind.path("id") String id) async {
-    var primaryKey = _query.entity.primaryKey;
+    var primaryKey = _query!.entity.primaryKey;
     final parsedIdentifier =
-        _getIdentifierFromPath(id, _query.entity.properties[primaryKey]);
-    _query.where((o) => o[primaryKey]).equalTo(parsedIdentifier);
+        _getIdentifierFromPath(id, _query!.entity.properties[primaryKey]!);
+    _query!.where((o) => o[primaryKey!]).equalTo(parsedIdentifier);
 
-    _query = await willDeleteObjectWithQuery(_query);
+    _query = await willDeleteObjectWithQuery(_query!);
 
-    var result = await _query?.delete();
+    var result = await _query!.delete();
 
     if (result == 0) {
       return didNotFindObjectToDeleteWithID(id);
@@ -205,16 +205,16 @@ class ManagedObjectController<InstanceType extends ManagedObject>
 
   @Operation.put("id")
   Future<Response> updateObject(@Bind.path("id") String id) async {
-    var primaryKey = _query.entity.primaryKey;
+    var primaryKey = _query!.entity.primaryKey;
     final parsedIdentifier =
-        _getIdentifierFromPath(id, _query.entity.properties[primaryKey]);
-    _query.where((o) => o[primaryKey]).equalTo(parsedIdentifier);
+        _getIdentifierFromPath(id, _query!.entity.properties[primaryKey]!);
+    _query!.where((o) => o[primaryKey!]).equalTo(parsedIdentifier);
 
-    final instance = _query.entity.instanceOf() as InstanceType;
-    instance.readFromMap(request.body.as());
-    _query.values = instance;
+    final instance = _query!.entity.instanceOf() as InstanceType;
+    instance.readFromMap(request!.body!.as());
+    _query!.values = instance;
 
-    _query = await willUpdateObjectWithQuery(_query);
+    _query = await willUpdateObjectWithQuery(_query!);
 
     var results = await _query?.updateOne();
     if (results == null) {
@@ -259,7 +259,7 @@ class ManagedObjectController<InstanceType extends ManagedObject>
       ///
       /// Must be a key in the object type being fetched. Must
       /// provide either pageAfter or pagePrior. Use with count.
-      @Bind.query("pageBy") String pageBy,
+      @Bind.query("pageBy") String? pageBy,
 
       /// A value-based offset into an ordered list of objects.
       ///
@@ -267,7 +267,7 @@ class ManagedObjectController<InstanceType extends ManagedObject>
       /// value for the property named by pageBy is greater than
       /// the value of pageAfter. Must provide pageBy, and the type
       /// of the property designated by pageBy must be the same as pageAfter.
-      @Bind.query("pageAfter") String pageAfter,
+      @Bind.query("pageAfter") String? pageAfter,
 
       /// A value-based offset into an ordered list of objects.
       ///
@@ -275,15 +275,15 @@ class ManagedObjectController<InstanceType extends ManagedObject>
       /// value for the property named by pageBy is less than
       /// the value of pageAfter. Must provide pageBy, and the type
       /// of the property designated by pageBy must be the same as pageAfter.
-      @Bind.query("pagePrior") String pagePrior,
+      @Bind.query("pagePrior") String? pagePrior,
 
       /// Designates a sorting strategy for the returned objects.
       ///
       /// This value must take the form 'name,asc' or 'name,desc', where name
       /// is the property of the returned objects to sort on.
-      @Bind.query("sortBy") List<String> sortBy}) async {
-    _query.fetchLimit = count;
-    _query.offset = offset;
+      @Bind.query("sortBy") List<String>? sortBy}) async {
+    _query!.fetchLimit = count;
+    _query!.offset = offset;
 
     if (pageBy != null) {
       QuerySortOrder direction;
@@ -301,13 +301,13 @@ class ManagedObjectController<InstanceType extends ManagedObject>
         });
       }
 
-      var pageByProperty = _query.entity.properties[pageBy];
+      var pageByProperty = _query!.entity.properties[pageBy];
       if (pageByProperty == null) {
         throw Response.badRequest(body: {"error": "cannot page by '$pageBy'"});
       }
 
       dynamic parsed = _parseValueForProperty(pageValue, pageByProperty);
-      _query.pageBy((t) => t[pageBy], direction,
+      _query!.pageBy((t) => t[pageBy], direction,
           boundingValue: parsed == "null" ? null : parsed);
     }
 
@@ -320,7 +320,7 @@ class ManagedObjectController<InstanceType extends ManagedObject>
                 "invalid 'sortyBy' format. syntax: 'name,asc' or 'name,desc'."
           });
         }
-        if (_query.entity.properties[split.first] == null) {
+        if (_query!.entity.properties[split.first] == null) {
           throw Response.badRequest(
               body: {"error": "cannot sort by '$sortBy'"});
         }
@@ -333,19 +333,19 @@ class ManagedObjectController<InstanceType extends ManagedObject>
         var sortOrder = split.last == "asc"
             ? QuerySortOrder.ascending
             : QuerySortOrder.descending;
-        _query.sortBy((t) => t[split.first], sortOrder);
+        _query!.sortBy((t) => t[split.first], sortOrder);
       });
     }
 
-    _query = await willFindObjectsWithQuery(_query);
+    _query = await willFindObjectsWithQuery(_query!);
 
-    var results = await _query?.fetch();
+    var results = await _query!.fetch();
 
     return didFindObjects(results);
   }
 
   @override
-  APIRequestBody documentOperationRequestBody(
+  APIRequestBody? documentOperationRequestBody(
       APIDocumentContext context, Operation operation) {
     if (operation.method == "POST" || operation.method == "PUT") {
       return APIRequestBody.schema(
@@ -412,19 +412,17 @@ class ManagedObjectController<InstanceType extends ManagedObject>
       APIDocumentContext context, String route, APIPath path) {
     final ops = super.documentOperations(context, route, path);
 
-    final entityName = _query.entity.name;
+    final entityName = _query!.entity.name;
 
-    if ((path.parameters
-                ?.where((p) => p.location == APIParameterLocation.path)
-                ?.length ??
-            0) >
-        0) {
-      ops["get"].id = "get$entityName";
-      ops["put"].id = "update$entityName";
-      ops["delete"].id = "delete$entityName";
+    if (path.parameters!
+        .where((p) => p.location == APIParameterLocation.path)
+        .isNotEmpty) {
+      ops["get"]!.id = "get$entityName";
+      ops["put"]!.id = "update$entityName";
+      ops["delete"]!.id = "delete$entityName";
     } else {
-      ops["get"].id = "get${entityName}s";
-      ops["post"].id = "create$entityName";
+      ops["get"]!.id = "get${entityName}s";
+      ops["post"]!.id = "create$entityName";
     }
 
     return ops;
@@ -436,13 +434,13 @@ class ManagedObjectController<InstanceType extends ManagedObject>
   }
 
   dynamic _parseValueForProperty(String value, ManagedPropertyDescription desc,
-      {Response onError}) {
+      {Response? onError}) {
     if (value == "null") {
       return null;
     }
 
     try {
-      switch (desc.type.kind) {
+      switch (desc.type.kind!) {
         case ManagedPropertyType.string:
           return value;
         case ManagedPropertyType.bigInteger:
@@ -464,8 +462,7 @@ class ManagedObjectController<InstanceType extends ManagedObject>
       }
     } on FormatException {
       throw onError ?? Response.badRequest();
+      // return null;
     }
-
-    return null;
   }
 }

@@ -9,9 +9,9 @@ import 'package:liquidart_test/liquidart_test.dart';
 import 'package:liquidart/src/dev/helpers.dart';
 
 void main() {
-  HttpServer server;
-  AuthServer authenticationServer;
-  Router router;
+  HttpServer? server;
+  AuthServer? authenticationServer;
+  Router? router;
   ////////////
 
   setUp(() async {
@@ -20,18 +20,18 @@ void main() {
     authenticationServer = AuthServer(storage);
 
     router = Router();
-    router
+    router!
         .route("/auth/token")
         .link(() => AuthController(authenticationServer));
-    router.didAddToChannel();
+    router!.didAddToChannel();
 
     server =
         await HttpServer.bind("localhost", 8888, v6Only: false, shared: false);
-    server.map((req) => Request(req)).listen(router.receive);
+    server!.map((req) => Request(req)).listen(router!.receive);
   });
 
   tearDown(() async {
-    await server?.close(force: true);
+    await server!.close(force: true);
     server = null;
   });
 
@@ -168,20 +168,20 @@ void main() {
   group("Success Cases: authorization_code", () {
     test("Exchange valid code gets new access token with refresh token",
         () async {
-      var code = await authenticationServer.authenticateForCode(
+      var code = await authenticationServer!.authenticateForCode(
           user1["username"], user1["password"], "com.stablekernel.redirect");
       var res =
-          await exchange("com.stablekernel.redirect", "mckinley", code.code);
+          await exchange("com.stablekernel.redirect", "mckinley", code.code!);
       expect(res, hasAuthResponse(200, bearerTokenMatcher));
     });
 
     test("If code is scoped, token has same scope", () async {
-      var code = await authenticationServer.authenticateForCode(
+      var code = await authenticationServer!.authenticateForCode(
           user1["username"], user1["password"], "com.stablekernel.scoped",
           requestedScopes: [AuthScope("user")]);
 
       var res =
-          await exchange("com.stablekernel.scoped", "kilimanjaro", code.code);
+          await exchange("com.stablekernel.scoped", "kilimanjaro", code.code!);
       expect(res, hasAuthResponse(200, bearerTokenMatcherWithScope("user")));
     });
   });
@@ -206,8 +206,8 @@ void main() {
     });
 
     test("Username is repeated returns 400", () async {
-      var encodedUsername = Uri.encodeQueryComponent(user1["username"]);
-      var encodedPassword = Uri.encodeQueryComponent(user1["password"]);
+      var encodedUsername = Uri.encodeQueryComponent(user1["username"]!);
+      var encodedPassword = Uri.encodeQueryComponent(user1["password"]!);
       var encodedWrongUsername = Uri.encodeQueryComponent("!@#kjasd");
       final client = Agent.onPort(8888)
         ..headers["authorization"] =
@@ -251,8 +251,8 @@ void main() {
     });
 
     test("password is repeated returns 400", () async {
-      var encodedUsername = Uri.encodeQueryComponent(user1["username"]);
-      var encodedPassword = Uri.encodeQueryComponent(user1["password"]);
+      var encodedUsername = Uri.encodeQueryComponent(user1["username"]!);
+      var encodedPassword = Uri.encodeQueryComponent(user1["password"]!);
       var encodedWrongPassword = Uri.encodeQueryComponent("!@#kjasd");
 
       final client = Agent.onPort(8888)
@@ -279,7 +279,7 @@ void main() {
 
   group("code Failure Cases", () {
     test("code is invalid (not issued)", () async {
-      var code = await authenticationServer.authenticateForCode(
+      var code = await authenticationServer!.authenticateForCode(
           user1["username"], user1["password"], "com.stablekernel.redirect");
       var res = await exchange(
           "com.stablekernel.redirect", "mckinley", "a${code.code}");
@@ -297,9 +297,9 @@ void main() {
     });
 
     test("code is duplicated", () async {
-      var code = await authenticationServer.authenticateForCode(
+      var code = await authenticationServer!.authenticateForCode(
           user1["username"], user1["password"], "com.stablekernel.redirect");
-      var encodedCode = Uri.encodeQueryComponent(code.code);
+      var encodedCode = Uri.encodeQueryComponent(code.code!);
 
       final client = Agent.onPort(8888)
         ..setBasicAuthorization("com.stablekernel.redirect", "mckinley");
@@ -322,7 +322,7 @@ void main() {
     });
 
     test("code is from a different client", () async {
-      var code = await authenticationServer.authenticateForCode(
+      var code = await authenticationServer!.authenticateForCode(
           user1["username"], user1["password"], "com.stablekernel.redirect");
       var res =
           await exchange("com.stablekernel.redirect2", "gibraltar", code.code);
@@ -331,7 +331,7 @@ void main() {
   });
 
   group("grant_type Failure Cases", () {
-    Agent client;
+    Agent? client;
 
     setUp(() {
       client = Agent.onPort(8888)
@@ -339,7 +339,7 @@ void main() {
     });
 
     test("Unknown grant_type", () async {
-      var req = client.request("/auth/token")
+      var req = client!.request("/auth/token")
         ..contentType = ContentType("application", "x-www-form-urlencoded")
         ..body = {
           "username": user1["username"],
@@ -353,7 +353,7 @@ void main() {
     });
 
     test("Missing grant_type", () async {
-      var req = client.request("/auth/token")
+      var req = client!.request("/auth/token")
         ..contentType = ContentType("application", "x-www-form-urlencoded")
         ..body = {"username": user1["username"], "password": user1["password"]};
 
@@ -363,9 +363,9 @@ void main() {
     });
 
     test("Duplicate grant_type", () async {
-      client.setBasicAuthorization("com.stablekernel.redirect", "mckinley");
+      client!.setBasicAuthorization("com.stablekernel.redirect", "mckinley");
 
-      var req = client.request("/auth/token")
+      var req = client!.request("/auth/token")
         ..encodeBody = false
         ..body = utf8.encode(
             "code=abcd&grant_type=authorization_code&grant_type=whatever")
@@ -374,7 +374,7 @@ void main() {
       var res = await req.post();
       expect(res, hasResponse(400, body: {"error": "invalid_request"}));
 
-      req = client.request("/auth/token")
+      req = client!.request("/auth/token")
         ..encodeBody = false
         ..body = utf8.encode(
             "grant_type=authorization_code&code=abcd&grant_type=whatever")
@@ -386,7 +386,7 @@ void main() {
   });
 
   group("refresh_token Failure Cases", () {
-    Agent client;
+    Agent? client;
 
     setUp(() {
       client = Agent.onPort(8888)
@@ -410,7 +410,7 @@ void main() {
       final refreshToken =
           Uri.encodeQueryComponent(grantMap["refresh_token"] as String);
 
-      var req = client.request("/auth/token")
+      var req = client!.request("/auth/token")
         ..encodeBody = false
         ..body = utf8.encode(
             "refresh_token=$refreshToken&refresh_token=abcdefg&grant_type=refresh_token")
@@ -418,7 +418,7 @@ void main() {
       var resp = await req.post();
       expect(resp, hasResponse(400, body: {"error": "invalid_request"}));
 
-      req = client.request("/auth/token")
+      req = client!.request("/auth/token")
         ..encodeBody = false
         ..body = utf8.encode(
             "refresh_token=abcdefg&refresh_token=$refreshToken&grant_type=refresh_token")
@@ -455,7 +455,7 @@ void main() {
   });
 
   group("Authorization Header Failure Cases (password grant_type)", () {
-    Agent client;
+    Agent? client;
 
     setUp(() {
       client = Agent.onPort(8888);
@@ -464,7 +464,7 @@ void main() {
     test("Client omits authorization header", () async {
       var m = Map<String, String>.from(user1);
       m["grant_type"] = "password";
-      var req = client.request("/auth/token")
+      var req = client!.request("/auth/token")
         ..contentType = ContentType("application", "x-www-form-urlencoded")
         ..body = m;
 
@@ -475,7 +475,7 @@ void main() {
     test("Confidential client has malformed authorization header", () async {
       var m = Map<String, String>.from(user1);
       m["grant_type"] = "password";
-      var req = client.request("/auth/token")
+      var req = client!.request("/auth/token")
         ..headers["Authorization"] = "Basic "
         ..contentType = ContentType("application", "x-www-form-urlencoded")
         ..body = m;
@@ -513,13 +513,13 @@ void main() {
   });
 
   group("Authorization Header Failure Cases (refresh_token grant_type)", () {
-    String refreshTokenString;
-    Agent client;
+    String? refreshTokenString;
+    Agent? client;
 
     setUp(() async {
       client = Agent.onPort(8888);
 
-      refreshTokenString = (await authenticationServer.authenticate(
+      refreshTokenString = (await authenticationServer!.authenticate(
               user1["username"],
               user1["password"],
               "com.stablekernel.app1",
@@ -528,7 +528,7 @@ void main() {
     });
 
     test("Client omits authorization header", () async {
-      var req = client.request("/auth/token")
+      var req = client!.request("/auth/token")
         ..contentType = ContentType("application", "x-www-form-urlencoded")
         ..body = {
           "refresh_token": refreshTokenString,
@@ -540,7 +540,7 @@ void main() {
     });
 
     test("Confidential client has malformed authorization header", () async {
-      var req = client.request("/auth/token")
+      var req = client!.request("/auth/token")
         ..headers["Authorization"] = "Basic "
         ..contentType = ContentType("application", "x-www-form-urlencoded")
         ..body = {
@@ -554,44 +554,44 @@ void main() {
 
     test("Confidential client has wrong secret", () async {
       var resp = await refresh("com.stablekernel.app1", "notright",
-          {"refresh_token": refreshTokenString});
+          {"refresh_token": refreshTokenString!});
       expect(resp, hasResponse(400, body: {"error": "invalid_client"}));
     });
 
     test("Confidential client can't be used as a public client", () async {
       var resp = await refresh(
-          "com.stablekernel.app1", "", {"refresh_token": refreshTokenString});
+          "com.stablekernel.app1", "", {"refresh_token": refreshTokenString!});
       expect(resp, hasResponse(400, body: {"error": "invalid_client"}));
     });
 
     test("Confidential Client ID doesn't exist", () async {
       var resp = await refresh("com.stablekernel.app123", "foo",
-          {"refresh_token": refreshTokenString});
+          {"refresh_token": refreshTokenString!});
       expect(resp, hasResponse(400, body: {"error": "invalid_client"}));
     });
 
     test("client id is different than one that generated token", () async {
       var resp = await refresh("com.stablekernel.app2", "fuji",
-          {"refresh_token": refreshTokenString});
+          {"refresh_token": refreshTokenString!});
       expect(resp, hasResponse(400, body: {"error": "invalid_grant"}));
     });
   });
 
   group("Authorization Header Failure Cases (authorization_code grant_type)",
       () {
-    String code;
-    Agent client;
+    String? code;
+    Agent? client;
 
     setUp(() async {
       client = Agent.onPort(8888);
 
-      code = (await authenticationServer.authenticateForCode(user1["username"],
+      code = (await authenticationServer!.authenticateForCode(user1["username"],
               user1["password"], "com.stablekernel.redirect"))
-          .code;
+          .code!;
     });
 
     test("Client omits authorization header", () async {
-      var req = client.request("/auth/token")
+      var req = client!.request("/auth/token")
         ..contentType = ContentType("application", "x-www-form-urlencoded")
         ..body = {"code": code, "grant_type": "authorization_code"};
 
@@ -600,7 +600,7 @@ void main() {
     });
 
     test("Confidential client has malformed authorization header", () async {
-      var req = client.request("/auth/token")
+      var req = client!.request("/auth/token")
         ..headers["Authorization"] = "Basic "
         ..contentType = ContentType("application", "x-www-form-urlencoded")
         ..body = {"code": code, "grant_type": "authorization_code"};
@@ -633,13 +633,13 @@ void main() {
 
   group("Scope failure cases", () {
     test("Try to add scope to code exchange is invalid_request", () async {
-      var code = await authenticationServer.authenticateForCode(
+      var code = await authenticationServer!.authenticateForCode(
           user1["username"], user1["password"], "com.stablekernel.scoped",
           requestedScopes: [AuthScope("user")]);
 
       var m = {
         "grant_type": "authorization_code",
-        "code": Uri.encodeQueryComponent(code.code),
+        "code": Uri.encodeQueryComponent(code.code!),
         "scope": "other_scope"
       };
 
@@ -686,7 +686,7 @@ void main() {
 }
 
 Map<String, String> substituteUser(Map<String, String> initial,
-    {String username, String password}) {
+    {String? username, String? password}) {
   var m = Map<String, String>.from(initial);
 
   if (username != null) {
@@ -788,7 +788,7 @@ Future<TestResponse> refresh(
 }
 
 Future<TestResponse> exchange(
-    String clientID, String clientSecret, String code) {
+    String clientID, String clientSecret, String? code) {
   Agent client = Agent.onPort(8888)
     ..setBasicAuthorization(clientID, clientSecret);
 

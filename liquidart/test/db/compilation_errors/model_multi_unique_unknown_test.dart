@@ -20,7 +20,7 @@ class MultiUniqueFailureUnknown
 @Table.unique([Symbol('a'), Symbol('b')])
 class _MultiUniqueFailureUnknown {
   @primaryKey
-  int id;
+  int? id;
 
-  int b;
+  int? b;
 }

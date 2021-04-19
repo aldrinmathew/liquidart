@@ -51,7 +51,7 @@ class CORSPolicy {
     return _defaultPolicy ??= CORSPolicy._defaults();
   }
 
-  static CORSPolicy _defaultPolicy;
+  static CORSPolicy? _defaultPolicy;
 
   /// List of 'Simple' CORS headers.
   ///
@@ -79,40 +79,40 @@ class CORSPolicy {
   /// The list of case-sensitive allowed origins.
   ///
   /// Defaults to '*'. Case-sensitive. In the specification (http://www.w3.org/TR/cors/), this is 'list of origins'.
-  List<String> allowedOrigins;
+  List<String> allowedOrigins = [];
 
   /// Whether or not to allow use of credentials, including Authorization and cookies.
   ///
   /// Defaults to true. In the specification (http://www.w3.org/TR/cors/), this is 'supports credentials'.
-  bool allowCredentials;
+  bool? allowCredentials;
 
   /// Which response headers to expose to the client.
   ///
   /// Defaults to empty. In the specification (http://www.w3.org/TR/cors/), this is 'list of exposed headers'.
   ///
   ///
-  List<String> exposedResponseHeaders;
+  List<String> exposedResponseHeaders = [];
 
   /// Which HTTP methods are allowed.
   ///
   /// Defaults to POST, PUT, DELETE, and GET. Case-sensitive. In the specification (http://www.w3.org/TR/cors/), this is 'list of methods'.
-  List<String> allowedMethods;
+  List<String> allowedMethods = [];
 
   /// The allowed request headers.
   ///
   /// Defaults to authorization, x-requested-with, x-forwarded-for. Must be lowercase.
   /// Use in conjunction with [simpleRequestHeaders]. In the specification (http://www.w3.org/TR/cors/), this is 'list of headers'.
-  List<String> allowedRequestHeaders;
+  List<String> allowedRequestHeaders = [];
 
   /// The number of seconds to cache a pre-flight request for a requesting client.
-  int cacheInSeconds;
+  int? cacheInSeconds;
 
   /// Returns a map of HTTP headers for a request based on this policy.
   ///
   /// This will add Access-Control-Allow-Origin, Access-Control-Expose-Headers and Access-Control-Allow-Credentials
   /// depending on the this policy.
   Map<String, dynamic> headersForRequest(Request request) {
-    var origin = request.raw.headers.value("origin");
+    var origin = request.raw!.headers.value("origin");
 
     var headers = <String, dynamic>{};
     headers["Access-Control-Allow-Origin"] = origin;
@@ -122,7 +122,7 @@ class CORSPolicy {
           exposedResponseHeaders.join(", ");
     }
 
-    if (allowCredentials) {
+    if (allowCredentials!) {
       headers["Access-Control-Allow-Credentials"] = "true";
     }
 
@@ -162,11 +162,11 @@ class CORSPolicy {
     }
 
     var requestedHeaders = request.headers
-        .value("access-control-request-headers")
-        ?.split(",")
-        ?.map((str) => str.trim().toLowerCase())
-        ?.toList();
-    if (requestedHeaders?.isNotEmpty ?? false) {
+        .value("access-control-request-headers")!
+        .split(",")
+        .map((str) => str.trim().toLowerCase())
+        .toList();
+    if (requestedHeaders.isNotEmpty) {
       var nonSimpleHeaders =
           requestedHeaders.where((str) => !simpleRequestHeaders.contains(str));
       if (nonSimpleHeaders.any((h) => !allowedRequestHeaders.contains(h))) {
@@ -184,12 +184,12 @@ class CORSPolicy {
   /// This method is invoked internally by [Controller]s that have a [Controller.policy].
   Response preflightResponse(Request req) {
     var headers = {
-      "Access-Control-Allow-Origin": req.raw.headers.value("origin"),
+      "Access-Control-Allow-Origin": req.raw!.headers.value("origin"),
       "Access-Control-Allow-Methods": allowedMethods.join(", "),
       "Access-Control-Allow-Headers": allowedRequestHeaders.join(", ")
     };
 
-    if (allowCredentials) {
+    if (allowCredentials!) {
       headers["Access-Control-Allow-Credentials"] = "true";
     }
 

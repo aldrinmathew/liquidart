@@ -6,7 +6,7 @@ import 'package:liquidart/src/application/channel.dart';
 import 'package:liquidart/src/runtime/orm/data_model_compiler.dart';
 
 import 'package:liquidart/src/runtime/impl.dart';
-import 'package:runtime/runtime.dart';
+import 'package:replica/replica.dart';
 
 class LiquidartCompiler extends Compiler {
   @override
@@ -36,7 +36,7 @@ class LiquidartCompiler extends Compiler {
   List<Uri> getUrisToResolve(BuildContext context) {
     return context.context
         .getSubclassesOf(ManagedObject)
-        .map((c) => c.location.sourceUri)
+        .map((c) => c.location!.sourceUri)
         .toList();
   }
 

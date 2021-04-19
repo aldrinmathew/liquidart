@@ -41,9 +41,9 @@ class FileController extends Controller {
   /// Note that the 'Last-Modified' header is always applied to a response served from this instance.
   FileController(String pathOfDirectoryToServe,
       {FutureOr<Response> onFileNotFound(
-          FileController controller, Request req)})
+          FileController controller, Request req)?})
       : _servingDirectory = Uri.directory(pathOfDirectoryToServe),
-        _onFileNotFound = onFileNotFound;
+        _onFileNotFound = onFileNotFound!;
 
   static Map<String, ContentType> _defaultExtensionMap = {
     /* Web content */
@@ -78,9 +78,9 @@ class FileController extends Controller {
   };
 
   final Map<String, ContentType> _extensionMap = Map.from(_defaultExtensionMap);
-  final List<_PolicyPair> _policyPairs = [];
-  final Uri _servingDirectory;
-  final _OnFileNotFound _onFileNotFound;
+  final List<_PolicyPair?> _policyPairs = [];
+  final Uri? _servingDirectory;
+  final _OnFileNotFound? _onFileNotFound;
 
   /// Returns a [ContentType] for a file extension.
   ///
@@ -88,11 +88,11 @@ class FileController extends Controller {
   /// e.g. both '.jpg' and 'jpg' are valid inputs to this method.
   ///
   /// Returns null if there is no entry for [extension]. Entries can be added with [setContentTypeForExtension].
-  ContentType contentTypeForExtension(String extension) {
+  ContentType? contentTypeForExtension(String extension) {
     if (extension.startsWith(".")) {
-      return _extensionMap[extension.substring(1)];
+      return _extensionMap[extension.substring(1)]!;
     }
-    return _extensionMap[extension];
+    return _extensionMap[extension]!;
   }
 
   /// Sets the associated content type for a file extension.
@@ -139,8 +139,9 @@ class FileController extends Controller {
   /// returns it if exists.
   CachePolicy cachePolicyForPath(String path) {
     return _policyPairs
-        .firstWhere((pair) => pair.shouldApplyToPath(path), orElse: () => null)
-        ?.policy;
+        .firstWhere((pair) => pair!.shouldApplyToPath(path),
+            orElse: () => null)!
+        .policy;
   }
 
   @override
@@ -149,8 +150,8 @@ class FileController extends Controller {
       return Response(HttpStatus.methodNotAllowed, null, null);
     }
 
-    var relativePath = request.path.remainingPath;
-    var fileUri = _servingDirectory.resolve(relativePath);
+    var relativePath = request.path!.remainingPath;
+    var fileUri = _servingDirectory!.resolve(relativePath!);
     File file;
     if (FileSystemEntity.isDirectorySync(fileUri.toFilePath())) {
       file = File.fromUri(fileUri.resolve("index.html"));
@@ -160,7 +161,7 @@ class FileController extends Controller {
 
     if (!file.existsSync()) {
       if (_onFileNotFound != null) {
-        return _onFileNotFound(this, request);
+        return _onFileNotFound!(this, request);
       }
 
       var response = Response.notFound();
@@ -174,7 +175,7 @@ class FileController extends Controller {
 
     var lastModifiedDate = file.lastModifiedSync();
     var ifModifiedSince =
-        request.raw.headers.value(HttpHeaders.ifModifiedSinceHeader);
+        request.raw!.headers.value(HttpHeaders.ifModifiedSinceHeader);
     if (ifModifiedSince != null) {
       var date = HttpDate.parse(ifModifiedSince);
       if (!lastModifiedDate.isAfter(date)) {

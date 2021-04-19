@@ -21,7 +21,7 @@ bool isListSerializable(Type type) {
       boundType.typeArguments.first.isSubtypeOf(reflectType(Serializable));
 }
 
-APISchemaObject getSchemaObjectReference(
+APISchemaObject? getSchemaObjectReference(
     APIDocumentContext context, Type type) {
   if (isListSerializable(type)) {
     return APISchemaObject.array(
@@ -42,14 +42,14 @@ class ResourceControllerDocumenterImpl extends ResourceControllerDocumenter {
   @override
   void documentComponents(ResourceController rc, APIDocumentContext context) {
     runtime.operations.forEach((b) {
-      [b.positionalParameters, b.namedParameters]
-          .expand((b) => b)
-          .where((b) => b.location == BindingType.body)
+      [b!.positionalParameters, b.namedParameters]
+          .expand((b) => b!)
+          .where((b) => b!.location == BindingType.body)
           .forEach((b) {
-        final boundType = reflectType(b.type);
-        if (isSerializable(b.type)) {
+        final boundType = reflectType(b!.type!);
+        if (isSerializable(b.type!)) {
           _registerType(context, boundType);
-        } else if (isListSerializable(b.type)) {
+        } else if (isListSerializable(b.type!)) {
           _registerType(context, boundType.typeArguments.first);
         }
       });
@@ -57,11 +57,11 @@ class ResourceControllerDocumenterImpl extends ResourceControllerDocumenter {
   }
 
   @override
-  List<APIParameter> documentOperationParameters(
+  List<APIParameter?> documentOperationParameters(
       ResourceController rc, APIDocumentContext context, Operation operation) {
     bool usesFormEncodedData = operation.method == "POST" &&
         rc.acceptedContentTypes.any((ct) =>
-            ct.primaryType == "application" &&
+            ct!.primaryType == "application" &&
             ct.subType == "x-www-form-urlencoded");
 
     return parametersForOperation(operation)
@@ -80,26 +80,26 @@ class ResourceControllerDocumenterImpl extends ResourceControllerDocumenter {
   }
 
   @override
-  APIRequestBody documentOperationRequestBody(
+  APIRequestBody? documentOperationRequestBody(
       ResourceController rc, APIDocumentContext context, Operation operation) {
     final op =
-        runtime.getOperationRuntime(operation.method, operation.pathVariables);
+        runtime.getOperationRuntime(operation.method!, operation.pathVariables);
     final usesFormEncodedData = operation.method == "POST" &&
         rc.acceptedContentTypes.any((ct) =>
-            ct.primaryType == "application" &&
+            ct!.primaryType == "application" &&
             ct.subType == "x-www-form-urlencoded");
-    final boundBody = op.positionalParameters.firstWhere(
-            (p) => p.location == BindingType.body,
+    final boundBody = op!.positionalParameters!.firstWhere(
+            (p) => p!.location == BindingType.body,
             orElse: () => null) ??
-        op.namedParameters.firstWhere((p) => p.location == BindingType.body,
+        op.namedParameters!.firstWhere((p) => p!.location == BindingType.body,
             orElse: () => null);
 
     if (boundBody != null) {
-      final ref = getSchemaObjectReference(context, boundBody.type);
+      final ref = getSchemaObjectReference(context, boundBody.type!);
       if (ref != null) {
         return APIRequestBody.schema(ref,
             contentTypes: rc.acceptedContentTypes
-                .map((ct) => "${ct.primaryType}/${ct.subType}"),
+                .map((ct) => "${ct!.primaryType}/${ct.subType}"),
             required: boundBody.isRequired);
       }
     } else if (usesFormEncodedData) {
@@ -108,7 +108,7 @@ class ResourceControllerDocumenterImpl extends ResourceControllerDocumenter {
               .where((p) => p.location == BindingType.query)
               .map((param) => _documentParameter(context, operation, param))
               .fold(<String, APISchemaObject>{}, (prev, elem) {
-        prev[elem.name] = elem.schema;
+        prev[elem.name!] = elem.schema!;
         return prev;
       });
 
@@ -122,44 +122,53 @@ class ResourceControllerDocumenterImpl extends ResourceControllerDocumenter {
   @override
   Map<String, APIOperation> documentOperations(ResourceController rc,
       APIDocumentContext context, String route, APIPath path) {
-    final opsForPath = runtime.operations
-        .where((method) => path.containsPathParameters(method.pathVariables));
+    List<String> pathVariablesList = [];
+    final opsForPath = runtime.operations.where((method) {
+      method!.pathVariables!.forEach((element) {
+        pathVariablesList.add(element!);
+      });
+      return path.containsPathParameters(pathVariablesList);
+    });
 
     return opsForPath.fold(<String, APIOperation>{}, (prev, opObj) {
       final instanceMembers = reflect(rc).type.instanceMembers;
-      Operation metadata =
-          firstMetadataOfType(instanceMembers[Symbol(opObj.dartMethodName)]);
-
+      Operation metadata = firstMetadataOfType(
+          instanceMembers[Symbol(opObj!.dartMethodName!)]!)!;
+      List<APIParameter>? parametersList = [];
+      rc.documentOperationParameters(context, metadata).forEach((element) {
+        parametersList.add(element!);
+      });
       final operationDoc = APIOperation(opObj.dartMethodName,
           rc.documentOperationResponses(context, metadata),
           summary: rc.documentOperationSummary(context, metadata),
           description: rc.documentOperationDescription(context, metadata),
-          parameters: rc.documentOperationParameters(context, metadata),
+          parameters: parametersList,
           requestBody: rc.documentOperationRequestBody(context, metadata),
           tags: rc.documentOperationTags(context, metadata));
 
       if (opObj.scopes != null) {
         context.defer(() async {
           operationDoc.security?.forEach((sec) {
-            sec.requirements.forEach((name, operationScopes) {
-              final secType = context.document.components.securitySchemes[name];
+            sec.requirements!.forEach((name, operationScopes) {
+              final secType =
+                  context.document.components!.securitySchemes[name];
               if (secType?.type == APISecuritySchemeType.oauth2 ||
                   secType?.type == APISecuritySchemeType.openID) {
-                _mergeScopes(operationScopes, opObj.scopes);
+                _mergeScopes(operationScopes, opObj.scopes!);
               }
             });
           });
         });
       }
 
-      prev[opObj.httpMethod.toLowerCase()] = operationDoc;
+      prev[opObj.httpMethod!.toLowerCase()] = operationDoc;
       return prev;
     });
   }
 
   List<ResourceControllerParameter> parametersForOperation(Operation op) {
     final operation = runtime.operations.firstWhere(
-        (b) => b.isSuitableForRequest(op.method, op.pathVariables),
+        (b) => b!.isSuitableForRequest(op.method, op.pathVariables),
         orElse: () => null);
 
     if (operation == null) {
@@ -170,7 +179,7 @@ class ResourceControllerDocumenterImpl extends ResourceControllerDocumenter {
       runtime.ivarParameters,
       operation.positionalParameters,
       operation.namedParameters
-    ].expand((i) => i).toList();
+    ].expand((i) => i!).toList() as List<ResourceControllerParameter>;
   }
 
   void _mergeScopes(
@@ -191,7 +200,7 @@ class ResourceControllerDocumenterImpl extends ResourceControllerDocumenter {
   APIParameter _documentParameter(APIDocumentContext context,
       Operation operation, ResourceControllerParameter param) {
     final schema =
-        SerializableRuntimeImpl.documentType(context, reflectType(param.type));
+        SerializableRuntimeImpl.documentType(context, reflectType(param.type!));
     final documentedParameter = APIParameter(param.name, param.apiLocation,
         schema: schema,
         required: param.isRequired,
@@ -206,7 +215,7 @@ void _registerType(APIDocumentContext context, TypeMirror typeMirror) {
     return;
   }
 
-  final classMirror = typeMirror as ClassMirror;
+  final classMirror = typeMirror;
   if (!context.schema.hasRegisteredType(classMirror.reflectedType) &&
       _shouldDocumentSerializable(classMirror.reflectedType)) {
     final instance =
@@ -220,7 +229,7 @@ void _registerType(APIDocumentContext context, TypeMirror typeMirror) {
 bool _shouldDocumentSerializable(Type type) {
   final hierarchy = classHierarchyForClass(reflectClass(type));
   final definingType = hierarchy.firstWhere(
-      (cm) => cm.staticMembers.containsKey(#shouldAutomaticallyDocument),
+      (cm) => cm!.staticMembers.containsKey(#shouldAutomaticallyDocument),
       orElse: () => null);
   if (definingType == null) {
     return Serializable.shouldAutomaticallyDocument;

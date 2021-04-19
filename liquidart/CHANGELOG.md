@@ -1,3 +1,10 @@
+## 5.0.0-b1
+- Migration to Dart Null Safety
+- Had 6000+ Errors uring Migration
+- Took 4 days of work to resolve them all and migrate the framework to Null Safety.
+- I also had to migrate all the packages that liquidart relied on, before migrating liquidart.
+- Huge Changes and Code Refactors.
+
 ## 4.0.1-b2
 - Changed Homepage link to Repository URL for now.
 

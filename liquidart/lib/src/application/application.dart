@@ -4,7 +4,7 @@ import 'dart:isolate';
 
 import 'package:liquidart/src/application/isolate_application_server.dart';
 import 'package:liquidart/src/openapi/openapi.dart';
-import 'package:runtime/runtime.dart';
+import 'package:replica/replica.dart';
 import 'package:logging/logging.dart';
 
 import '../http/http.dart';
@@ -29,7 +29,7 @@ class Application<T extends ApplicationChannel> {
   /// The [ApplicationServer] listening for HTTP requests while under test.
   ///
   /// This property is only valid when an application is started via [startOnCurrentIsolate].
-  ApplicationServer server;
+  ApplicationServer? server;
 
   /// The [ApplicationChannel] handling requests while under test.
   ///
@@ -125,7 +125,7 @@ class Application<T extends ApplicationChannel> {
 
       server = ApplicationServer(_runtime.channelType, options, 1);
 
-      await server.start();
+      await server!.start();
       _hasFinishedLaunching = true;
     } catch (e, st) {
       logger.severe("$e", this, st);
@@ -162,11 +162,11 @@ class Application<T extends ApplicationChannel> {
 
     final server = ApplicationServer(runtime.channelType, config, 1);
 
-    await server.channel.prepare();
+    await server.channel!.prepare();
 
-    final doc = await server.channel.documentAPI(projectSpec);
+    final doc = await server.channel!.documentAPI(projectSpec);
 
-    await server.channel.close();
+    await server.channel!.close();
 
     return doc;
   }

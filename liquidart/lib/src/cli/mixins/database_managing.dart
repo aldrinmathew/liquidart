@@ -7,14 +7,14 @@ import 'package:liquidart/src/cli/mixins/project.dart';
 import 'package:liquidart/src/cli/scripts/schema_builder.dart';
 import 'package:liquidart/src/cli/migration_source.dart';
 import 'package:liquidart/src/db/schema/schema.dart';
-import 'package:isolate_executor/isolate_executor.dart';
+import 'package:loner/loner.dart';
 
 abstract class CLIDatabaseManagingCommand implements CLICommand, CLIProject {
   @Option("migration-directory",
       help:
           "The directory where migration files are stored. Relative paths are relative to the application-directory.",
       defaultsTo: "migrations")
-  Directory get migrationDirectory {
+  Directory? get migrationDirectory {
     final dir = Directory(decode("migration-directory")).absolute;
 
     if (!dir.existsSync()) {
@@ -26,7 +26,7 @@ abstract class CLIDatabaseManagingCommand implements CLICommand, CLIProject {
   List<MigrationSource> get projectMigrations {
     try {
       final pattern = RegExp(r"^[0-9]+[_a-zA-Z0-9]*\.migration\.dart$");
-      final sources = migrationDirectory
+      final sources = migrationDirectory!
           .listSync()
           .where((fse) =>
               fse is File && pattern.hasMatch(fse.uri.pathSegments.last))
@@ -42,7 +42,7 @@ abstract class CLIDatabaseManagingCommand implements CLICommand, CLIProject {
   }
 
   Future<Schema> schemaByApplyingMigrationSources(List<MigrationSource> sources,
-      {Schema fromSchema}) async {
+      {Schema? fromSchema}) async {
     fromSchema ??= Schema.empty();
 
     if (sources.isNotEmpty) {
@@ -50,14 +50,14 @@ abstract class CLIDatabaseManagingCommand implements CLICommand, CLIProject {
           "Replaying versions: ${sources.map((f) => f.versionNumber.toString()).join(", ")}...");
     }
 
-    final schemaMap = await IsolateExecutor.run(
+    final schemaMap = await Loner.run(
         SchemaBuilderExecutable.input(sources, fromSchema),
         packageConfigURI: packageConfigUri,
         imports: SchemaBuilderExecutable.imports,
         additionalContents: MigrationSource.combine(sources),
         logHandler: displayProgress);
 
-    if (schemaMap.containsKey("error")) {
+    if (schemaMap.containsKey("error") == true) {
       throw CLIException(schemaMap["error"] as String);
     }
 

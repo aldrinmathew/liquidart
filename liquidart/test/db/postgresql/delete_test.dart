@@ -4,10 +4,10 @@ import 'package:postgres/postgres.dart';
 import 'package:liquidart/src/dev/helpers.dart';
 
 void main() {
-  ManagedContext context;
+  ManagedContext? context;
 
   tearDown(() async {
-    await context?.close();
+    await context!.close();
     context = null;
   });
 
@@ -17,18 +17,18 @@ void main() {
     var m = TestModel()
       ..email = "a@a.com"
       ..name = "joe";
-    var req = Query<TestModel>(context)..values = m;
+    var req = Query<TestModel>(context!)..values = m;
 
     var inserted = await req.insert();
     expect(inserted.id, greaterThan(0));
 
-    req = Query<TestModel>(context)
+    req = Query<TestModel>(context!)
       ..predicate = QueryPredicate("id = @id", {"id": inserted.id});
 
     var count = await req.delete();
     expect(count, 1);
 
-    req = Query<TestModel>(context)
+    req = Query<TestModel>(context!)
       ..predicate = QueryPredicate("id = @id", {"id": inserted.id});
 
     var result = await req.fetch();
@@ -45,21 +45,21 @@ void main() {
         ..email = "$i@a.com"
         ..name = "joe";
 
-      var req = Query<TestModel>(context)..values = m;
+      var req = Query<TestModel>(context!)..values = m;
 
       await req.insert();
     }
 
-    var req = Query<TestModel>(context);
+    var req = Query<TestModel>(context!);
     var result = await req.fetch();
     expect(result.length, 10);
 
-    req = Query<TestModel>(context)
+    req = Query<TestModel>(context!)
       ..predicate = QueryPredicate("id = @id", {"id": 1});
     var count = await req.delete();
     expect(count, 1);
 
-    req = Query<TestModel>(context);
+    req = Query<TestModel>(context!);
     result = await req.fetch();
     expect(result.length, 9);
   });
@@ -73,20 +73,20 @@ void main() {
         ..email = "$i@a.com"
         ..name = "joe";
 
-      var req = Query<TestModel>(context)..values = m;
+      var req = Query<TestModel>(context!)..values = m;
 
       await req.insert();
     }
 
-    var req = Query<TestModel>(context);
+    var req = Query<TestModel>(context!);
     var result = await req.fetch();
     expect(result.length, 10);
 
-    req = Query<TestModel>(context)..canModifyAllInstances = true;
+    req = Query<TestModel>(context!)..canModifyAllInstances = true;
     var count = await req.delete();
     expect(count, 10);
 
-    req = Query<TestModel>(context);
+    req = Query<TestModel>(context!);
     result = await req.fetch();
     expect(result.length, 0);
   });
@@ -100,23 +100,23 @@ void main() {
         ..email = "$i@a.com"
         ..name = "joe";
 
-      var req = Query<TestModel>(context)..values = m;
+      var req = Query<TestModel>(context!)..values = m;
 
       await req.insert();
     }
 
-    var req = Query<TestModel>(context);
+    var req = Query<TestModel>(context!);
     var result = await req.fetch();
     expect(result.length, 10);
 
     try {
-      req = Query<TestModel>(context);
+      req = Query<TestModel>(context!);
       await req.delete();
     } on StateError catch (e) {
       expect(e.toString(), contains("'canModifyAllInstances'"));
     }
 
-    req = Query<TestModel>(context);
+    req = Query<TestModel>(context!);
     result = await req.fetch();
     expect(result.length, 10);
   });
@@ -125,37 +125,37 @@ void main() {
     context = await contextWithModels([TestModel, RefModel]);
 
     var testModelObject = TestModel()..name = "a";
-    var testModelReq = Query<TestModel>(context)..values = testModelObject;
+    var testModelReq = Query<TestModel>(context!)..values = testModelObject;
     var testObj = await testModelReq.insert();
 
     var refModelObject = RefModel()..test = testObj;
-    var refModelReq = Query<RefModel>(context)..values = refModelObject;
-    var refObj = await refModelReq.insert();
+    var refModelReq = Query<RefModel>(context!)..values = refModelObject;
+    RefModel? refObj = await refModelReq.insert();
 
-    testModelReq = Query<TestModel>(context)..canModifyAllInstances = true;
+    testModelReq = Query<TestModel>(context!)..canModifyAllInstances = true;
     var count = await testModelReq.delete();
     expect(count, 1);
 
-    refModelReq = Query<RefModel>(context)
+    refModelReq = Query<RefModel>(context!)
       ..returningProperties((r) => [r.id, r.test]);
     refObj = await refModelReq.fetchOne();
-    expect(refObj.test, null);
+    expect(refObj!.test, null);
   });
 
   test("Deleting a related object w/restrict fails", () async {
     context = await contextWithModels([GRestrict, GRestrictInverse]);
 
     var griObject = GRestrictInverse()..name = "a";
-    var griReq = Query<GRestrictInverse>(context)..values = griObject;
+    var griReq = Query<GRestrictInverse>(context!)..values = griObject;
     var testObj = await griReq.insert();
 
     var grObject = GRestrict()..test = testObj;
-    var grReq = Query<GRestrict>(context)..values = grObject;
+    var grReq = Query<GRestrict>(context!)..values = grObject;
     await grReq.insert();
 
     var successful = false;
     try {
-      griReq = Query<GRestrictInverse>(context)..canModifyAllInstances = true;
+      griReq = Query<GRestrictInverse>(context!)..canModifyAllInstances = true;
       await griReq.delete();
       successful = true;
     } on QueryException catch (e) {
@@ -169,18 +169,18 @@ void main() {
     context = await contextWithModels([GCascade, GCascadeInverse]);
 
     var obj = GCascadeInverse()..name = "a";
-    var req = Query<GCascadeInverse>(context)..values = obj;
+    var req = Query<GCascadeInverse>(context!)..values = obj;
     var testObj = await req.insert();
 
     var cascadeObj = GCascade()..test = testObj;
-    var cascadeReq = Query<GCascade>(context)..values = cascadeObj;
+    var cascadeReq = Query<GCascade>(context!)..values = cascadeObj;
     await cascadeReq.insert();
 
-    req = Query<GCascadeInverse>(context)..canModifyAllInstances = true;
+    req = Query<GCascadeInverse>(context!)..canModifyAllInstances = true;
     var count = await req.delete();
     expect(count, 1);
 
-    cascadeReq = Query<GCascade>(context);
+    cascadeReq = Query<GCascade>(context!);
     var res = await cascadeReq.fetch();
     expect(res.length, 0);
   });
@@ -190,15 +190,16 @@ class TestModel extends ManagedObject<_TestModel> implements _TestModel {}
 
 class _TestModel {
   @primaryKey
-  int id;
+  int? id;
 
-  String name;
+  String? name;
 
   @Column(nullable: true, unique: true)
-  String email;
+  String? email;
 
-  ManagedSet<RefModel> ref;
+  ManagedSet<RefModel>? ref;
 
+  // ignore: unused_element
   static String tableName() {
     return "simple";
   }
@@ -213,10 +214,10 @@ class RefModel extends ManagedObject<_RefModel> implements _RefModel {}
 
 class _RefModel {
   @primaryKey
-  int id;
+  int? id;
 
   @Relate(Symbol('ref'), isRequired: false, onDelete: DeleteRule.nullify)
-  TestModel test;
+  TestModel? test;
 }
 
 class GRestrictInverse extends ManagedObject<_GRestrictInverse>
@@ -224,21 +225,21 @@ class GRestrictInverse extends ManagedObject<_GRestrictInverse>
 
 class _GRestrictInverse {
   @primaryKey
-  int id;
+  int? id;
 
-  String name;
+  String? name;
 
-  ManagedSet<GRestrict> test;
+  ManagedSet<GRestrict>? test;
 }
 
 class GRestrict extends ManagedObject<_GRestrict> implements _GRestrict {}
 
 class _GRestrict {
   @primaryKey
-  int id;
+  int? id;
 
   @Relate(Symbol('test'), isRequired: false, onDelete: DeleteRule.restrict)
-  GRestrictInverse test;
+  GRestrictInverse? test;
 }
 
 class GCascadeInverse extends ManagedObject<_GCascadeInverse>
@@ -246,19 +247,19 @@ class GCascadeInverse extends ManagedObject<_GCascadeInverse>
 
 class _GCascadeInverse {
   @primaryKey
-  int id;
+  int? id;
 
-  String name;
+  String? name;
 
-  ManagedSet<GCascade> test;
+  ManagedSet<GCascade>? test;
 }
 
 class GCascade extends ManagedObject<_GCascade> implements _GCascade {}
 
 class _GCascade {
   @primaryKey
-  int id;
+  int? id;
 
   @Relate(Symbol('test'), isRequired: false, onDelete: DeleteRule.cascade)
-  GCascadeInverse test;
+  GCascadeInverse? test;
 }

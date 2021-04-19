@@ -17,7 +17,7 @@ class AuthorizationBearerParser extends AuthorizationParser<String> {
   ///
   /// If [authorizationHeader] is malformed or null, throws an [AuthorizationParserException].
   @override
-  String parse(String authorizationHeader) {
+  String parse(String? authorizationHeader) {
     if (authorizationHeader == null) {
       throw AuthorizationParserException(
           AuthorizationParserExceptionReason.missing);
@@ -29,7 +29,7 @@ class AuthorizationBearerParser extends AuthorizationParser<String> {
       throw AuthorizationParserException(
           AuthorizationParserExceptionReason.malformed);
     }
-    return match[1];
+    return match[1]!;
   }
 }
 
@@ -38,10 +38,10 @@ class AuthorizationBearerParser extends AuthorizationParser<String> {
 /// See [AuthorizationBasicParser] for getting instances of this type.
 class AuthBasicCredentials {
   /// The username of a Basic Authorization header.
-  String username;
+  String? username;
 
   /// The password of a Basic Authorization header.
-  String password;
+  String? password;
 
   @override
   String toString() => "$username:$password";
@@ -59,7 +59,7 @@ class AuthorizationBasicParser
   ///
   /// If [authorizationHeader] is malformed or null, throws an [AuthorizationParserException].
   @override
-  AuthBasicCredentials parse(String authorizationHeader) {
+  AuthBasicCredentials parse(String? authorizationHeader) {
     if (authorizationHeader == null) {
       throw AuthorizationParserException(
           AuthorizationParserExceptionReason.missing);
@@ -76,7 +76,7 @@ class AuthorizationBasicParser
     String decodedCredentials;
     try {
       decodedCredentials =
-          String.fromCharCodes(const Base64Decoder().convert(base64String));
+          String.fromCharCodes(const Base64Decoder().convert(base64String!));
     } catch (e) {
       throw AuthorizationParserException(
           AuthorizationParserExceptionReason.malformed);

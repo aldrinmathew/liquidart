@@ -24,7 +24,7 @@ class CLITemplateCreator extends CLICommand with CLILiquidartGlobal {
       help: "Will fetch dependencies from a local cache if they exist.")
   bool get offline => decode("offline");
 
-  String get projectName =>
+  String? get projectName =>
       remainingArguments.isNotEmpty ? remainingArguments.first : null;
 
   @override
@@ -34,12 +34,12 @@ class CLITemplateCreator extends CLICommand with CLILiquidartGlobal {
       return 1;
     }
 
-    if (!isSnakeCase(projectName)) {
+    if (!isSnakeCase(projectName!)) {
       displayError("Invalid project name ($projectName is not snake_case).");
       return 1;
     }
 
-    var destDirectory = destinationDirectoryFromPath(projectName);
+    var destDirectory = destinationDirectoryFromPath(projectName!);
     if (destDirectory.existsSync()) {
       displayError("${destDirectory.path} already exists, stopping.");
       return 1;
@@ -57,11 +57,11 @@ class CLITemplateCreator extends CLICommand with CLILiquidartGlobal {
     displayProgress("Template source is: ${templateSourceDirectory.path}");
     displayProgress(
         "See more templates with 'liquidart create list-templates'");
-    copyProjectFiles(destDirectory, templateSourceDirectory, projectName);
+    copyProjectFiles(destDirectory, templateSourceDirectory, projectName!);
 
     createProjectSpecificFiles(destDirectory.path);
     if (liquidartPackageRef.sourceType == "path") {
-      final liquidartLocation = liquidartPackageRef.resolve().location;
+      final liquidartLocation = liquidartPackageRef.resolve()!.location;
 
       addDependencyOverridesToPackage(destDirectory.path, {
         "liquidart": liquidartLocation.uri,
@@ -251,10 +251,10 @@ class CLITemplateCreator extends CLICommand with CLILiquidartGlobal {
           .timeout(const Duration(seconds: 60));
       process.stdout
           .transform(utf8.decoder)
-          .listen((output) => outputSink?.write(output));
+          .listen((output) => outputSink.write(output));
       process.stderr
           .transform(utf8.decoder)
-          .listen((output) => outputSink?.write(output));
+          .listen((output) => outputSink.write(output));
 
       final exitCode = await process.exitCode;
 
@@ -342,11 +342,11 @@ class CLILiquidartGlobal {
     return pub
         .getGlobalApplications()
         .firstWhere((app) => app.name == "liquidart")
-        .getDefiningPackageRef();
+        .getDefiningPackageRef()!;
   }
 
   Uri get templateDirectory {
-    return liquidartPackageRef.resolve().location.uri.resolve("templates/");
+    return liquidartPackageRef.resolve()!.location.uri.resolve("templates/");
   }
 
   Uri getTemplateLocation(String templateName) {

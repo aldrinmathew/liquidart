@@ -47,7 +47,7 @@ class ManagedContext implements APIComponentDocumenter {
   /// A [Query] is sent to the database described by [persistentStore]. A [Query] may only be executed
   /// on this context if its type is in [dataModel].
   ManagedContext(this.dataModel, this.persistentStore) {
-    ManagedDataModelManager.add(dataModel);
+    ManagedDataModelManager.add(dataModel!);
     ServiceRegistry.defaultInstance
         .register<ManagedContext>(this, (o) => o.close());
   }
@@ -58,10 +58,10 @@ class ManagedContext implements APIComponentDocumenter {
         dataModel = parentContext.dataModel;
 
   /// The persistent store that [Query]s on this context are executed through.
-  PersistentStore persistentStore;
+  PersistentStore? persistentStore;
 
   /// The data model containing the [ManagedEntity]s that describe the [ManagedObject]s this instance works with.
-  final ManagedDataModel dataModel;
+  final ManagedDataModel? dataModel;
 
   /// Runs all [Query]s in [transactionBlock] within a database transaction.
   ///
@@ -91,8 +91,8 @@ class ManagedContext implements APIComponentDocumenter {
   ///         });
   Future<T> transaction<T>(
       Future<T> transactionBlock(ManagedContext transaction)) {
-    return persistentStore.transaction(
-        ManagedContext.childOf(this), transactionBlock);
+    return persistentStore!
+        .transaction(ManagedContext.childOf(this), transactionBlock);
   }
 
   /// Closes this context and release its underlying resources.
@@ -100,15 +100,15 @@ class ManagedContext implements APIComponentDocumenter {
   /// This method closes the connection to [persistentStore] and releases [dataModel].
   /// A context may not be reused once it has been closed.
   Future close() async {
-    await persistentStore?.close();
-    dataModel?.release();
+    await persistentStore!.close();
+    dataModel!.release();
   }
 
   /// Returns an entity for a type from [dataModel].
   ///
   /// See [ManagedDataModel.entityForType].
   ManagedEntity entityForType(Type type) {
-    return dataModel.entityForType(type);
+    return dataModel!.entityForType(type);
   }
 
   /// Inserts a single [object] into this context.
@@ -133,9 +133,9 @@ class ManagedContext implements APIComponentDocumenter {
   ///
   /// If [T] cannot be inferred, an error is thrown. If [identifier] is not the same type as [T]'s primary key,
   /// null is returned.
-  Future<T> fetchObjectWithID<T extends ManagedObject>(
+  Future<T?> fetchObjectWithID<T extends ManagedObject>(
       dynamic identifier) async {
-    final entity = dataModel.entityForType(T);
+    final ManagedEntity? entity = dataModel!.entityForType(T);
     if (entity == null) {
       throw ArgumentError("Unknown entity '$T' in fetchObjectWithID. "
           "Provide a type to this method and ensure it is in this context's data model.");
@@ -153,7 +153,7 @@ class ManagedContext implements APIComponentDocumenter {
 
   @override
   void documentComponents(APIDocumentContext context) =>
-      dataModel.documentComponents(context);
+      dataModel!.documentComponents(context);
 }
 
 /// Throw this object to roll back a [ManagedContext.transaction].

@@ -4,7 +4,7 @@ import 'dart:mirrors';
 import 'package:liquidart/liquidart.dart';
 import 'package:liquidart/src/cli/migration_source.dart';
 import 'package:postgres/postgres.dart';
-import 'package:isolate_executor/isolate_executor.dart';
+import 'package:loner/loner.dart';
 
 class RunUpgradeExecutable extends Executable<Map<String, dynamic>> {
   RunUpgradeExecutable(Map<String, dynamic> message)
@@ -20,13 +20,13 @@ class RunUpgradeExecutable extends Executable<Map<String, dynamic>> {
       this.inputSchema, this.dbInfo, this.sources, this.currentVersion)
       : super({
           "schema": inputSchema.asMap(),
-          "dbInfo": dbInfo.asMap(),
+          "dbInfo": dbInfo!.asMap(),
           "migrations": sources.map((source) => source.asMap()).toList(),
           "currentVersion": currentVersion
         });
 
   final Schema inputSchema;
-  final DBInfo dbInfo;
+  final DBInfo? dbInfo;
   final List<MigrationSource> sources;
   final int currentVersion;
 
@@ -38,11 +38,11 @@ class RunUpgradeExecutable extends Executable<Map<String, dynamic>> {
     PostgreSQLPersistentStore.logger.onRecord
         .listen((r) => log("${r.message}"));
 
-    PersistentStore store;
-    if (dbInfo != null && dbInfo.flavor == "postgres") {
-      store = PostgreSQLPersistentStore(dbInfo.username, dbInfo.password,
-          dbInfo.host, dbInfo.port, dbInfo.databaseName,
-          timeZone: dbInfo.timeZone);
+    PersistentStore? store;
+    if (dbInfo != null && dbInfo!.flavor == "postgres") {
+      store = PostgreSQLPersistentStore(dbInfo!.username, dbInfo!.password,
+          dbInfo!.host, dbInfo!.port, dbInfo!.databaseName,
+          timeZone: dbInfo!.timeZone);
     }
 
     var migrationTypes = currentMirrorSystem()
@@ -65,14 +65,14 @@ class RunUpgradeExecutable extends Executable<Map<String, dynamic>> {
     }).toList();
 
     try {
-      final updatedSchema = await store.upgrade(inputSchema, instances);
+      final updatedSchema = await store!.upgrade(inputSchema, instances);
       await store.close();
 
       return updatedSchema.asMap();
     } on QueryException catch (e) {
       if (e.event == QueryExceptionEvent.transport) {
         final databaseUrl =
-            "${dbInfo.username}:${dbInfo.password}@${dbInfo.host}:${dbInfo.port}/${dbInfo.databaseName}";
+            "${dbInfo!.username}:${dbInfo!.password}@${dbInfo!.host}:${dbInfo!.port}/${dbInfo!.databaseName}";
         return {
           "error":
               "There was an error connecting to the database '$databaseUrl'. Reason: ${e.message}."
@@ -89,7 +89,7 @@ class RunUpgradeExecutable extends Executable<Map<String, dynamic>> {
       };
     } on PostgreSQLException catch (e) {
       if (e.severity == PostgreSQLSeverity.error &&
-          e.message.contains("contains null values")) {
+          e.message!.contains("contains null values")) {
         return {
           "error": "There was an issue when adding or altering column '${e.tableName}.${e.columnName}'. "
               "This column cannot be null, but there already exist rows that would violate this constraint. "
@@ -109,7 +109,7 @@ class RunUpgradeExecutable extends Executable<Map<String, dynamic>> {
         "package:logging/logging.dart",
         "package:postgres/postgres.dart",
         "package:liquidart/src/cli/migration_source.dart",
-        "package:runtime/runtime.dart"
+        "package:replica/replica.dart"
       ];
 }
 

@@ -5,8 +5,8 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:liquidart/src/db/managed/managed.dart';
 import 'package:liquidart/src/runtime/orm/entity_builder.dart';
 import 'package:liquidart/src/utilities/sourcify.dart';
-import 'package:meta/meta.dart';
-import 'package:runtime/runtime.dart';
+// import 'package:meta/meta.dart';
+import 'package:replica/replica.dart';
 
 class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
     implements SourceCompiler {
@@ -18,7 +18,7 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
   final ManagedEntity entity;
 
   @override
-  ManagedObject instanceOfImplementation({ManagedBacking backing}) {
+  ManagedObject instanceOfImplementation({ManagedBacking? backing}) {
     final object = instanceType.newInstance(const Symbol(""), []).reflectee
         as ManagedObject;
     if (backing != null) {
@@ -63,7 +63,7 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
   }
 
   @override
-  String getPropertyName(Invocation invocation, ManagedEntity entity) {
+  String? getPropertyName(Invocation invocation, ManagedEntity entity) {
     // It memberName is not in symbolMap, it may be because that property doesn't exist for this object's entity.
     // But it also may occur for private ivars, in which case, we reconstruct the symbol and try that.
     return entity.symbolMap[invocation.memberName] ??
@@ -73,34 +73,34 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
   @override
   dynamic dynamicConvertFromPrimitiveValue(
       ManagedPropertyDescription property, dynamic value) {
-    return runtimeCast(value, reflectType(property.type.type));
+    return replicaCast(value, reflectType(property.type.type!));
   }
 
   List<String> _getValidatorConstructionFromAnnotation(BuildContext buildCtx,
       Annotation annotation, ManagedPropertyDescription property,
-      {@required List<Uri> importUris}) {
+      {required List<Uri> importUris}) {
     // For every annotation, grab the name of the type and find the corresponding type mirror in our list of type mirrors.
     // Documentation mismatch: `annotation.name.name` is NOT the class name, it is the entire constructor name.
     final typeOfAnnotationName = annotation.name.name.split(".").first;
-    final mirrorOfAnnotationType = buildCtx.context.types.firstWhere(
-        (t) => MirrorSystem.getName(t.simpleName) == typeOfAnnotationName,
+    List<ClassMirror?> buildContextTypes = buildCtx.context.types;
+    final ClassMirror? mirrorOfAnnotationType = buildContextTypes.firstWhere(
+        (t) => MirrorSystem.getName(t!.simpleName) == typeOfAnnotationName,
         orElse: () => null);
 
     // Following cases: @Validate, @Column(validators: [Validate]), or a const variable reference
-    if (mirrorOfAnnotationType?.isSubtypeOf(reflectType(Validate)) ?? false) {
+    if (mirrorOfAnnotationType!.isSubtypeOf(reflectType(Validate))) {
       // If the annotation is a const Validate instantiation, we just copy it directly
       // and import the file where the const constructor is declared.
-      importUris?.add(annotation.element.source.uri);
+      importUris.add(annotation.element!.source!.uri);
       return [annotation.toSource().substring(1)];
-    } else if (mirrorOfAnnotationType?.isSubtypeOf(reflectType(Column)) ??
-        false) {
+    } else if (mirrorOfAnnotationType.isSubtypeOf(reflectType(Column))) {
       // This is a direct column constructor and potentially has instances of Validate in its constructor
       // We should be able to navigate the unresolved AST to copy this text.
-      return _getConstructorSourcesFromColumnArgList(annotation.arguments,
-                  importUris: importUris)
-              ?.map((c) => c)
-              ?.toList() ??
-          [];
+      return _getConstructorSourcesFromColumnArgList(annotation.arguments!,
+              importUris: importUris)!
+          .map((c) => c)
+          .toList();
+      // ignore: unnecessary_null_comparison
     } else if (mirrorOfAnnotationType == null) {
       // Then this is not a const constructor - there is no type - it is a
       // instance (pointing at a const constructor) e.g. @primaryKey.
@@ -109,7 +109,7 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
         return [];
       }
 
-      final type = (element as PropertyAccessorElement).variable.type;
+      final type = element.variable.type;
       final isSubclassOrInstanceOfValidate = buildCtx.context
               .getSubclassesOf(Validate)
               .any((subclass) =>
@@ -120,23 +120,21 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
           type.getDisplayString(withNullability: false) == "Column";
 
       if (isSubclassOrInstanceOfValidate) {
-        importUris.add(annotation.element.source.uri);
+        importUris.add(annotation.element!.source!.uri);
         return [annotation.toSource().substring(1)];
       } else if (isInstanceOfColumn) {
         final originatingLibrary =
-            element.session.getParsedLibraryByElement(element.library);
+            element.session!.getParsedLibraryByElement(element.library);
         final elementDeclaration = originatingLibrary
-            .getElementDeclaration(
-                (element as PropertyAccessorElement).variable)
+            .getElementDeclaration(element.variable)!
             .node as VariableDeclaration;
 
         return _getConstructorSourcesFromColumnArgList(
-                    (elementDeclaration.initializer as MethodInvocation)
-                        .argumentList,
-                    importUris: importUris)
-                ?.map((c) => c)
-                ?.toList() ??
-            [];
+                (elementDeclaration.initializer as MethodInvocation)
+                    .argumentList,
+                importUris: importUris)!
+            .map((c) => c)
+            .toList();
       }
     }
     return [];
@@ -144,12 +142,12 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
 
   String _getValidators(
       BuildContext context, ManagedPropertyDescription property,
-      {@required List<Uri> importUris}) {
+      {required List<Uri> importUris}) {
     // For the property we are looking at, grab all of its annotations from the analyzer.
     // We also have all of the instances created by these annotations available in some
     // way or another in the [property].
     final fieldAnnotations = context.getAnnotationsFromField(
-        EntityBuilder.getTableDefinitionForType(property.entity.instanceType)
+        EntityBuilder.getTableDefinitionForType(property.entity.instanceType!)
             .reflectedType,
         property.name);
 
@@ -160,9 +158,9 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
         .expand((i) => i)
         .toList();
 
-    if (property.type?.isEnumerated ?? false) {
+    if (property.type.isEnumerated!) {
       final enumeratedValues =
-          property.type.enumerationMap.values.map(sourcifyValue).join(",");
+          property.type.enumerationMap!.values.map(sourcifyValue).join(",");
       constructorInvocations.add('Validate.oneOf([$enumeratedValues])');
     }
 
@@ -182,13 +180,13 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
 }()""";
   }
 
-  List<String> _getConstructorSourcesFromColumnArgList(ArgumentList argList,
-      {@required List<Uri> importUris}) {
+  List<String>? _getConstructorSourcesFromColumnArgList(ArgumentList argList,
+      {required List<Uri> importUris}) {
     final expression = argList.arguments
-        .whereType<NamedExpression>()
-        .firstWhere((c) => c.name.label.name == "validators",
+        .whereType<NamedExpression?>()
+        .firstWhere((c) => c!.name.label.name == "validators",
             orElse: () => null)
-        ?.expression as ListLiteral;
+        ?.expression as ListLiteral?;
     if (expression == null) {
       return null;
     }
@@ -211,7 +209,7 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
     return expression.elements.map((e) => e.toSource()).toList();
   }
 
-  String _getManagedTypeInstantiator(ManagedType type) {
+  String _getManagedTypeInstantiator(ManagedType? type) {
     if (type == null) {
       return "null";
     }
@@ -222,8 +220,8 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
 
     final enumStr = type.enumerationMap == null
         ? "null"
-        : "{${type.enumerationMap.keys.map((k) {
-            var vStr = sourcifyValue(type.enumerationMap[k]);
+        : "{${type.enumerationMap!.keys.map((k) {
+            var vStr = sourcifyValue(type.enumerationMap![k]);
             return "'$k': $vStr";
           }).join(",")}}";
 
@@ -240,9 +238,9 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
 
   String _getAttributeInstantiator(
       BuildContext ctx, ManagedAttributeDescription attribute,
-      {@required List<Uri> importUris}) {
+      {required List<Uri> importUris}) {
     final transienceStr = attribute.isTransient
-        ? "Serialize(input: ${attribute.transientStatus.isAvailableAsInput}, output: ${attribute.transientStatus.isAvailableAsOutput})"
+        ? "Serialize(input: ${attribute.transientStatus!.isAvailableAsInput}, output: ${attribute.transientStatus!.isAvailableAsOutput})"
         : null;
     final validatorStr = attribute.isTransient
         ? "[]"
@@ -265,7 +263,7 @@ ManagedAttributeDescription.make<${attribute.declaredType}>(entity, '${attribute
 
   String _getRelationshipInstantiator(
       BuildContext ctx, ManagedRelationshipDescription relationship,
-      {@required List<Uri> importUris}) {
+      {required List<Uri> importUris}) {
     return """
 ManagedRelationshipDescription.make<${relationship.declaredType}>(
   entity,
@@ -284,9 +282,9 @@ ManagedRelationshipDescription.make<${relationship.declaredType}>(
   }
 
   String _getEntityConstructor(BuildContext context,
-      {@required List<Uri> importUris}) {
+      {required List<Uri> importUris}) {
     final attributesStr = entity.attributes.keys.map((name) {
-      return "'$name': ${_getAttributeInstantiator(context, entity.attributes[name], importUris: importUris)}";
+      return "'$name': ${_getAttributeInstantiator(context, entity.attributes[name]!, importUris: importUris)}";
     }).join(", ");
 
     final symbolMapBuffer = StringBuffer();
@@ -298,7 +296,7 @@ ManagedRelationshipDescription.make<${relationship.declaredType}>(
     });
 
     final tableDef =
-        EntityBuilder.getTableDefinitionForType(entity.instanceType)
+        EntityBuilder.getTableDefinitionForType(entity.instanceType!)
             .reflectedType
             .toString();
 
@@ -314,7 +312,7 @@ return entity
   String _getSetTransientValueForKeyImpl(BuildContext ctx) {
     final cases = entity.attributes.values
         .where((attr) => attr.isTransient)
-        .where((attr) => attr.transientStatus.isAvailableAsInput)
+        .where((attr) => attr.transientStatus!.isAvailableAsInput!)
         .map((attr) {
       return "case '${attr.name}': (object as ${instanceType.reflectedType}).${attr.name} = value as ${attr.declaredType}; break;";
     }).join("\n");
@@ -327,7 +325,7 @@ return entity
   String _getGetTransientValueForKeyImpl(BuildContext ctx) {
     final cases = entity.attributes.values
         .where((attr) => attr.isTransient)
-        .where((attr) => attr.transientStatus.isAvailableAsOutput)
+        .where((attr) => attr.transientStatus!.isAvailableAsOutput!)
         .map((attr) {
       return "case '${attr.name}': return (object as ${instanceType.reflectedType}).${attr.name};";
     }).join("\n");
@@ -384,34 +382,34 @@ return entity.symbolMap[Symbol(symbolName)];
     final importUris = <Uri>[];
 
     final className = "${MirrorSystem.getName(instanceType.simpleName)}";
-    final originalFileUri = instanceType.location.sourceUri.toString();
-    final relationshipsStr = entity.relationships.keys.map((name) {
-      return "'$name': ${_getRelationshipInstantiator(ctx, entity.relationships[name], importUris: importUris)}";
+    final originalFileUri = instanceType.location!.sourceUri.toString();
+    final relationshipsStr = entity.relationships!.keys.map((name) {
+      return "'$name': ${_getRelationshipInstantiator(ctx, entity.relationships![name]!, importUris: importUris)}";
     }).join(", ");
 
     final uniqueStr = entity.uniquePropertySet == null
         ? "null"
-        : "[${entity.uniquePropertySet.map((u) => "'${u.name}'").join(",")}].map((k) => entity.properties[k]).toList()";
+        : "[${entity.uniquePropertySet!.map((u) => "'${u!.name}'").join(",")}].map((k) => entity.properties[k]).toList()";
 
     final entityConstructor =
         _getEntityConstructor(ctx, importUris: importUris);
 
     // Need to import any relationships types and metadata types
     // todo: limit import of importUris to only show symbols required to replicate metadata
-    final directives = entity.relationships.values.map((r) {
-      var mirror = reflectType(r.declaredType);
+    final directives = entity.relationships!.values.map((r) {
+      var mirror = reflectType(r.declaredType!);
       if (mirror.isSubtypeOf(reflectType(ManagedSet))) {
         mirror = mirror.typeArguments.first;
       }
 
-      final uri = mirror.location.sourceUri;
+      final uri = mirror.location!.sourceUri;
       return "import '$uri' show ${mirror.reflectedType};";
     }).toList()
       ..addAll(Set.from(importUris).map((uri) => "import '$uri';"));
 
     return """
 import 'package:liquidart/liquidart.dart';
-import 'package:runtime/runtime.dart';
+import 'package:replica/replica.dart';
 import '$originalFileUri';
 ${directives.join("\n")}
 

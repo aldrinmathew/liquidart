@@ -24,9 +24,9 @@ class RouteSegment {
   }
 
   RouteSegment.direct(
-      {String literal,
-      String variableName,
-      String expression,
+      {String? literal,
+      String? variableName,
+      String? expression,
       bool matchesAnything = false}) {
     this.literal = literal;
     this.variableName = variableName;
@@ -36,9 +36,9 @@ class RouteSegment {
     }
   }
 
-  String literal;
-  String variableName;
-  RegExp matcher;
+  String? literal;
+  String? variableName;
+  RegExp? matcher;
 
   bool get isLiteralMatcher =>
       !isRemainingMatcher && !isVariable && !hasRegularExpression;
@@ -62,15 +62,15 @@ class RouteSegment {
   @override
   String toString() {
     if (isLiteralMatcher) {
-      return literal;
+      return literal!;
     }
 
     if (isVariable) {
-      return variableName;
+      return variableName!;
     }
 
     if (hasRegularExpression) {
-      return "(${matcher.pattern})";
+      return "(${matcher!.pattern})";
     }
 
     return "*";
@@ -78,11 +78,11 @@ class RouteSegment {
 }
 
 class RouteNode {
-  RouteNode(List<RouteSpecification> specs, {int depth = 0, RegExp matcher}) {
-    patternMatcher = matcher;
+  RouteNode(List<RouteSpecification?> specs, {int depth = 0, RegExp? matcher}) {
+    patternMatcher = matcher!;
 
     var terminatedAtThisDepth =
-        specs.where((spec) => spec.segments.length == depth).toList();
+        specs.where((spec) => spec!.segments.length == depth).toList();
     if (terminatedAtThisDepth.length > 1) {
       throw ArgumentError(
           "Router compilation failed. Cannot disambiguate from the following routes: $terminatedAtThisDepth.");
@@ -90,16 +90,16 @@ class RouteNode {
       specification = terminatedAtThisDepth.first;
     }
 
-    final remainingSpecifications = List<RouteSpecification>.from(
-        specs.where((spec) => depth != spec.segments.length));
+    final remainingSpecifications = List<RouteSpecification?>.from(
+        specs.where((spec) => depth != spec!.segments.length));
 
     Set<String> childEqualitySegments = Set.from(remainingSpecifications
-        .where((spec) => spec.segments[depth].isLiteralMatcher)
-        .map((spec) => spec.segments[depth].literal));
+        .where((spec) => spec!.segments[depth].isLiteralMatcher)
+        .map((spec) => spec!.segments[depth].literal));
 
     childEqualitySegments.forEach((childSegment) {
       final childrenBeginningWithThisSegment = remainingSpecifications
-          .where((spec) => spec.segments[depth].literal == childSegment)
+          .where((spec) => spec!.segments[depth].literal == childSegment)
           .toList();
       equalityChildren[childSegment] =
           RouteNode(childrenBeginningWithThisSegment, depth: depth + 1);
@@ -108,42 +108,42 @@ class RouteNode {
     });
 
     var takeAllSegment = remainingSpecifications.firstWhere(
-        (spec) => spec.segments[depth].isRemainingMatcher,
+        (spec) => spec!.segments[depth].isRemainingMatcher,
         orElse: () => null);
     if (takeAllSegment != null) {
       takeAllChild = RouteNode.withSpecification(takeAllSegment);
       remainingSpecifications
-          .removeWhere((spec) => spec.segments[depth].isRemainingMatcher);
+          .removeWhere((spec) => spec!.segments[depth].isRemainingMatcher);
     }
 
     Set<String> childPatternedSegments = Set.from(remainingSpecifications
-        .map((spec) => spec.segments[depth].matcher?.pattern));
+        .map((spec) => spec!.segments[depth].matcher?.pattern));
 
     patternedChildren = childPatternedSegments.map((pattern) {
       var childrenWithThisPattern = remainingSpecifications
-          .where((spec) => spec.segments[depth].matcher?.pattern == pattern)
+          .where((spec) => spec!.segments[depth].matcher?.pattern == pattern)
           .toList();
 
       if (childrenWithThisPattern
-              .any((spec) => spec.segments[depth].matcher == null) &&
+              .any((spec) => spec!.segments[depth].matcher == null) &&
           childrenWithThisPattern
-              .any((spec) => spec.segments[depth].matcher != null)) {
+              .any((spec) => spec!.segments[depth].matcher != null)) {
         throw ArgumentError(
             "Router compilation failed. Cannot disambiguate from the following routes, as one of them will match anything: $childrenWithThisPattern.");
       }
 
       return RouteNode(childrenWithThisPattern,
           depth: depth + 1,
-          matcher: childrenWithThisPattern.first.segments[depth].matcher);
+          matcher: childrenWithThisPattern.first!.segments[depth].matcher);
     }).toList();
   }
 
   RouteNode.withSpecification(this.specification);
 
   // Regular expression matcher for this node. May be null.
-  RegExp patternMatcher;
-  Controller get controller => specification?.controller;
-  RouteSpecification specification;
+  RegExp? patternMatcher;
+  Controller get controller => specification!.controller!;
+  RouteSpecification? specification;
 
   // Includes children that are variables with and without regex patterns
   List<RouteNode> patternedChildren = [];
@@ -152,7 +152,7 @@ class RouteNode {
   Map<String, RouteNode> equalityChildren = {};
 
   // Valid if has child that is a take all (*) segment.
-  RouteNode takeAllChild;
+  RouteNode? takeAllChild;
 
   RouteNode nodeForPathSegments(
       Iterator<String> requestSegments, RequestPath path) {
@@ -163,7 +163,7 @@ class RouteNode {
     var nextSegment = requestSegments.current;
 
     if (equalityChildren.containsKey(nextSegment)) {
-      return equalityChildren[nextSegment]
+      return equalityChildren[nextSegment]!
           .nodeForPathSegments(requestSegments, path);
     }
 
@@ -173,7 +173,7 @@ class RouteNode {
         return node.nodeForPathSegments(requestSegments, path);
       }
 
-      if (node.patternMatcher.firstMatch(nextSegment) != null) {
+      if (node.patternMatcher!.firstMatch(nextSegment) != null) {
         // This segment has a regular expression
         return node.nodeForPathSegments(requestSegments, path);
       }
@@ -181,7 +181,7 @@ class RouteNode {
 
     // If this is null, then we return null from this method
     // and the router knows we didn't find a match.
-    return takeAllChild;
+    return takeAllChild!;
   }
 
   @override
@@ -192,11 +192,11 @@ class RouteNode {
     }
 
     if (patternMatcher != null) {
-      buf.write("(match: ${patternMatcher.pattern})");
+      buf.write("(match: ${patternMatcher!.pattern})");
     }
 
     buf.writeln(
-        "Controller: ${specification?.controller?.nextController?.runtimeType}");
+        "Controller: ${specification?.controller!.nextController!.runtimeType}");
     equalityChildren.forEach((seg, spec) {
       for (var i = 0; i < depth; i++) {
         buf.write("\t");

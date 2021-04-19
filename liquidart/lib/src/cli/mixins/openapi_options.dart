@@ -48,12 +48,13 @@ abstract class CLIDocumentOptions implements CLICommand {
       valueHelp: "https://api.myapp.com:8000")
   List<Uri> get hosts {
     List<String> hostValues = decode("host");
-    if (hostValues?.isEmpty ?? true) {
+    if (hostValues.isEmpty) {
       hostValues = ["http://localhost:8888"];
     }
     return hostValues.map((str) {
-      var uri = Uri.parse(str);
-      if (uri == null) {
+      Uri uri = Uri.parse(str);
+      dynamic uriCheck = uri;
+      if (uriCheck == null) {
         throw CLIException("Invalid Host Option", instructions: [
           "Host names must identify scheme, host and port. Example: https://api.myapp.com:8000"
         ]);

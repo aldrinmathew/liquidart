@@ -32,23 +32,23 @@ abstract class QueryController<InstanceType extends ManagedObject>
   /// 2. If the request contains a path variable that matches the name of the primary key of [InstanceType], the [Query] will set
   /// its [Query.where] to match on the [ManagedObject] whose primary key is that value of the path parameter.
   /// 3. If the [Request] contains a body, it will be decoded per the [acceptedContentTypes] and deserialized into the [Query.values] property via [ManagedObject.readFromMap].
-  Query<InstanceType> query;
+  Query<InstanceType>? query;
 
   @override
   FutureOr<RequestOrResponse> willProcessRequest(Request req) {
-    if (req.path.orderedVariableNames.isNotEmpty) {
-      var firstVarName = req.path.orderedVariableNames.first;
-      var idValue = req.path.variables[firstVarName];
+    if (req.path!.orderedVariableNames.isNotEmpty) {
+      var firstVarName = req.path!.orderedVariableNames.first;
+      var idValue = req.path!.variables[firstVarName];
 
       if (idValue != null) {
-        var primaryKeyDesc = query.entity.attributes[query.entity.primaryKey];
-        if (primaryKeyDesc.isAssignableWith(idValue)) {
-          query.where((o) => o[query.entity.primaryKey]).equalTo(idValue);
+        var primaryKeyDesc = query!.entity.attributes[query!.entity.primaryKey];
+        if (primaryKeyDesc!.isAssignableWith(idValue)) {
+          query!.where((o) => o[query!.entity.primaryKey!]).equalTo(idValue);
         } else if (primaryKeyDesc.type.kind == ManagedPropertyType.bigInteger ||
             primaryKeyDesc.type.kind == ManagedPropertyType.integer) {
           try {
-            query
-                .where((o) => o[query.entity.primaryKey])
+            query!
+                .where((o) => o[query!.entity.primaryKey!])
                 .equalTo(int.parse(idValue));
           } on FormatException {
             return Response.notFound();
@@ -64,7 +64,8 @@ abstract class QueryController<InstanceType extends ManagedObject>
 
   @override
   void didDecodeRequestBody(RequestBody body) {
-    query.values.readFromMap(body.as());
-    query.values.removePropertyFromBackingMap(query.values.entity.primaryKey);
+    query!.values!.readFromMap(body.as());
+    query!.values!
+        .removePropertyFromBackingMap(query!.values!.entity.primaryKey!);
   }
 }

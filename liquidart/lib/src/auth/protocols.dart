@@ -11,19 +11,19 @@ abstract class ResourceOwner {
   ///
   /// This value must be unique amongst all resource owners. It is often an email address. This value
   /// is used by authenticating users to identify their account.
-  String username;
+  String? username;
 
   /// The hashed password of this instance.
-  String hashedPassword;
+  String? hashedPassword;
 
   /// The salt the [hashedPassword] was hashed with.
-  String salt;
+  String? salt;
 
   /// A unique identifier of this resource owner.
   ///
   /// This unique identifier is used by [AuthServer] to associate authorization codes and access tokens with
   /// this resource owner.
-  int get id;
+  int? get id;
 }
 
 /// The methods used by an [AuthServer] to store information and customize behavior related to authorization.
@@ -41,7 +41,7 @@ abstract class AuthServerDelegate {
   /// Every property declared by [ResourceOwner] must be non-null in the return value.
   ///
   /// [server] is the [AuthServer] invoking this method.
-  FutureOr<ResourceOwner> getResourceOwner(AuthServer server, String username);
+  FutureOr<ResourceOwner?> getResourceOwner(AuthServer server, String username);
 
   /// Must store [client].
   ///
@@ -74,7 +74,7 @@ abstract class AuthServerDelegate {
   /// If no match is found, return null.
   ///
   /// [server] is the [AuthServer] requesting the [AuthToken].
-  FutureOr<AuthToken> getToken(AuthServer server,
+  FutureOr<AuthToken?> getToken(AuthServer server,
       {String byAccessToken, String byRefreshToken});
 
   /// This method must delete all [AuthToken] and [AuthCode]s for a [ResourceOwner].
@@ -123,7 +123,7 @@ abstract class AuthServerDelegate {
   ///
   /// This must return an instance of [AuthCode] where [AuthCode.code] matches [code].
   /// Return null if no matching code.
-  FutureOr<AuthCode> getCode(AuthServer server, String code);
+  FutureOr<AuthCode?> getCode(AuthServer server, String code);
 
   /// Must remove [AuthCode] identified by [code].
   ///

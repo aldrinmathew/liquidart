@@ -10,7 +10,7 @@ class KeyPath {
       : path = List.from(original.path)..add(key);
 
   final List<ManagedPropertyDescription> path;
-  List<dynamic> dynamicElements;
+  List<dynamic>? dynamicElements;
 
   ManagedPropertyDescription operator [](int index) => path[index];
 
@@ -22,6 +22,6 @@ class KeyPath {
 
   void addDynamicElement(dynamic element) {
     dynamicElements ??= [];
-    dynamicElements.add(element);
+    dynamicElements!.add(element);
   }
 }

@@ -3,9 +3,9 @@ import 'package:liquidart/liquidart.dart';
 import 'package:liquidart/src/dev/helpers.dart';
 
 void main() {
-  ManagedContext context;
+  ManagedContext? context;
   tearDown(() async {
-    await context?.close();
+    await context!.close();
     context = null;
   });
 
@@ -13,14 +13,14 @@ void main() {
     context = await contextWithModels([TestModel]);
 
     var m = TestModel(name: "Joe", email: "a@a.com");
-    var req = Query<TestModel>(context)..values = m;
-    var item = await req.insert();
+    var req = Query<TestModel>(context!)..values = m;
+    TestModel? item = await req.insert();
 
-    req = Query<TestModel>(context)
+    req = Query<TestModel>(context!)
       ..predicate = QueryPredicate("id = @id", {"id": item.id});
     item = await req.fetchOne();
 
-    expect(item.name, "Joe");
+    expect(item!.name, "Joe");
     expect(item.email, "a@a.com");
   });
 
@@ -31,7 +31,7 @@ void main() {
     var someOtherContext = ManagedContext(ManagedDataModel([]), null);
     try {
       Query.forEntity(
-          context.dataModel.entityForType(TestModel), someOtherContext);
+          context!.dataModel!.entityForType(TestModel), someOtherContext);
       expect(true, false);
     } on StateError catch (e) {
       expect(e.toString(),
@@ -43,18 +43,18 @@ void main() {
     context = await contextWithModels([TestModel]);
 
     var m = TestModel(name: "Joe", email: "b@a.com");
-    var req = Query<TestModel>(context)..values = m;
+    var req = Query<TestModel>(context!)..values = m;
 
-    var item = await req.insert();
+    TestModel? item = await req.insert();
     var id = item.id;
 
-    req = Query<TestModel>(context)
+    req = Query<TestModel>(context!)
       ..predicate = QueryPredicate("id = @id", {"id": item.id})
       ..returningProperties((t) => [t.id, t.name]);
 
     item = await req.fetchOne();
 
-    expect(item.name, "Joe");
+    expect(item!.name, "Joe");
     expect(item.id, id);
     expect(item.email, isNull);
   });
@@ -63,12 +63,12 @@ void main() {
     context = await contextWithModels([TestModel]);
 
     var m = TestModel(name: "Joe", email: "b@a.com");
-    var req = Query<TestModel>(context)..values = m;
+    var req = Query<TestModel>(context!)..values = m;
 
     await req.insert();
 
     try {
-      req = Query<TestModel>(context)
+      req = Query<TestModel>(context!)
         ..returningProperties((t) => [t.id, t["foobar"]]);
       fail("unreachable");
     } on ArgumentError catch (e) {
@@ -86,11 +86,11 @@ void main() {
 
     for (int i = 0; i < 10; i++) {
       var m = TestModel(name: "Joe$i", email: "asc$i@a.com");
-      var req = Query<TestModel>(context)..values = m;
+      var req = Query<TestModel>(context!)..values = m;
       await req.insert();
     }
 
-    var req = Query<TestModel>(context)
+    var req = Query<TestModel>(context!)
       ..sortBy((t) => t.email, QuerySortOrder.ascending)
       ..predicate = QueryPredicate("email like @key", {"key": "asc%"});
 
@@ -100,13 +100,13 @@ void main() {
       expect(result[i].email, "asc$i@a.com");
     }
 
-    req = Query<TestModel>(context)
+    req = Query<TestModel>(context!)
       ..sortBy((t) => t.id, QuerySortOrder.ascending);
     result = await req.fetch();
 
     int idIndex = 0;
     for (TestModel m in result) {
-      int next = m.id;
+      int next = m.id!;
       expect(next, greaterThan(idIndex));
       idIndex = next;
     }
@@ -118,12 +118,12 @@ void main() {
     for (int i = 0; i < 10; i++) {
       var m = TestModel(name: "Joe$i", email: "desc$i@a.com");
 
-      var req = Query<TestModel>(context)..values = m;
+      var req = Query<TestModel>(context!)..values = m;
 
       await req.insert();
     }
 
-    var req = Query<TestModel>(context)
+    var req = Query<TestModel>(context!)
       ..sortBy((t) => t.email, QuerySortOrder.descending)
       ..predicate = QueryPredicate("email like @key", {"key": "desc%"});
     var result = await req.fetch();
@@ -137,7 +137,7 @@ void main() {
   test("Cannot sort by property that doesn't exist", () async {
     context = await contextWithModels([TestModel]);
     try {
-      Query<TestModel>(context)
+      Query<TestModel>(context!)
           .sortBy((u) => u["nonexisting"], QuerySortOrder.ascending);
       expect(true, false);
     } on ArgumentError catch (e) {
@@ -154,7 +154,7 @@ void main() {
   test("Cannot sort by relationship property", () async {
     context = await contextWithModels([GenUser, GenPost]);
     try {
-      Query<GenUser>(context).sortBy((u) => u.posts, QuerySortOrder.ascending);
+      Query<GenUser>(context!).sortBy((u) => u.posts, QuerySortOrder.ascending);
       expect(true, false);
     } on ArgumentError catch (e) {
       expect(
@@ -173,12 +173,12 @@ void main() {
     for (int i = 0; i < 10; i++) {
       var m = TestModel(name: "Joe${i % 2}", email: "multi$i@a.com");
 
-      var req = Query<TestModel>(context)..values = m;
+      var req = Query<TestModel>(context!)..values = m;
 
       await req.insert();
     }
 
-    var req = Query<TestModel>(context)
+    var req = Query<TestModel>(context!)
       ..sortBy((t) => t.name, QuerySortOrder.ascending)
       ..sortBy((t) => t.email, QuerySortOrder.descending)
       ..predicate = QueryPredicate("email like @key", {"key": "multi%"});
@@ -221,11 +221,11 @@ void main() {
 
     var m = TestModel(name: "invkey", email: "invkey@a.com");
 
-    var req = Query<TestModel>(context)..values = m;
+    var req = Query<TestModel>(context!)..values = m;
     await req.insert();
 
     try {
-      req = Query<TestModel>(context)
+      req = Query<TestModel>(context!)
         ..returningProperties((t) => [t.id, t["badkey"]]);
 
       fail("unreachable");
@@ -240,42 +240,42 @@ void main() {
 
     var u1 = GenUser()..name = "Joe";
     var u2 = GenUser()..name = "Fred";
-    u1 = await (Query<GenUser>(context)..values = u1).insert();
-    u2 = await (Query<GenUser>(context)..values = u2).insert();
+    u1 = await (Query<GenUser>(context!)..values = u1).insert();
+    u2 = await (Query<GenUser>(context!)..values = u2).insert();
 
     for (int i = 0; i < 5; i++) {
       var p1 = GenPost()..text = "${2 * i}";
       p1.owner = u1;
-      await (Query<GenPost>(context)..values = p1).insert();
+      await (Query<GenPost>(context!)..values = p1).insert();
 
       var p2 = GenPost()..text = "${2 * i + 1}";
       p2.owner = u2;
-      await (Query<GenPost>(context)..values = p2).insert();
+      await (Query<GenPost>(context!)..values = p2).insert();
     }
 
-    var req = Query<GenPost>(context)
+    var req = Query<GenPost>(context!)
       ..predicate = QueryPredicate("owner_id = @id", {"id": u1.id});
     var res = await req.fetch();
     expect(res.length, 5);
     expect(
         res
             .map((p) => p.text)
-            .where((text) => num.parse(text) % 2 == 0)
+            .where((text) => num.parse(text!) % 2 == 0)
             .toList()
             .length,
         5);
 
-    var query = Query<GenPost>(context);
+    var query = Query<GenPost>(context!);
     query.where((o) => o.owner).identifiedBy(u1.id);
     res = await query.fetch();
 
-    GenUser user = res.first.owner;
+    GenUser user = res.first.owner!;
     expect(user, isNotNull);
     expect(res.length, 5);
     expect(
         res
             .map((p) => p.text)
-            .where((text) => num.parse(text) % 2 == 0)
+            .where((text) => num.parse(text!) % 2 == 0)
             .toList()
             .length,
         5);
@@ -283,30 +283,31 @@ void main() {
 
   test("Fetch object with null reference", () async {
     context = await contextWithModels([GenUser, GenPost]);
-    var p1 = await (Query<GenPost>(context)..values = (GenPost()..text = "1"))
+    GenPost? p1 = await (Query<GenPost>(context!)
+          ..values = (GenPost()..text = "1"))
         .insert();
 
-    var req = Query<GenPost>(context);
+    var req = Query<GenPost>(context!);
     p1 = await req.fetchOne();
 
-    expect(p1.owner, isNull);
+    expect(p1!.owner, isNull);
   });
 
   test("Omits specific keys", () async {
     context = await contextWithModels([Omit]);
 
-    var iq = Query<Omit>(context)..values = (Omit()..text = "foobar");
+    var iq = Query<Omit>(context!)..values = (Omit()..text = "foobar");
 
     var result = await iq.insert();
     expect(result.id, greaterThan(0));
-    expect(result.backing.contents["text"], isNull);
+    expect(result.backing.contents!["text"], isNull);
 
-    var fq = Query<Omit>(context)
+    var fq = Query<Omit>(context!)
       ..predicate = QueryPredicate("id=@id", {"id": result.id});
 
     var fResult = await fq.fetchOne();
-    expect(fResult.id, result.id);
-    expect(fResult.backing.contents["text"], isNull);
+    expect(fResult!.id, result.id);
+    expect(fResult.backing.contents!["text"], isNull);
   });
 
   test(
@@ -317,12 +318,12 @@ void main() {
     var objects = [GenUser()..name = "Joe", GenUser()..name = "Bob"];
 
     for (var o in objects) {
-      var req = Query<GenUser>(context)..values = o;
+      var req = Query<GenUser>(context!)..values = o;
       await req.insert();
     }
 
     try {
-      var q = Query<GenUser>(context)..join(set: (u) => u.posts);
+      var q = Query<GenUser>(context!)..join(set: (u) => u.posts!);
 
       await q.fetchOne();
 
@@ -338,22 +339,22 @@ void main() {
       () async {
     context = await contextWithModels([GenUser, GenPost]);
 
-    var u1 = await (Query<GenUser>(context)..values.name = "Joe").insert();
+    var u1 = await (Query<GenUser>(context!)..values!.name = "Joe").insert();
 
-    await (Query<GenPost>(context)
-          ..values.text = "text"
-          ..values.owner = u1)
+    await (Query<GenPost>(context!)
+          ..values!.text = "text"
+          ..values!.owner = u1)
         .insert();
 
-    var q = Query<GenPost>(context)
+    var q = Query<GenPost>(context!)
       ..returningProperties((p) => [p.id, p.owner]);
 
     var result = await q.fetchOne();
-    expect(result.owner.id, 1);
-    expect(result.owner.backing.contents.length, 1);
+    expect(result!.owner!.id, 1);
+    expect(result.owner!.backing.contents!.length, 1);
 
     try {
-      q = Query<GenPost>(context)
+      q = Query<GenPost>(context!)
         ..returningProperties((p) => [p.id, p["owner_id"]]);
       expect(true, false);
     } on ArgumentError catch (e) {
@@ -365,10 +366,10 @@ void main() {
   test("Can use public accessor to private property", () async {
     context = await contextWithModels([PrivateField]);
 
-    await Query<PrivateField>(context).insert();
-    var q = Query<PrivateField>(context);
+    await Query<PrivateField>(context!).insert();
+    var q = Query<PrivateField>(context!);
     var result = await q.fetchOne();
-    expect(result.public, "x");
+    expect(result!.public, "x");
   });
 
   test(
@@ -376,21 +377,21 @@ void main() {
       () async {
     context = await contextWithModels([EnumObject]);
 
-    var q = Query<EnumObject>(context)..values.enumValues = EnumValues.abcd;
+    var q = Query<EnumObject>(context!)..values!.enumValues = EnumValues.abcd;
 
     await q.insert();
 
-    q = Query<EnumObject>(context);
+    q = Query<EnumObject>(context!);
     var result = await q.fetchOne();
-    expect(result.enumValues, EnumValues.abcd);
+    expect(result!.enumValues, EnumValues.abcd);
     expect(result.asMap()["enumValues"], "abcd");
 
-    q = Query<EnumObject>(context)
+    q = Query<EnumObject>(context!)
       ..where((o) => o.enumValues).equalTo(EnumValues.abcd);
     result = await q.fetchOne();
     expect(result, isNotNull);
 
-    q = Query<EnumObject>(context)
+    q = Query<EnumObject>(context!)
       ..where((o) => o.enumValues).equalTo(EnumValues.efgh);
     result = await q.fetchOne();
     expect(result, isNull);
@@ -399,23 +400,23 @@ void main() {
   test("Can fetch enum value that is null", () async {
     context = await contextWithModels([EnumObject]);
 
-    var q = Query<EnumObject>(context)..values.enumValues = null;
+    var q = Query<EnumObject>(context!)..values!.enumValues = null;
 
     await q.insert();
-    q = Query<EnumObject>(context);
+    q = Query<EnumObject>(context!);
     var result = await q.fetchOne();
-    expect(result.enumValues, null);
+    expect(result!.enumValues, null);
     expect(result.asMap()["enumValues"], isNull);
   });
 
   test("When fetching invalid enum value from db, throws error", () async {
     context = await contextWithModels([EnumObject]);
 
-    await context.persistentStore
+    await context!.persistentStore!
         .execute("INSERT INTO _enumobject (enumValues) VALUES ('foobar')");
 
     try {
-      var q = Query<EnumObject>(context);
+      var q = Query<EnumObject>(context!);
       await q.fetch();
       expect(true, false);
     } on StateError catch (e) {
@@ -428,7 +429,7 @@ void main() {
     context = await contextWithModels([GenUser, GenPost]);
 
     try {
-      Query<GenUser>(context).returningProperties((p) => [p.posts]);
+      Query<GenUser>(context!).returningProperties((p) => [p.posts]);
       fail("unreachable");
     } on ArgumentError catch (e) {
       expect(
@@ -439,26 +440,26 @@ void main() {
   });
 
   group("Fetch by id", () {
-    int id;
+    int? id;
     setUp(() async {
       context = await contextWithModels([TestModel]);
-      id = (await context.insertObject(TestModel(name: "bob"))).id;
+      id = (await context!.insertObject(TestModel(name: "bob"))).id;
     });
 
     test("If object exists and type is specified, find object", () async {
-      final o = await context.fetchObjectWithID<TestModel>(id);
-      expect(o.name, "bob");
+      final o = await context!.fetchObjectWithID<TestModel>(id);
+      expect(o!.name, "bob");
     });
 
     test("If object does not exist and type is specified, return null",
         () async {
-      final o = await context.fetchObjectWithID<TestModel>(id + 1);
+      final o = await context!.fetchObjectWithID<TestModel>(id! + 1);
       expect(o, isNull);
     });
 
     test("If type is not specified, throw error", () async {
       try {
-        await context.fetchObjectWithID(id);
+        await context!.fetchObjectWithID(id);
         fail('unreachable');
       } on ArgumentError catch (e) {
         expect(e.message, contains("Unknown entity"));
@@ -467,7 +468,7 @@ void main() {
 
     test("If type is not found in data model, throw error", () async {
       try {
-        await context.fetchObjectWithID<Omit>(id);
+        await context!.fetchObjectWithID<Omit>(id);
         fail('unreachable');
       } on ArgumentError catch (e) {
         expect(e.message, contains("Unknown entity"));
@@ -477,28 +478,29 @@ void main() {
     test(
         "If identifier type is not the same type as return type, throw exception with 404",
         () async {
-      final o = await context.fetchObjectWithID<TestModel>("not-an-int");
+      final o = await context!.fetchObjectWithID<TestModel>("not-an-int");
       expect(o, isNull);
     });
   });
 }
 
 class TestModel extends ManagedObject<_TestModel> implements _TestModel {
-  TestModel({String name, String email}) {
-    this.name = name;
-    this.email = email;
+  TestModel({String? name, String? email}) {
+    this.name = name!;
+    this.email = email!;
   }
 }
 
 class _TestModel {
   @primaryKey
-  int id;
+  int? id;
 
-  String name;
+  String? name;
 
   @Column(nullable: true, unique: true)
-  String email;
+  String? email;
 
+  // ignore: unused_element
   static String tableName() {
     return "simple";
   }
@@ -513,12 +515,13 @@ class GenUser extends ManagedObject<_GenUser> implements _GenUser {}
 
 class _GenUser {
   @primaryKey
-  int id;
+  int? id;
 
-  String name;
+  String? name;
 
-  ManagedSet<GenPost> posts;
+  ManagedSet<GenPost>? posts;
 
+  // ignore: unused_element
   static String tableName() {
     return "GenUser";
   }
@@ -528,22 +531,22 @@ class GenPost extends ManagedObject<_GenPost> implements _GenPost {}
 
 class _GenPost {
   @primaryKey
-  int id;
+  int? id;
 
-  String text;
+  String? text;
 
   @Relate(Symbol('posts'), onDelete: DeleteRule.cascade, isRequired: false)
-  GenUser owner;
+  GenUser? owner;
 }
 
 class Omit extends ManagedObject<_Omit> implements _Omit {}
 
 class _Omit {
   @primaryKey
-  int id;
+  int? id;
 
   @Column(omitByDefault: true)
-  String text;
+  String? text;
 }
 
 class PrivateField extends ManagedObject<_PrivateField>
@@ -556,24 +559,24 @@ class PrivateField extends ManagedObject<_PrivateField>
     _private = p;
   }
 
-  String get public => _private;
+  String get public => _private!;
 }
 
 class _PrivateField {
   @primaryKey
-  int id;
+  int? id;
 
-  String _private;
+  String? _private;
 }
 
 class EnumObject extends ManagedObject<_EnumObject> implements _EnumObject {}
 
 class _EnumObject {
   @primaryKey
-  int id;
+  int? id;
 
   @Column(nullable: true)
-  EnumValues enumValues;
+  EnumValues? enumValues;
 }
 
 enum EnumValues { abcd, efgh, other18 }

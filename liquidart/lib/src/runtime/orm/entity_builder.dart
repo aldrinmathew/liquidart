@@ -16,34 +16,35 @@ class EntityBuilder {
   EntityBuilder(Type type)
       : instanceType = reflectClass(type),
         tableDefinitionType = getTableDefinitionForType(type),
-        metadata = firstMetadataOfType(getTableDefinitionForType(type)) {
+        metadata = firstMetadataOfType<Table>(getTableDefinitionForType(type)) {
     name = _getName();
 
     entity = ManagedEntity(
         name, type, MirrorSystem.getName(tableDefinitionType.simpleName))
       ..validators = [];
 
-    runtime = ManagedEntityRuntimeImpl(instanceType, entity);
+    runtime = ManagedEntityRuntimeImpl(instanceType, entity!);
 
     properties = _getProperties();
-    primaryKeyProperty = properties
-        .firstWhere((p) => p.column?.isPrimaryKey ?? false, orElse: () => null);
+    primaryKeyProperty = properties!.firstWhere(
+        (p) => p!.column!.isPrimaryKey ?? false,
+        orElse: () => null);
     if (primaryKeyProperty == null) {
-      throw ManagedDataModelErrorImpl.noPrimaryKey(entity);
+      throw ManagedDataModelErrorImpl.noPrimaryKey(entity!);
     }
   }
 
   final ClassMirror instanceType;
   final ClassMirror tableDefinitionType;
-  final Table metadata;
+  final Table? metadata;
 
-  ManagedEntityRuntime runtime;
+  ManagedEntityRuntime? runtime;
 
-  String name;
-  ManagedEntity entity;
-  List<String> uniquePropertySet;
-  PropertyBuilder primaryKeyProperty;
-  List<PropertyBuilder> properties = [];
+  String? name;
+  ManagedEntity? entity;
+  List<String>? uniquePropertySet;
+  PropertyBuilder? primaryKeyProperty;
+  List<PropertyBuilder?>? properties;
   Map<String, ManagedAttributeDescription> attributes = {};
   Map<String, ManagedRelationshipDescription> relationships = {};
 
@@ -53,12 +54,12 @@ class EntityBuilder {
       MirrorSystem.getName(tableDefinitionType.simpleName);
 
   void compile(List<EntityBuilder> entityBuilders) {
-    properties.forEach((p) {
-      p.compile(entityBuilders);
+    properties!.forEach((p) {
+      p!.compile(entityBuilders);
     });
 
     uniquePropertySet =
-        metadata?.uniquePropertySet?.map(MirrorSystem.getName)?.toList();
+        metadata!.uniquePropertySet!.map(MirrorSystem.getName).toList();
   }
 
   void validate(List<EntityBuilder> entityBuilders) {
@@ -68,27 +69,27 @@ class EntityBuilder {
     }
 
     // Check that we only have one primary key
-    if (properties.where((pb) => pb.primaryKey).length != 1) {
-      throw ManagedDataModelErrorImpl.noPrimaryKey(entity);
+    if (properties!.where((pb) => pb!.primaryKey).length != 1) {
+      throw ManagedDataModelErrorImpl.noPrimaryKey(entity!);
     }
 
     // Check that our unique property set is valid
     if (uniquePropertySet != null) {
-      if (uniquePropertySet.isEmpty) {
+      if (uniquePropertySet!.isEmpty) {
         throw ManagedDataModelErrorImpl.emptyEntityUniqueProperties(
             tableDefinitionTypeName);
-      } else if (uniquePropertySet.length == 1) {
+      } else if (uniquePropertySet!.length == 1) {
         throw ManagedDataModelErrorImpl.singleEntityUniqueProperty(
-            tableDefinitionTypeName, metadata.uniquePropertySet.first);
+            tableDefinitionTypeName, metadata!.uniquePropertySet!.first);
       }
 
-      uniquePropertySet.forEach((key) {
-        final prop = properties.firstWhere((p) => p.name == key, orElse: () {
+      uniquePropertySet!.forEach((key) {
+        final prop = properties!.firstWhere((p) => p!.name == key, orElse: () {
           throw ManagedDataModelErrorImpl.invalidEntityUniqueProperty(
               tableDefinitionTypeName, Symbol(key));
         });
 
-        if (prop.isRelationship &&
+        if (prop!.isRelationship &&
             prop.relationshipType != ManagedRelationshipType.belongsTo) {
           throw ManagedDataModelErrorImpl.relationshipEntityUniqueProperty(
               tableDefinitionTypeName, Symbol(key));
@@ -97,92 +98,92 @@ class EntityBuilder {
     }
 
     // Check that relationships are unique, i.e. two Relates point to the same property
-    properties.where((p) => p.isRelationship).forEach((p) {
-      final relationshipsWithThisInverse = properties
+    properties!.where((p) => p!.isRelationship).forEach((p) {
+      final relationshipsWithThisInverse = properties!
           .where((check) =>
-              check.isRelationship &&
-              check.relatedProperty == p.relatedProperty)
+              check!.isRelationship &&
+              check.relatedProperty == p!.relatedProperty)
           .toList();
       if (relationshipsWithThisInverse.length > 1) {
         throw ManagedDataModelErrorImpl.duplicateInverse(
             tableDefinitionTypeName,
-            p.relatedProperty.name,
-            relationshipsWithThisInverse.map((r) => r.name).toList());
+            p!.relatedProperty!.name!,
+            relationshipsWithThisInverse.map((r) => r!.name).toList());
       }
     });
 
     // Check each property
-    properties.forEach((p) => p.validate(entityBuilders));
+    properties!.forEach((p) => p!.validate(entityBuilders));
   }
 
-  void link(List<ManagedEntity> entities) {
-    entity.symbolMap = {};
-    properties.forEach((p) {
-      p.link(entities);
+  void link(List<ManagedEntity?> entities) {
+    entity!.symbolMap = {};
+    properties!.forEach((p) {
+      p!.link(entities);
 
-      entity.symbolMap[Symbol(p.name)] = p.name;
-      entity.symbolMap[Symbol("${p.name}=")] = p.name;
+      entity!.symbolMap[Symbol(p.name!)] = p.name!;
+      entity!.symbolMap[Symbol("${p.name}=")] = p.name!;
 
       if (p.isRelationship) {
-        relationships[p.name] = p.relationship;
+        relationships[p.name!] = p.relationship!;
       } else {
-        attributes[p.name] = p.attribute;
+        attributes[p.name!] = p.attribute!;
         if (p.primaryKey) {
-          entity.primaryKey = p.name;
+          entity!.primaryKey = p.name;
         }
       }
     });
 
-    entity.attributes = attributes;
-    entity.relationships = relationships;
-    entity.validators = [];
-    entity.validators.addAll(attributes.values.expand((a) => a.validators));
-    entity.validators.addAll(relationships.values.expand((a) => a.validators));
-    entity.uniquePropertySet =
-        uniquePropertySet?.map((key) => entity.properties[key])?.toList();
+    entity!.attributes = attributes;
+    entity!.relationships = relationships;
+    entity!.validators = [];
+    entity!.validators.addAll(attributes.values.expand((a) => a.validators));
+    entity!.validators.addAll(relationships.values.expand((a) => a.validators));
+    entity!.uniquePropertySet =
+        uniquePropertySet!.map((key) => entity!.properties[key]).toList();
   }
 
   PropertyBuilder getInverseOf(PropertyBuilder foreignKey) {
-    final expectedSymbol = foreignKey.relate.inversePropertyName;
+    final expectedSymbol = foreignKey.relate!.inversePropertyName;
     var finder =
-        (PropertyBuilder p) => p.declaration.simpleName == expectedSymbol;
-    if (foreignKey.relate.isDeferred) {
+        (PropertyBuilder? p) => p!.declaration!.simpleName == expectedSymbol;
+    if (foreignKey.relate!.isDeferred) {
       finder = (p) {
-        final propertyType = p.getDeclarationType();
+        final propertyType = p!.getDeclarationType();
         if (propertyType.isSubtypeOf(reflectType(ManagedSet))) {
           return propertyType.typeArguments.first
-              .isSubtypeOf(foreignKey.parent.tableDefinitionType);
+              .isSubtypeOf(foreignKey.parent!.tableDefinitionType);
         }
-        return propertyType.isSubtypeOf(foreignKey.parent.tableDefinitionType);
+        return propertyType.isSubtypeOf(foreignKey.parent!.tableDefinitionType);
       };
     }
 
-    final candidates = properties.where(finder).toList();
+    final candidates = properties!.where(finder).toList();
     if (candidates.length == 1) {
-      return candidates.first;
+      return candidates.first!;
     } else if (candidates.isEmpty) {
       throw ManagedDataModelErrorImpl.missingInverse(
-          foreignKey.parent.tableDefinitionTypeName,
-          foreignKey.parent.instanceTypeName,
-          foreignKey.declaration.simpleName,
+          foreignKey.parent!.tableDefinitionTypeName,
+          foreignKey.parent!.instanceTypeName,
+          foreignKey.declaration!.simpleName,
           tableDefinitionTypeName,
           null);
     }
 
     throw ManagedDataModelError(
-        "The relationship '${foreignKey.name}' on '${foreignKey.parent.tableDefinitionTypeName}' "
+        "The relationship '${foreignKey.name}' on '${foreignKey.parent!.tableDefinitionTypeName}' "
         "has multiple inverse candidates. There must be exactly one property that is a subclass of the expected type "
         "('${MirrorSystem.getName(foreignKey.getDeclarationType().simpleName)}'), but the following are all possible:"
-        " ${candidates.map((p) => p.name).join(", ")}");
+        " ${candidates.map((p) => p!.name).join(", ")}");
   }
 
   String _getName() {
-    if (metadata?.name != null) {
-      return metadata.name;
+    if (metadata!.name != null) {
+      return metadata!.name!;
     }
 
     var declaredTableNameClass = classHierarchyForClass(tableDefinitionType)
-        .firstWhere((cm) => cm.staticMembers[#tableName] != null,
+        .firstWhere((cm) => cm!.staticMembers[#tableName] != null,
             orElse: () => null);
 
     if (declaredTableNameClass == null) {
@@ -211,8 +212,8 @@ class EntityBuilder {
         .map((declaration) => PropertyBuilder(this, declaration))
         .toList();
 
-    if (instanceType.superclass.mixin != instanceType.superclass) {
-      final mixin = instanceType.superclass.mixin.declarations.values
+    if (instanceType.superclass!.mixin != instanceType.superclass) {
+      final mixin = instanceType.superclass!.mixin.declarations.values
           .where(isTransientPropertyOrAccessor)
           .map((declaration) => PropertyBuilder(this, declaration))
           .toList();
@@ -221,8 +222,9 @@ class EntityBuilder {
 
     final out = <PropertyBuilder>[];
     attributes.forEach((prop) {
-      final complement =
-          out.firstWhere((pb) => pb.name == prop.name, orElse: () => null);
+      List<PropertyBuilder?> outList = out;
+      final PropertyBuilder? complement =
+          outList.firstWhere((pb) => pb!.name == prop.name, orElse: () => null);
       if (complement != null) {
         complement.serialize = const Serialize(input: true, output: true);
       } else {
@@ -239,8 +241,8 @@ class EntityBuilder {
 
     return classHierarchyForClass(reflectClass(instanceType))
         .firstWhere(
-            (cm) => !cm.superclass.isSubtypeOf(reflectType(ManagedObject)),
-            orElse: () => throw ifNotFoundException)
+            (cm) => !cm!.superclass!.isSubtypeOf(reflectType(ManagedObject)),
+            orElse: () => throw ifNotFoundException)!
         .typeArguments
         .first as ClassMirror;
   }

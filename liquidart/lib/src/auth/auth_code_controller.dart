@@ -56,7 +56,7 @@ class AuthCodeController extends ResourceController {
   }
 
   /// A reference to the [AuthServer] used to grant authorization codes.
-  final AuthServer authServer;
+  final AuthServer? authServer;
 
   /// A randomly generated value the client can use to verify the origin of the redirect.
   ///
@@ -64,20 +64,20 @@ class AuthCodeController extends ResourceController {
   /// server have the same value for 'state' as passed in. This value is usually a randomly generated
   /// session identifier.
   @Bind.query("state")
-  String state;
+  String? state;
 
   /// Must be 'code'.
   @Bind.query("response_type")
-  String responseType;
+  String? responseType;
 
   /// The client ID of the authenticating client.
   ///
   /// This must be a valid client ID according to [authServer].\
   @Bind.query("client_id")
-  String clientID;
+  String? clientID;
 
   /// Renders an HTML login form.
-  final AuthCodeControllerDelegate delegate;
+  final AuthCodeControllerDelegate? delegate;
 
   /// Returns an HTML login form.
   ///
@@ -92,13 +92,13 @@ class AuthCodeController extends ResourceController {
       {
 
       /// A space-delimited list of access scopes to be requested by the form submission on the returned page.
-      @Bind.query("scope") String scope}) async {
+      @Bind.query("scope") String? scope}) async {
     if (delegate == null) {
       return Response(405, {}, null);
     }
 
-    final renderedPage = await delegate.render(
-        this, request.raw.uri, responseType, clientID, state, scope);
+    final String? renderedPage = await delegate!.render(
+        this, request!.raw!.uri, responseType!, clientID!, state!, scope!);
     if (renderedPage == null) {
       return Response.notFound();
     }
@@ -118,14 +118,14 @@ class AuthCodeController extends ResourceController {
       {
 
       /// The username of the authenticating user.
-      @Bind.query("username") String username,
+      @Bind.query("username") String? username,
 
       /// The password of the authenticating user.
-      @Bind.query("password") String password,
+      @Bind.query("password") String? password,
 
       /// A space-delimited list of access scopes being requested.
-      @Bind.query("scope") String scope}) async {
-    final client = await authServer.getClient(clientID);
+      @Bind.query("scope") String? scope}) async {
+    final client = await authServer!.getClient(clientID!);
 
     if (state == null) {
       return _redirectResponse(null, null,
@@ -133,7 +133,7 @@ class AuthCodeController extends ResourceController {
     }
 
     if (responseType != "code") {
-      if (client?.redirectURI == null) {
+      if (client.redirectURI == null) {
         return Response.badRequest();
       }
 
@@ -142,11 +142,11 @@ class AuthCodeController extends ResourceController {
     }
 
     try {
-      final scopes = scope?.split(" ")?.map((s) => AuthScope(s))?.toList();
+      final scopes = scope?.split(" ").map((s) => AuthScope(s)).toList();
 
-      final authCode = await authServer.authenticateForCode(
-          username, password, clientID,
-          requestedScopes: scopes);
+      final authCode = await authServer!.authenticateForCode(
+          username!, password!, clientID!,
+          requestedScopes: scopes!);
       return _redirectResponse(client.redirectURI, state, code: authCode.code);
     } on FormatException {
       return _redirectResponse(null, state,
@@ -161,9 +161,9 @@ class AuthCodeController extends ResourceController {
       APIDocumentContext context, Operation operation) {
     final body = super.documentOperationRequestBody(context, operation);
     if (operation.method == "POST") {
-      body.content["application/x-www-form-urlencoded"].schema
-          .properties["password"].format = "password";
-      body.content["application/x-www-form-urlencoded"].schema.required = [
+      body!.content!["application/x-www-form-urlencoded"]!.schema!
+          .properties!["password"]!.format = "password";
+      body.content!["application/x-www-form-urlencoded"]!.schema!.required = [
         "client_id",
         "state",
         "response_type",
@@ -171,15 +171,15 @@ class AuthCodeController extends ResourceController {
         "password"
       ];
     }
-    return body;
+    return body!;
   }
 
   @override
-  List<APIParameter> documentOperationParameters(
+  List<APIParameter?> documentOperationParameters(
       APIDocumentContext context, Operation operation) {
     final params = super.documentOperationParameters(context, operation);
-    params.where((p) => p.name != "scope").forEach((p) {
-      p.isRequired = true;
+    params.where((p) => p!.name != "scope").forEach((p) {
+      p!.isRequired = true;
     });
     return params;
   }
@@ -216,17 +216,17 @@ class AuthCodeController extends ResourceController {
   Map<String, APIOperation> documentOperations(
       APIDocumentContext context, String route, APIPath path) {
     final ops = super.documentOperations(context, route, path);
-    authServer.documentedAuthorizationCodeFlow.authorizationURL =
+    authServer!.documentedAuthorizationCodeFlow.authorizationURL =
         Uri(path: route.substring(1));
     return ops;
   }
 
   static Response _redirectResponse(
-      final String inputUri, String clientStateOrNull,
-      {String code, AuthServerException error}) {
-    final uriString = inputUri ?? error.client?.redirectURI;
+      final String? inputUri, String? clientStateOrNull,
+      {String? code, AuthServerException? error}) {
+    final uriString = inputUri ?? error!.client!.redirectURI;
     if (uriString == null) {
-      return Response.badRequest(body: {"error": error.reasonString});
+      return Response.badRequest(body: {"error": error!.reasonString});
     }
 
     final redirectURI = Uri.parse(uriString);
@@ -240,7 +240,7 @@ class AuthCodeController extends ResourceController {
       queryParameters["state"] = clientStateOrNull;
     }
     if (error != null) {
-      queryParameters["error"] = error.reasonString;
+      queryParameters["error"] = error.reasonString!;
     }
 
     final responseURI = Uri(

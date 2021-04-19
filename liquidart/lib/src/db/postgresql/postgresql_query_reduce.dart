@@ -56,7 +56,7 @@ class PostgresQueryReduce<T extends ManagedObject>
     try {
       final result = await connection
           .query(buffer.toString(), substitutionValues: builder.variables)
-          .timeout(Duration(seconds: query.timeoutInSeconds));
+          .timeout(Duration(seconds: query.timeoutInSeconds!));
       return result.first.first as U;
     } on TimeoutException catch (e) {
       throw QueryException.transport("timed out connecting to database",

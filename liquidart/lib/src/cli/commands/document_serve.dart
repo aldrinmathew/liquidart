@@ -17,10 +17,10 @@ class CLIDocumentServe extends CLICommand with CLIProject, CLIDocumentOptions {
   int get port => decode("port");
 
   @override
-  StoppableProcess runningProcess;
+  StoppableProcess? runningProcess;
 
   Directory get _hostedDirectory =>
-      Directory.fromUri(projectDirectory.uri.resolve(".liquidart_spec"));
+      Directory.fromUri(projectDirectory!.uri.resolve(".liquidart_spec"));
 
   @override
   Future<int> handle() async {
@@ -28,7 +28,7 @@ class CLIDocumentServe extends CLICommand with CLIProject, CLIDocumentOptions {
 
     runningProcess = await _listen();
 
-    return runningProcess.exitCode;
+    return runningProcess!.exitCode;
   }
 
   @override

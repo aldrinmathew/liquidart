@@ -15,7 +15,7 @@ class ColumnBuilder extends Returnable {
     final entity = table.entity;
 
     // Ensure the primary key is always available and at 0th index.
-    int primaryKeyIndex;
+    int? primaryKeyIndex;
     for (var i = 0; i < keys.length; i++) {
       final firstElement = keys[i].path.first;
       if (firstElement is ManagedAttributeDescription &&
@@ -26,14 +26,14 @@ class ColumnBuilder extends Returnable {
     }
 
     if (primaryKeyIndex == null) {
-      keys.insert(0, KeyPath(entity.primaryKeyAttribute));
+      keys.insert(0, KeyPath(entity!.primaryKeyAttribute));
     } else if (primaryKeyIndex > 0) {
       keys.removeAt(primaryKeyIndex);
-      keys.insert(0, KeyPath(entity.primaryKeyAttribute));
+      keys.insert(0, KeyPath(entity!.primaryKeyAttribute));
     }
 
     return List.from(keys.map((key) {
-      return ColumnBuilder(table, propertyForName(entity, key.path.first.name),
+      return ColumnBuilder(table, propertyForName(entity!, key.path.first.name),
           documentKeyPath: key.dynamicElements);
     }));
   }
@@ -78,7 +78,7 @@ class ColumnBuilder extends Returnable {
 
   final TableBuilder table;
   final ManagedPropertyDescription property;
-  final List<dynamic> documentKeyPath;
+  final List<dynamic>? documentKeyPath;
 
   dynamic convertValueForStorage(dynamic value) {
     if (value == null) {
@@ -112,10 +112,10 @@ class ColumnBuilder extends Returnable {
     if (property is ManagedAttributeDescription) {
       final p = property as ManagedAttributeDescription;
       if (p.isEnumeratedValue) {
-        if (!p.enumerationValueMap.containsKey(value)) {
+        if (!p.enumerationValueMap!.containsKey(value)) {
           throw ValidationException(["invalid option for key '${p.name}'"]);
         }
-        return p.enumerationValueMap[value];
+        return p.enumerationValueMap![value];
       } else if (p.type.kind == ManagedPropertyType.document) {
         return Document(value);
       }
@@ -137,7 +137,7 @@ class ColumnBuilder extends Returnable {
   String sqlColumnName(
       {bool withTypeSuffix = false,
       bool withTableNamespace = false,
-      String withPrefix}) {
+      String? withPrefix}) {
     var name = property.name;
 
     if (property is ManagedRelationshipDescription) {
@@ -147,7 +147,7 @@ class ColumnBuilder extends Returnable {
       name = "${name}_$relatedPrimaryKey";
     } else if (documentKeyPath != null) {
       final keys =
-          documentKeyPath.map((k) => k is String ? "'$k'" : k).join("->");
+          documentKeyPath!.map((k) => k is String ? "'$k'" : k).join("->");
       name = "$name->$keys";
     }
 

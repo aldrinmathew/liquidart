@@ -2,7 +2,7 @@ import 'dart:mirrors';
 import 'package:liquidart/src/runtime/orm/entity_builder.dart';
 
 import 'package:liquidart/src/db/managed/managed.dart';
-import 'package:runtime/runtime.dart';
+import 'package:replica/replica.dart';
 
 class DataModelCompiler {
   Map<String, dynamic> compile(MirrorContext context) {
@@ -20,13 +20,13 @@ class DataModelCompiler {
 
     _builders.forEach((b) {
       b.link(_builders.map((eb) => eb.entity).toList());
-      m[b.entity.instanceType.toString()] = b.runtime;
+      m[b.entity!.instanceType.toString()] = b.runtime;
     });
 
     return m;
   }
 
-  List<EntityBuilder> _builders;
+  List<EntityBuilder> _builders = [];
 
   void _validate() {
     // Check for dupe tables
@@ -37,7 +37,7 @@ class DataModelCompiler {
           .toList();
       if (withSameName.length > 1) {
         throw ManagedDataModelErrorImpl.duplicateTables(
-            builder.name, withSameName);
+            builder.name!, withSameName);
       }
     });
 
@@ -108,7 +108,7 @@ class ManagedDataModelErrorImpl extends ManagedDataModelError {
       String instanceName,
       Symbol property,
       String destinationTableName,
-      Symbol expectedProperty) {
+      Symbol? expectedProperty) {
     var expectedString = "Some property";
     if (expectedProperty != null) {
       expectedString = "'${_getName(expectedProperty)}'";
@@ -144,7 +144,7 @@ class ManagedDataModelErrorImpl extends ManagedDataModelError {
   }
 
   factory ManagedDataModelErrorImpl.duplicateInverse(
-      String tableName, String inverseName, List<String> conflictingNames) {
+      String tableName, String inverseName, List<String?> conflictingNames) {
     return ManagedDataModelErrorImpl(
         "Entity '${tableName}' has multiple relationship "
         "properties that claim to be the inverse of '$inverseName'. A property may "
@@ -242,7 +242,7 @@ class ManagedDataModelErrorImpl extends ManagedDataModelError {
         "in this way.");
   }
 
-  static String _getPersistentClassName(ManagedEntity entity) {
+  static String? _getPersistentClassName(ManagedEntity? entity) {
     if (entity == null) {
       return null;
     }
@@ -254,7 +254,7 @@ class ManagedDataModelErrorImpl extends ManagedDataModelError {
     return entity.tableDefinition;
   }
 
-  static String _getInstanceClassName(ManagedEntity entity) {
+  static String? _getInstanceClassName(ManagedEntity? entity) {
     if (entity == null) {
       return null;
     }
@@ -263,9 +263,9 @@ class ManagedDataModelErrorImpl extends ManagedDataModelError {
       return null;
     }
 
-    return _getName(reflectType(entity.instanceType).simpleName);
+    return _getName(reflectType(entity.instanceType!).simpleName);
   }
 
-  static String _getName(Symbol s) =>
+  static String? _getName(Symbol? s) =>
       s != null ? MirrorSystem.getName(s) : null;
 }

@@ -17,7 +17,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 library liquidart;
 
 export 'package:logging/logging.dart';
-export 'package:safe_config/safe_config.dart';
+export 'package:safe_yaml/safe_yaml.dart';
 
 export 'package:liquidart/src/runtime/compiler.dart';
 

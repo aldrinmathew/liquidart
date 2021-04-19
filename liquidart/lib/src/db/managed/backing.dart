@@ -37,8 +37,8 @@ class ManagedForeignKeyBuilderBacking extends ManagedBacking {
   ManagedForeignKeyBuilderBacking();
   ManagedForeignKeyBuilderBacking.from(
       ManagedEntity entity, ManagedBacking backing) {
-    if (backing.contents.containsKey(entity.primaryKey)) {
-      contents[entity.primaryKey] = backing.contents[entity.primaryKey];
+    if (backing.contents!.containsKey(entity.primaryKey)) {
+      contents[entity.primaryKey!] = backing.contents![entity.primaryKey];
     }
   }
 
@@ -133,21 +133,20 @@ class ManagedBuilderBacking extends ManagedBacking {
 }
 
 class ManagedAccessTrackingBacking extends ManagedBacking {
-  List<KeyPath> keyPaths;
-  KeyPath workingKeyPath;
+  List<KeyPath> keyPaths = [];
+  KeyPath? workingKeyPath;
 
   @override
-  Map<String, dynamic> get contents => null;
+  Map<String, dynamic>? get contents => null;
 
   @override
   dynamic valueForProperty(ManagedPropertyDescription property) {
     if (workingKeyPath != null) {
-      workingKeyPath.add(property);
+      workingKeyPath!.add(property);
 
-      return forward(property, workingKeyPath);
+      return forward(property, workingKeyPath!);
     }
 
-    keyPaths ??= [];
     final keyPath = KeyPath(property);
     keyPaths.add(keyPath);
 

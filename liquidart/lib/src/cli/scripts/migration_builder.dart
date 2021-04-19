@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:liquidart/liquidart.dart';
 import 'package:liquidart/src/cli/command.dart';
 import 'package:liquidart/src/cli/mixins/project.dart';
-import 'package:isolate_executor/isolate_executor.dart';
+import 'package:loner/loner.dart';
 
 class MigrationBuilderExecutable extends Executable<Map<String, dynamic>> {
   MigrationBuilderExecutable(Map<String, dynamic> message)
@@ -43,7 +43,7 @@ class MigrationBuilderExecutable extends Executable<Map<String, dynamic>> {
   static List<String> importsForPackage(String packageName) => [
         "package:liquidart/liquidart.dart",
         "package:$packageName/$packageName.dart",
-        "package:runtime/runtime.dart"
+        "package:replica/replica.dart"
       ];
 }
 
@@ -60,7 +60,7 @@ class MigrationBuilderResult {
 
 Future<MigrationBuilderResult> generateMigrationFileForProject(
     CLIProject project, Schema initialSchema, int inputVersion) async {
-  final resultMap = await IsolateExecutor.run(
+  final resultMap = await Loner.run(
       MigrationBuilderExecutable.input(initialSchema, inputVersion),
       packageConfigURI: project.packageConfigUri,
       imports:

@@ -30,7 +30,7 @@ class AuthController extends ResourceController {
   }
 
   /// A reference to the [AuthServer] this controller uses to grant tokens.
-  final AuthServer authServer;
+  final AuthServer? authServer;
 
   /// Required basic authentication Authorization header containing client ID and secret for the authenticating client.
   ///
@@ -45,7 +45,7 @@ class AuthController extends ResourceController {
   ///
   /// Notice the trailing colon indicates that the client secret is the empty string.
   @Bind.header(HttpHeaders.authorizationHeader)
-  String authHeader;
+  String? authHeader;
 
   final AuthorizationBasicParser _parser = const AuthorizationBasicParser();
 
@@ -59,32 +59,32 @@ class AuthController extends ResourceController {
   /// include a valid Client ID and Secret in the Basic authorization scheme format.
   @Operation.post()
   Future<Response> grant(
-      {@Bind.query("username") String username,
-      @Bind.query("password") String password,
-      @Bind.query("refresh_token") String refreshToken,
-      @Bind.query("code") String authCode,
-      @Bind.query("grant_type") String grantType,
-      @Bind.query("scope") String scope}) async {
+      {@Bind.query("username") String? username,
+      @Bind.query("password") String? password,
+      @Bind.query("refresh_token") String? refreshToken,
+      @Bind.query("code") String? authCode,
+      @Bind.query("grant_type") String? grantType,
+      @Bind.query("scope") String? scope}) async {
     AuthBasicCredentials basicRecord;
     try {
-      basicRecord = _parser.parse(authHeader);
+      basicRecord = _parser.parse(authHeader!);
     } on AuthorizationParserException catch (_) {
       return _responseForError(AuthRequestError.invalidClient);
     }
 
     try {
-      final scopes = scope?.split(" ")?.map((s) => AuthScope(s))?.toList();
+      final scopes = scope?.split(" ").map((s) => AuthScope(s)).toList();
 
       if (grantType == "password") {
-        final token = await authServer.authenticate(
-            username, password, basicRecord.username, basicRecord.password,
-            requestedScopes: scopes);
+        final token = await authServer!.authenticate(
+            username!, password!, basicRecord.username, basicRecord.password,
+            requestedScopes: scopes!);
 
         return AuthController.tokenResponse(token);
       } else if (grantType == "refresh_token") {
-        final token = await authServer.refresh(
-            refreshToken, basicRecord.username, basicRecord.password,
-            requestedScopes: scopes);
+        final token = await authServer!.refresh(
+            refreshToken!, basicRecord.username!, basicRecord.password!,
+            requestedScopes: scopes!);
 
         return AuthController.tokenResponse(token);
       } else if (grantType == "authorization_code") {
@@ -92,8 +92,8 @@ class AuthController extends ResourceController {
           return _responseForError(AuthRequestError.invalidRequest);
         }
 
-        final token = await authServer.exchange(
-            authCode, basicRecord.username, basicRecord.password);
+        final token = await authServer!
+            .exchange(authCode!, basicRecord.username!, basicRecord.password!);
 
         return AuthController.tokenResponse(token);
       } else if (grantType == null) {
@@ -102,7 +102,7 @@ class AuthController extends ResourceController {
     } on FormatException {
       return _responseForError(AuthRequestError.invalidScope);
     } on AuthServerException catch (e) {
-      return _responseForError(e.reason);
+      return _responseForError(e.reason!);
     }
 
     return _responseForError(AuthRequestError.unsupportedGrantType);
@@ -135,10 +135,10 @@ class AuthController extends ResourceController {
   }
 
   @override
-  List<APIParameter> documentOperationParameters(
+  List<APIParameter?> documentOperationParameters(
       APIDocumentContext context, Operation operation) {
     final parameters = super.documentOperationParameters(context, operation);
-    parameters.removeWhere((p) => p.name == HttpHeaders.authorizationHeader);
+    parameters.removeWhere((p) => p!.name == HttpHeaders.authorizationHeader);
     return parameters;
   }
 
@@ -146,11 +146,11 @@ class AuthController extends ResourceController {
   APIRequestBody documentOperationRequestBody(
       APIDocumentContext context, Operation operation) {
     final body = super.documentOperationRequestBody(context, operation);
-    body.content["application/x-www-form-urlencoded"].schema.required = [
+    body!.content!["application/x-www-form-urlencoded"]!.schema!.required = [
       "grant_type"
     ];
-    body.content["application/x-www-form-urlencoded"].schema
-        .properties["password"].format = "password";
+    body.content!["application/x-www-form-urlencoded"]!.schema!
+        .properties!["password"]!.format = "password";
     return body;
   }
 
@@ -166,11 +166,11 @@ class AuthController extends ResourceController {
     });
 
     final relativeUri = Uri(path: route.substring(1));
-    authServer.documentedAuthorizationCodeFlow.tokenURL = relativeUri;
-    authServer.documentedAuthorizationCodeFlow.refreshURL = relativeUri;
+    authServer!.documentedAuthorizationCodeFlow.tokenURL = relativeUri;
+    authServer!.documentedAuthorizationCodeFlow.refreshURL = relativeUri;
 
-    authServer.documentedPasswordFlow.tokenURL = relativeUri;
-    authServer.documentedPasswordFlow.refreshURL = relativeUri;
+    authServer!.documentedPasswordFlow.tokenURL = relativeUri;
+    authServer!.documentedPasswordFlow.refreshURL = relativeUri;
 
     return operations;
   }

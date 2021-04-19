@@ -6,7 +6,7 @@ import 'dart:mirrors';
 import 'package:liquidart/src/cli/metadata.dart';
 import 'package:liquidart/src/cli/running_process.dart';
 import 'package:args/args.dart' as args;
-import 'package:runtime/runtime.dart';
+import 'package:replica/replica.dart';
 import 'package:yaml/yaml.dart';
 import 'package:pub_semver/pub_semver.dart';
 
@@ -14,11 +14,11 @@ import 'package:pub_semver/pub_semver.dart';
 class CLIException implements Exception {
   CLIException(this.message, {this.instructions});
 
-  final List<String> instructions;
-  final String message;
+  final List<String>? instructions;
+  final String? message;
 
   @override
-  String toString() => message;
+  String toString() => message!;
 }
 
 enum CLIColor { red, green, blue, boldRed, boldGreen, boldBlue, boldNone, none }
@@ -32,7 +32,7 @@ abstract class CLICommand {
     arguments.forEach((arg) {
       if (!arg.isGetter) {
         throw StateError("Declaration "
-            "${MirrorSystem.getName(arg.owner.simpleName)}.${MirrorSystem.getName(arg.simpleName)} "
+            "${MirrorSystem.getName(arg.owner!.simpleName)}.${MirrorSystem.getName(arg.simpleName)} "
             "has CLI annotation, but is not a getter.");
       }
 
@@ -44,16 +44,17 @@ abstract class CLICommand {
   /// Options for this command.
   args.ArgParser options = args.ArgParser(allowTrailingOptions: true);
 
-  args.ArgResults _argumentValues;
+  args.ArgResults? _argumentValues;
 
-  List<String> get remainingArguments => _argumentValues.rest;
+  List<String> get remainingArguments => _argumentValues!.rest;
 
-  args.ArgResults get command => _argumentValues.command;
+  args.ArgResults get command => _argumentValues!.command!;
 
-  StoppableProcess get runningProcess {
+  StoppableProcess? get runningProcess {
     return _commandMap.values
-        .firstWhere((cmd) => cmd.runningProcess != null, orElse: () => null)
-        ?.runningProcess;
+        .firstWhere((cmd) => cmd.runningProcess != null,
+            orElse: () => null as CLICommand)
+        .runningProcess;
   }
 
   @Flag("version", help: "Prints version of this tool", negatable: false)
@@ -88,15 +89,15 @@ abstract class CLICommand {
     });
   }
 
-  Version get toolVersion => _toolVersion;
-  Version _toolVersion;
+  Version get toolVersion => _toolVersion!;
+  Version? _toolVersion;
 
   static const _delimiter = "-- ";
   static const _tabs = "    ";
   static const _errorDelimiter = "*** ";
 
   T decode<T>(String key) {
-    final val = _argumentValues[key];
+    final val = _argumentValues![key];
     if (T == int && val is String) {
       return int.parse(val) as T;
     }
@@ -125,13 +126,13 @@ abstract class CLICommand {
   /// Do not override this method. This method invokes [handle] within a try-catch block
   /// and will invoke [cleanup] when complete.
   Future<int> process(args.ArgResults results,
-      {List<String> commandPath}) async {
+      {List<String>? commandPath}) async {
     final parentCommandNames = commandPath ?? <String>[];
 
     if (results.command != null) {
       parentCommandNames.add(name);
-      return _commandMap[results.command.name]
-          .process(results.command, commandPath: parentCommandNames);
+      return _commandMap[results.command!.name]!
+          .process(results.command!, commandPath: parentCommandNames);
     }
 
     try {
@@ -151,13 +152,13 @@ abstract class CLICommand {
       preProcess();
 
       if (helpMeItsScary) {
-        printHelp(parentCommandName: parentCommandNames?.join(" "));
+        printHelp(parentCommandName: parentCommandNames.join(" "));
         return 0;
       }
 
       return await handle();
     } on CLIException catch (e, st) {
-      displayError(e.message);
+      displayError(e.message!);
       e.instructions?.forEach(displayProgress);
 
       if (showStacktrace) {
@@ -176,7 +177,7 @@ abstract class CLICommand {
   Future determineToolVersion() async {
     try {
       var toolLibraryFilePath = (await Isolate.resolvePackageUri(
-              currentMirrorSystem().findLibrary(#liquidart).uri))
+              currentMirrorSystem().findLibrary(#liquidart).uri))!
           .toFilePath(windows: Platform.isWindows);
       var liquidartDirectory = Directory(FileSystemEntity.parentOf(
           FileSystemEntity.parentOf(toolLibraryFilePath)));
@@ -218,7 +219,7 @@ abstract class CLICommand {
     if (!showColors) {
       return "";
     }
-    return _lookupTable[color];
+    return _lookupTable[color]!;
   }
 
   String get name;
@@ -254,7 +255,7 @@ abstract class CLICommand {
     CLIColor.none: "\u001b[0m",
   };
 
-  void printHelp({String parentCommandName}) {
+  void printHelp({String? parentCommandName}) {
     print("$description");
     print("$detailedDescription");
     print("");

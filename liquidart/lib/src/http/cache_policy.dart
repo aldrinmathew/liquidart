@@ -34,7 +34,7 @@ class CachePolicy {
   /// Sets how long a resource is valid for.
   ///
   /// Sets 'Cache-Control: max-age=x', where 'x' is [expirationFromNow] in seconds.
-  final Duration expirationFromNow;
+  final Duration? expirationFromNow;
 
   /// Constructs a header value configured from this instance.
   ///
@@ -53,7 +53,7 @@ class CachePolicy {
     }
 
     if (expirationFromNow != null) {
-      items.add("max-age=${expirationFromNow.inSeconds}");
+      items.add("max-age=${expirationFromNow!.inSeconds}");
     }
 
     if (requireConditionalRequest) {

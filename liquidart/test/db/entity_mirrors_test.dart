@@ -6,23 +6,23 @@ import 'package:test/test.dart';
 import 'package:liquidart/liquidart.dart';
 
 void main() {
-  ManagedContext context;
+  ManagedContext? context;
   tearDown(() async {
-    await context?.close();
+    await context!.close();
     context = null;
   });
 
   test("Have access to type args in Map", () {
     final type = getManagedTypeFromType(typeOf(#mapOfInts));
     expect(type.kind, ManagedPropertyType.map);
-    expect(type.elements.kind, ManagedPropertyType.integer);
+    expect(type.elements!.kind, ManagedPropertyType.integer);
   });
 
   test("Have access to type args in list of maps", () {
     final type = getManagedTypeFromType(typeOf(#listOfIntMaps));
     expect(type.kind, ManagedPropertyType.list);
-    expect(type.elements.kind, ManagedPropertyType.map);
-    expect(type.elements.elements.kind, ManagedPropertyType.integer);
+    expect(type.elements!.kind, ManagedPropertyType.map);
+    expect(type.elements!.elements!.kind, ManagedPropertyType.integer);
   });
 
   test("Cannot create ManagedType from invalid types", () {
@@ -54,26 +54,26 @@ class TestModel extends ManagedObject<_TestModel> implements _TestModel {}
 
 class _TestModel {
   @primaryKey
-  int id;
+  int? id;
 
-  String n;
-  DateTime t;
-  int l;
-  bool b;
-  double d;
-  Document doc;
+  String? n;
+  DateTime? t;
+  int? l;
+  bool? b;
+  double? d;
+  Document? doc;
 }
 
 class TypeRepo {
-  Map<String, int> mapOfInts;
-  List<Map<String, int>> listOfIntMaps;
+  Map<String, int>? mapOfInts;
+  List<Map<String, int>>? listOfIntMaps;
 
-  Map<int, String> invalidMapKey;
-  Map<String, Uri> invalidMapValue;
+  Map<int, String>? invalidMapKey;
+  Map<String, Uri>? invalidMapValue;
 
-  List<Uri> invalidList;
+  List<Uri>? invalidList;
 
-  Uri uri;
+  Uri? uri;
 }
 
 TypeMirror typeOf(Symbol symbol) {

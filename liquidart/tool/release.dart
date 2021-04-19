@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:yaml/yaml.dart';
 import 'package:http/http.dart' as http;
-import 'package:safe_config/safe_config.dart';
+import 'package:safe_yaml/safe_yaml.dart';
 import 'package:args/args.dart';
 
 Future main(List<String> args) async {
@@ -33,16 +33,16 @@ class Runner {
   }
 
   ArgResults options;
-  ReleaseConfig configuration;
+  ReleaseConfig? configuration;
   List<Function> _cleanup = [];
   bool get isDryRun => options["dry-run"] as bool;
   bool get docsOnly => options["docs-only"] as bool;
-  String get name => options["name"] as String;
+  String? get name => options["name"] as String?;
   Uri baseReferenceURL =
       Uri.parse("https://www.dartdocs.org/documentation/liquidart/latest/");
 
   Future cleanup() async {
-    return Future.forEach(_cleanup, (f) => f());
+    return Future.forEach(_cleanup, (Function f) => f());
   }
 
   Future<int> run() async {
@@ -59,8 +59,8 @@ class Runner {
         "Preparing release: '$name'... ${isDryRun ? "(dry-run)" : ""} ${docsOnly ? "(docs-only)" : ""}");
 
     var master = await directoryWithBranch("master");
-    String upcomingVersion;
-    String changeset;
+    String? upcomingVersion;
+    String? changeset;
     if (!docsOnly) {
       var previousVersion = await latestVersion();
       upcomingVersion = await versionFromDirectory(master);
@@ -77,7 +77,7 @@ class Runner {
     await publishDocs(docsSource, master);
 
     if (!docsOnly) {
-      await postGithubRelease(upcomingVersion, name, changeset);
+      await postGithubRelease(upcomingVersion!, name!, changeset!);
       await publish(master);
     }
 
@@ -194,14 +194,15 @@ class Runner {
   Future<String> latestVersion() async {
     print("Getting latest version...");
     var response = await http.get(
-        "https://api.github.com/repos/stablekernel/liquidart/releases/latest",
-        headers: {"Authorization": "Bearer ${configuration.githubToken}"});
+        Uri.parse(
+            "https://api.github.com/repos/aldrinsartfactory/liquidart/releases/latest"),
+        headers: {"Authorization": "Bearer ${configuration!.githubToken}"});
 
     if (response.statusCode != 200) {
       throw "latestVersion failed with status code ${response.statusCode}. Reason: ${response.body}";
     }
 
-    final tag = json.decode(response.body)["tag_name"] as String;
+    final tag = json.decode(response.body)["tag_name"] as String?;
     if (tag == null) {
       throw "latestVersion failed. Reason: no tag found";
     }
@@ -256,10 +257,11 @@ class Runner {
 
     if (!isDryRun) {
       var response = await http.post(
-          "https://api.github.com/repos/stablekernel/liquidart/releases",
+          Uri.parse(
+              "https://api.github.com/repos/aldrinsartfactory/liquidart/releases"),
           headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer ${configuration.githubToken}"
+            "Authorization": "Bearer ${configuration!.githubToken}"
           },
           body: body);
 
@@ -333,19 +335,19 @@ class Runner {
     var nameMap = <String, List<SymbolResolution>>{};
     resolutions.forEach((resolution) {
       if (!nameMap.containsKey(resolution.name)) {
-        nameMap[resolution.name] = [resolution];
+        nameMap[resolution.name!] = [resolution];
       } else {
-        nameMap[resolution.name].add(resolution);
+        nameMap[resolution.name]!.add(resolution);
       }
 
       var qualifiedKey =
-          libraries.fold(resolution.qualifiedName, (String p, e) {
+          libraries.fold<String>(resolution.qualifiedName!, (String p, e) {
         return p.replaceFirst("$e.", "");
       });
       if (!qualifiedMap.containsKey(qualifiedKey)) {
         qualifiedMap[qualifiedKey] = [resolution];
       } else {
-        qualifiedMap[qualifiedKey].add(resolution);
+        qualifiedMap[qualifiedKey]!.add(resolution);
       }
     });
 
@@ -359,7 +361,7 @@ class Runner {
     for (var f in files) {
       var filename = f.uri.pathSegments.last;
 
-      List<int> contents;
+      List<int>? contents;
       for (var transformer in transformers) {
         if (!transformer.shouldIncludeItem(filename)) {
           break;
@@ -384,7 +386,7 @@ class Runner {
     for (var subdirectory in subdirectories) {
       var dirName = subdirectory
           .uri.pathSegments[subdirectory.uri.pathSegments.length - 2];
-      var destinationDir =
+      Directory? destinationDir =
           Directory.fromUri(destination.uri.resolve("$dirName"));
 
       for (var t in transformers) {
@@ -409,23 +411,23 @@ class Runner {
 class ReleaseConfig extends Configuration {
   ReleaseConfig(String filename) : super.fromFile(File(filename));
 
-  String githubToken;
+  String? githubToken;
 }
 
 //////
 
 class SymbolResolution {
   SymbolResolution.fromMap(Map<String, String> map) {
-    name = map["name"];
-    qualifiedName = map["qualifiedName"];
-    link = map["href"];
-    type = map["type"];
+    name = map["name"]!;
+    qualifiedName = map["qualifiedName"]!;
+    link = map["href"]!;
+    type = map["type"]!;
   }
 
-  String name;
-  String qualifiedName;
-  String type;
-  String link;
+  String? name;
+  String? qualifiedName;
+  String? type;
+  String? link;
 
   @override
   String toString() => "$name: $qualifiedName $link $type";
@@ -481,11 +483,11 @@ class APIReferenceTransformer extends Transformer {
 
     matches.forEach((match) {
       var symbol = match.group(1);
-      var resolution = bestGuessForSymbol(symbol);
+      var resolution = bestGuessForSymbol(symbol!);
       if (resolution != null) {
         symbol = symbol.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
         var replacement = constructedReferenceURLFrom(
-            baseReferenceURL, resolution.link.split("/"));
+            baseReferenceURL, resolution.link!.split("/"));
         contents = contents.replaceRange(
             match.start, match.end, "<a href=\"$replacement\">$symbol</a>");
       } else {
@@ -496,7 +498,7 @@ class APIReferenceTransformer extends Transformer {
     return utf8.encode(contents);
   }
 
-  SymbolResolution bestGuessForSymbol(String inputSymbol) {
+  SymbolResolution? bestGuessForSymbol(String inputSymbol) {
     if (symbolMap.isEmpty) {
       return null;
     }
@@ -506,8 +508,8 @@ class APIReferenceTransformer extends Transformer {
         .replaceAll("@", "")
         .replaceAll("()", "");
 
-    var possible = symbolMap["qualified"][symbol];
-    possible ??= symbolMap["name"][symbol];
+    var possible = symbolMap["qualified"]![symbol];
+    possible ??= symbolMap["name"]![symbol];
 
     if (possible == null) {
       return null;
@@ -518,7 +520,7 @@ class APIReferenceTransformer extends Transformer {
     }
 
     return possible.firstWhere((r) => r.type == "class",
-        orElse: () => possible.first);
+        orElse: () => possible!.first);
   }
 }
 

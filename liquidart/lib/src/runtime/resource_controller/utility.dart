@@ -9,32 +9,33 @@ bool isOperation(DeclarationMirror m) {
   return getMethodOperationMetadata(m) != null;
 }
 
-List<AuthScope> getMethodScopes(DeclarationMirror m) {
+List<AuthScope>? getMethodScopes(DeclarationMirror m) {
   if (!isOperation(m)) {
     return null;
   }
 
   final method = m as MethodMirror;
-  final metadata = method.metadata
-      .firstWhere((im) => im.reflectee is Scope, orElse: () => null)
-      ?.reflectee as Scope;
+  final List<InstanceMirror?> metadataList = method.metadata;
+  final metadata = metadataList
+      .firstWhere((im) => im!.reflectee is Scope, orElse: () => null)!
+      .reflectee as Scope;
 
-  return metadata?.scopes?.map((scope) => AuthScope(scope))?.toList();
+  return metadata.scopes.map((scope) => AuthScope(scope)).toList();
 }
 
-Operation getMethodOperationMetadata(DeclarationMirror m) {
+Operation? getMethodOperationMetadata(DeclarationMirror m) {
   if (m is! MethodMirror) {
     return null;
   }
 
-  final method = m as MethodMirror;
+  final method = m;
   if (!method.isRegularMethod || method.isStatic) {
     return null;
   }
-
-  final metadata = method.metadata
-      .firstWhere((im) => im.reflectee is Operation, orElse: () => null)
-      ?.reflectee as Operation;
+  final List<InstanceMirror?> metadataList = method.metadata;
+  final metadata = metadataList
+      .firstWhere((im) => im!.reflectee is Operation, orElse: () => null)!
+      .reflectee as Operation;
 
   return metadata;
 }

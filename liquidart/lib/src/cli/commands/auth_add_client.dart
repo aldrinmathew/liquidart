@@ -12,13 +12,13 @@ import 'package:liquidart/liquidart.dart';
 class CLIAuthAddClient extends CLICommand
     with CLIDatabaseConnectingCommand, CLIDatabaseManagingCommand, CLIProject {
   @Option("id", abbr: "i", help: "The client ID to insert.")
-  String get clientID => decode("id");
+  String? get clientID => decode("id");
 
   @Option("secret",
       abbr: "s",
       help:
           "The client secret. This secret will be hashed on insertion, so you *must* store it somewhere. For public clients, this option may be omitted.")
-  String get secret => decode("secret");
+  String? get secret => decode("secret");
 
   @Option("redirect-uri",
       abbr: "r",
@@ -61,15 +61,15 @@ class CLIAuthAddClient extends CLICommand
       help:
           "A space-delimited list of allowed scopes. Omit if application does not support scopes.",
       defaultsTo: "")
-  List<String> get allowedScopes {
+  List<String>? get allowedScopes {
     String v = decode("allowed-scopes") as String;
     if (v.isEmpty) {
       return null;
     }
-    return v?.split(" ")?.toList();
+    return v.split(" ").toList();
   }
 
-  ManagedContext context;
+  ManagedContext? context;
 
   @override
   Future<int> handle() async {
@@ -81,16 +81,16 @@ class CLIAuthAddClient extends CLICommand
     var dataModel = ManagedDataModel.fromCurrentMirrorSystem();
     context = ManagedContext(dataModel, persistentStore);
 
-    var credentials = AuthUtility.generateAPICredentialPair(clientID, secret,
+    var credentials = AuthUtility.generateAPICredentialPair(clientID!, secret,
         redirectURI: redirectUri,
         hashLength: hashLength,
         hashRounds: hashRounds,
         hashFunction: hashFunction)
-      ..allowedScopes = allowedScopes?.map((s) => AuthScope(s))?.toList();
+      ..allowedScopes = allowedScopes?.map((s) => AuthScope(s)).toList();
 
     var managedCredentials = ManagedAuthClient.fromClient(credentials);
 
-    final query = Query<ManagedAuthClient>(context)
+    final query = Query<ManagedAuthClient>(context!)
       ..values = managedCredentials;
 
     try {
@@ -108,9 +108,9 @@ class CLIAuthAddClient extends CLICommand
       return 0;
     } on QueryException catch (e) {
       if (e.event == QueryExceptionEvent.conflict) {
-        if (e.offendingItems.contains("id")) {
+        if (e.offendingItems!.contains("id")) {
           displayError("Client ID '$clientID' already exists.");
-        } else if (e.offendingItems.contains("redirectURI")) {
+        } else if (e.offendingItems!.contains("redirectURI")) {
           displayError("Redirect URI '$redirectUri' already exists.");
         }
 

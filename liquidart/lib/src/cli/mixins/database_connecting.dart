@@ -5,13 +5,13 @@ import 'package:liquidart/src/cli/metadata.dart';
 import 'package:liquidart/src/cli/mixins/project.dart';
 import 'package:liquidart/src/db/persistent_store/persistent_store.dart';
 import 'package:liquidart/src/db/postgresql/postgresql_persistent_store.dart';
-import 'package:safe_config/safe_config.dart';
+import 'package:safe_yaml/safe_yaml.dart';
 import 'package:liquidart/src/cli/command.dart';
 
 abstract class CLIDatabaseConnectingCommand implements CLICommand, CLIProject {
   static const String flavorPostgreSQL = "postgres";
 
-  DatabaseConfiguration connectedDatabase;
+  DatabaseConfiguration? connectedDatabase;
 
   @Flag("use-ssl",
       help: "Whether or not the database connection should use SSL",
@@ -23,7 +23,7 @@ abstract class CLIDatabaseConnectingCommand implements CLICommand, CLIProject {
       help:
           "A database connection URI string. If this option is set, database-config is ignored.",
       valueHelp: "postgres://user:password@localhost:port/databaseName")
-  String get databaseConnectionString => decode("connect");
+  String? get databaseConnectionString => decode("connect");
 
   @Option("flavor",
       abbr: "f",
@@ -41,11 +41,11 @@ abstract class CLIDatabaseConnectingCommand implements CLICommand, CLIProject {
   File get databaseConfigurationFile =>
       fileInProjectDirectory(decode("database-config"));
 
-  PersistentStore _persistentStore;
+  PersistentStore? _persistentStore;
 
   PersistentStore get persistentStore {
     if (_persistentStore != null) {
-      return _persistentStore;
+      return _persistentStore!;
     }
 
     if (decode("flavor") == null) {
@@ -56,7 +56,7 @@ abstract class CLIDatabaseConnectingCommand implements CLICommand, CLIProject {
       if (databaseConnectionString != null) {
         try {
           connectedDatabase = DatabaseConfiguration();
-          connectedDatabase.decode(databaseConnectionString);
+          connectedDatabase!.decode(databaseConnectionString);
         } catch (_) {
           throw CLIException("Invalid database configuration.", instructions: [
             "Invalid connection string was: $databaseConnectionString",
@@ -86,11 +86,11 @@ abstract class CLIDatabaseConnectingCommand implements CLICommand, CLIProject {
       }
 
       return _persistentStore = PostgreSQLPersistentStore(
-          connectedDatabase.username,
-          connectedDatabase.password,
-          connectedDatabase.host,
-          connectedDatabase.port,
-          connectedDatabase.databaseName,
+          connectedDatabase!.username!,
+          connectedDatabase!.password!,
+          connectedDatabase!.host!,
+          connectedDatabase!.port!,
+          connectedDatabase!.databaseName!,
           useSSL: useSSL);
     }
 

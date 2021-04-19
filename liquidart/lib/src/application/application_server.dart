@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:liquidart/src/application/channel.dart';
 import 'package:logging/logging.dart';
-import 'package:runtime/runtime.dart';
+import 'package:replica/replica.dart';
 
 import '../http/controller.dart';
 import '../http/request.dart';
@@ -23,27 +23,27 @@ class ApplicationServer {
     channel = (RuntimeContext.current[channelType] as ChannelRuntime)
         .instantiateChannel()
           ..server = this
-          ..options = options;
+          ..options = options!;
   }
 
   /// The configuration this instance used to start its [channel].
-  ApplicationOptions options;
+  ApplicationOptions? options;
 
   /// The underlying [HttpServer].
-  HttpServer server;
+  HttpServer? server;
 
   /// The instance of [ApplicationChannel] serving requests.
-  ApplicationChannel channel;
+  ApplicationChannel? channel;
 
   /// The cached entrypoint of [channel].
-  Controller entryPoint;
+  Controller? entryPoint;
 
   final Type channelType;
 
   /// Target for sending messages to other [ApplicationChannel.messageHub]s.
   ///
   /// Events are added to this property by instances of [ApplicationMessageHub] and should not otherwise be used.
-  EventSink<dynamic> hubSink;
+  EventSink<dynamic>? hubSink;
 
   /// Whether or not this server requires an HTTPS listener.
   bool get requiresHTTPS => _requiresHTTPS;
@@ -64,26 +64,26 @@ class ApplicationServer {
   Future start({bool shareHttpServer = false}) async {
     logger.fine("ApplicationServer($identifier).start entry");
 
-    await channel.prepare();
+    await channel!.prepare();
 
-    entryPoint = channel.entryPoint;
-    entryPoint.didAddToChannel();
+    entryPoint = channel!.entryPoint;
+    entryPoint!.didAddToChannel();
 
     logger.fine("ApplicationServer($identifier).start binding HTTP");
-    final securityContext = channel.securityContext;
+    final SecurityContext? securityContext = channel!.securityContext;
     if (securityContext != null) {
       _requiresHTTPS = true;
 
       server = await HttpServer.bindSecure(
-          options.address, options.port, securityContext,
-          requestClientCertificate: options.isUsingClientCertificate,
-          v6Only: options.isIpv6Only,
+          options!.address, options!.port, securityContext,
+          requestClientCertificate: options!.isUsingClientCertificate,
+          v6Only: options!.isIpv6Only,
           shared: shareHttpServer);
     } else {
       _requiresHTTPS = false;
 
-      server = await HttpServer.bind(options.address, options.port,
-          v6Only: options.isIpv6Only, shared: shareHttpServer);
+      server = await HttpServer.bind(options!.address, options!.port,
+          v6Only: options!.isIpv6Only, shared: shareHttpServer);
     }
 
     logger.fine("ApplicationServer($identifier).start bound HTTP");
@@ -106,12 +106,12 @@ class ApplicationServer {
   ///
   /// [ApplicationChannel.willStartReceivingRequests] is invoked after this opening has completed.
   Future didOpen() async {
-    server.serverHeader = "liquidart/$identifier";
+    server!.serverHeader = "liquidart/$identifier";
 
     logger.fine("ApplicationServer($identifier).didOpen start listening");
-    server.map((baseReq) => Request(baseReq)).listen(entryPoint.receive);
+    server!.map((baseReq) => Request(baseReq)).listen(entryPoint!.receive);
 
-    channel.willStartReceivingRequests();
+    channel!.willStartReceivingRequests();
     logger.info("Server liquidart/$identifier started.");
   }
 

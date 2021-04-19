@@ -1,5 +1,5 @@
 import 'package:liquidart/src/openapi/openapi.dart';
-import 'package:runtime/runtime.dart';
+import 'package:replica/replica.dart';
 
 import 'http.dart';
 
@@ -43,10 +43,10 @@ abstract class Serializable {
   ///     var user = User()
   ///       ..read(values, ignore: ["id"]);
   void read(Map<String, dynamic> object,
-      {Iterable<String> accept,
-      Iterable<String> ignore,
-      Iterable<String> reject,
-      Iterable<String> require}) {
+      {Iterable<String>? accept,
+      Iterable<String>? ignore,
+      Iterable<String>? reject,
+      Iterable<String>? require}) {
     if (accept == null && ignore == null && reject == null && require == null) {
       readFromMap(object);
       return;
@@ -67,7 +67,7 @@ abstract class Serializable {
 
     if (stillRequired?.isNotEmpty ?? false) {
       throw SerializableException(
-          ["missing required input key(s): '${stillRequired.join(", ")}'"]);
+          ["missing required input key(s): '${stillRequired!.join(", ")}'"]);
     }
 
     readFromMap(copy);
@@ -79,7 +79,7 @@ abstract class Serializable {
   /// If a [Response.body]'s type implements this interface, this method is invoked prior to any content-type encoding
   /// performed by the [Response].  A [Response.body] may also be a [List<Serializable>], for which this method is invoked on
   /// each element in the list.
-  Map<String, dynamic> asMap();
+  Map<String, dynamic>? asMap();
 
   /// Whether a subclass will automatically be registered as a schema component automatically.
   ///
@@ -94,7 +94,7 @@ abstract class Serializable {
 class SerializableException implements HandlerException {
   SerializableException(this.reasons);
 
-  final List<String> reasons;
+  final List<String>? reasons;
 
   @override
   Response get response {

@@ -10,51 +10,51 @@ import 'sort_descriptor.dart';
 abstract class QueryMixin<InstanceType extends ManagedObject>
     implements Query<InstanceType> {
   @override
-  int offset = 0;
+  int? offset = 0;
 
   @override
-  int fetchLimit = 0;
+  int? fetchLimit = 0;
 
   @override
-  int timeoutInSeconds = 30;
+  int? timeoutInSeconds = 30;
 
   @override
-  bool canModifyAllInstances = false;
+  bool? canModifyAllInstances = false;
 
   @override
-  Map<String, dynamic> valueMap;
+  Map<String, dynamic>? valueMap;
 
   @override
-  QueryPredicate predicate;
+  QueryPredicate? predicate;
 
-  QueryPage pageDescriptor;
-  List<QuerySortDescriptor> sortDescriptors;
-  Map<ManagedRelationshipDescription, Query> subQueries;
+  QueryPage? pageDescriptor;
+  List<QuerySortDescriptor>? sortDescriptors = <QuerySortDescriptor>[];
+  Map<ManagedRelationshipDescription, Query> subQueries = {};
 
-  QueryMixin _parentQuery;
+  QueryMixin? _parentQuery;
   List<QueryExpression<dynamic, dynamic>> expressions = [];
-  InstanceType _valueObject;
+  InstanceType? _valueObject;
 
-  List<KeyPath> _propertiesToFetch;
+  List<KeyPath>? _propertiesToFetch;
 
-  List<KeyPath> get propertiesToFetch =>
+  List<KeyPath>? get propertiesToFetch =>
       _propertiesToFetch ??
       entity.defaultProperties
-          .map((k) => KeyPath(entity.properties[k]))
+          .map((k) => KeyPath(entity.properties[k]!))
           .toList();
 
   @override
   InstanceType get values {
     if (_valueObject == null) {
       _valueObject = entity.instanceOf() as InstanceType;
-      _valueObject.backing =
-          ManagedBuilderBacking.from(_valueObject.entity, _valueObject.backing);
+      _valueObject!.backing = ManagedBuilderBacking.from(
+          _valueObject!.entity, _valueObject!.backing);
     }
-    return _valueObject;
+    return _valueObject!;
   }
 
   @override
-  set values(InstanceType obj) {
+  set values(InstanceType? obj) {
     if (obj == null) {
       _valueObject = null;
       return;
@@ -80,15 +80,15 @@ abstract class QueryMixin<InstanceType extends ManagedObject>
 
   @override
   Query<T> join<T extends ManagedObject>(
-      {T object(InstanceType x), ManagedSet<T> set(InstanceType x)}) {
-    final desc = entity.identifyRelationship(object ?? set);
+      {T object(InstanceType x)?, ManagedSet<T> set(InstanceType x)?}) {
+    final desc = entity.identifyRelationship(object ?? set!);
 
     return _createSubquery<T>(desc);
   }
 
   @override
   void pageBy<T>(T propertyIdentifier(InstanceType x), QuerySortOrder order,
-      {T boundingValue}) {
+      {T? boundingValue}) {
     final attribute = entity.identifyAttribute(propertyIdentifier);
     pageDescriptor =
         QueryPage(order, attribute.name, boundingValue: boundingValue);
@@ -98,8 +98,7 @@ abstract class QueryMixin<InstanceType extends ManagedObject>
   void sortBy<T>(T propertyIdentifier(InstanceType x), QuerySortOrder order) {
     final attribute = entity.identifyAttribute(propertyIdentifier);
 
-    sortDescriptors ??= <QuerySortDescriptor>[];
-    sortDescriptors.add(QuerySortDescriptor(attribute.name, order));
+    sortDescriptors!.add(QuerySortDescriptor(attribute.name, order));
   }
 
   @override
@@ -133,7 +132,7 @@ abstract class QueryMixin<InstanceType extends ManagedObject>
 
   Query<T> _createSubquery<T extends ManagedObject>(
       ManagedRelationshipDescription fromRelationship) {
-    if (subQueries?.containsKey(fromRelationship) ?? false) {
+    if (subQueries.containsKey(fromRelationship)) {
       throw StateError(
           "Invalid query. Cannot join same property more than once.");
     }
@@ -142,7 +141,7 @@ abstract class QueryMixin<InstanceType extends ManagedObject>
     var parent = _parentQuery;
     while (parent != null) {
       if (parent.subQueries.containsKey(fromRelationship.inverse)) {
-        var validJoins = fromRelationship.entity.relationships.values
+        var validJoins = fromRelationship.entity.relationships!.values
             .where((r) => !identical(r, fromRelationship))
             .map((r) => "'${r.name}'")
             .join(", ");
@@ -158,8 +157,6 @@ abstract class QueryMixin<InstanceType extends ManagedObject>
 
       parent = parent._parentQuery;
     }
-
-    subQueries ??= {};
 
     var subquery = Query<T>(context);
     (subquery as QueryMixin)._parentQuery = this;

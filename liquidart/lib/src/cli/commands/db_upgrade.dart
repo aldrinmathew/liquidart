@@ -9,7 +9,7 @@ import 'package:liquidart/src/db/postgresql/postgresql_persistent_store.dart';
 import 'package:liquidart/src/db/query/query.dart';
 import 'package:liquidart/src/cli/migration_source.dart';
 import 'package:liquidart/src/db/schema/schema.dart';
-import 'package:isolate_executor/isolate_executor.dart';
+import 'package:loner/loner.dart';
 
 /// Used internally.
 class CLIDatabaseUpgrade extends CLICommand
@@ -54,7 +54,7 @@ class CLIDatabaseUpgrade extends CLICommand
     } on QueryException catch (e) {
       if (e.event == QueryExceptionEvent.transport) {
         final databaseUrl =
-            "${connectedDatabase.username}:${connectedDatabase.password}@${connectedDatabase.host}:${connectedDatabase.port}/${connectedDatabase.databaseName}";
+            "${connectedDatabase!.username}:${connectedDatabase!.password}@${connectedDatabase!.host}:${connectedDatabase!.port}/${connectedDatabase!.databaseName}";
         throw CLIException(
             "There was an error connecting to the database '$databaseUrl'. Reason: ${e.message}.");
       }
@@ -76,27 +76,27 @@ class CLIDatabaseUpgrade extends CLICommand
 
   Future<Schema> executeMigrations(List<MigrationSource> migrations,
       Schema fromSchema, int fromVersion) async {
-    final schemaMap = await IsolateExecutor.run(
+    final schemaMap = await Loner.run(
         RunUpgradeExecutable.input(
-            fromSchema, _storeConnectionInfo, migrations, fromVersion),
+            fromSchema, _storeConnectionInfo!, migrations, fromVersion),
         packageConfigURI: packageConfigUri,
         imports: RunUpgradeExecutable.imports,
         additionalContents: MigrationSource.combine(migrations),
         additionalTypes: [DBInfo],
         logHandler: displayProgress);
 
-    if (schemaMap.containsKey("error")) {
+    if (schemaMap.containsKey("error") == true) {
       throw CLIException(schemaMap["error"] as String);
     }
 
     return Schema.fromMap(schemaMap);
   }
 
-  DBInfo get _storeConnectionInfo {
+  DBInfo? get _storeConnectionInfo {
     var s = persistentStore;
     if (s is PostgreSQLPersistentStore) {
-      return DBInfo("postgres", s.username, s.password, s.host, s.port,
-          s.databaseName, s.timeZone);
+      return DBInfo("postgres", s.username!, s.password!, s.host!, s.port!,
+          s.databaseName!, s.timeZone!);
     }
 
     return null;

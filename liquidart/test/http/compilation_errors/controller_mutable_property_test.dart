@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:liquidart/liquidart.dart';
-import 'package:runtime/runtime.dart';
+import 'package:replica/replica.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -18,7 +18,7 @@ void main() {
 }
 
 class MutablePropertyController extends Controller {
-  String mutableProperty;
+  String? mutableProperty;
 
   @override
   FutureOr<RequestOrResponse> handle(Request request) {

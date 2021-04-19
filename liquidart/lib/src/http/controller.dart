@@ -4,12 +4,12 @@ import 'dart:io';
 import 'package:liquidart/src/http/resource_controller_interfaces.dart';
 import 'package:liquidart/src/openapi/openapi.dart';
 import 'package:logging/logging.dart';
-import 'package:runtime/runtime.dart';
+import 'package:replica/replica.dart';
 
 import 'http.dart';
 
 typedef _ControllerGeneratorClosure = Controller Function();
-typedef _Handler = FutureOr<RequestOrResponse> Function(Request request);
+typedef _Handler = FutureOr<RequestOrResponse?> Function(Request request);
 
 /// The unifying protocol for [Request] and [Response] classes.
 ///
@@ -47,7 +47,7 @@ abstract class Linkable {
   Linkable link(Controller instantiator());
 
   /// See [Controller.linkFunction].
-  Linkable linkFunction(FutureOr<RequestOrResponse> handle(Request request));
+  Linkable linkFunction(FutureOr<RequestOrResponse?> handle(Request request));
 }
 
 /// Base class for request handling objects.
@@ -81,15 +81,15 @@ abstract class Controller
   /// Receives requests that this controller does not respond to.
   ///
   /// This value is set by [link] or [linkFunction].
-  Controller get nextController => _nextController;
+  Controller? get nextController => _nextController;
 
   /// An instance of the 'liquidart' logger.
   Logger get logger => Logger("liquidart");
 
   /// The CORS policy of this controller.
-  CORSPolicy policy = CORSPolicy();
+  CORSPolicy? policy = CORSPolicy();
 
-  Controller _nextController;
+  Controller? _nextController;
 
   /// Links a controller to the receiver to form a request channel.
   ///
@@ -114,7 +114,7 @@ abstract class Controller
       _nextController = instantiator();
     }
 
-    return _nextController;
+    return _nextController!;
   }
 
   /// Links a function controller to the receiver to form a request channel.
@@ -123,7 +123,7 @@ abstract class Controller
   ///
   /// See [link] for a variant of this method that takes an object instead of a closure.
   @override
-  Linkable linkFunction(FutureOr<RequestOrResponse> handle(Request request)) {
+  Linkable linkFunction(FutureOr<RequestOrResponse?> handle(Request request)) {
     return _nextController = _FunctionController(handle);
   }
 
@@ -156,7 +156,7 @@ abstract class Controller
       return _handlePreflightRequest(req);
     }
 
-    Request next;
+    Request? next;
     try {
       try {
         final result = await handle(req);
@@ -204,7 +204,7 @@ abstract class Controller
   ///
   /// If this method returns null, [request] is not passed to any other controller and is not responded to. You must respond to [request]
   /// through [Request.raw].
-  FutureOr<RequestOrResponse> handle(Request request);
+  FutureOr<RequestOrResponse?> handle(Request request);
 
   /// Executed prior to [Response] being sent.
   ///
@@ -238,7 +238,7 @@ abstract class Controller
           ? {
               "controller": "$runtimeType",
               "error": "$caughtValue.",
-              "stacktrace": trace?.toString()
+              "stacktrace": trace.toString()
             }
           : null;
 
@@ -252,16 +252,16 @@ abstract class Controller
     } catch (e) {
       logger.severe("Failed to send response, draining request. Reason: $e");
       // ignore: unawaited_futures
-      request.raw.drain().catchError((_) => null);
+      request.raw!.drain().catchError((_) => null);
     }
   }
 
   void applyCORSHeadersIfNecessary(Request req, Response resp) {
     if (req.isCORSRequest && !req.isPreflightRequest) {
       var lastPolicyController = _lastController;
-      var p = lastPolicyController.policy;
+      CORSPolicy? p = lastPolicyController.policy;
       if (p != null) {
-        if (p.isRequestOriginAllowed(req.raw)) {
+        if (p.isRequestOriginAllowed(req.raw!)) {
           resp.headers.addAll(p.headersForRequest(req));
         }
       }
@@ -270,7 +270,7 @@ abstract class Controller
 
   @override
   Map<String, APIPath> documentPaths(APIDocumentContext context) =>
-      nextController?.documentPaths(context);
+      nextController!.documentPaths(context);
 
   @override
   Map<String, APIOperation> documentOperations(
@@ -279,7 +279,7 @@ abstract class Controller
       return {};
     }
 
-    return nextController?.documentOperations(context, route, path);
+    return nextController!.documentOperations(context, route, path);
   }
 
   @override
@@ -294,11 +294,11 @@ abstract class Controller
         controllerToDictatePolicy = lastControllerInChain;
       } else {
         if (policy != null) {
-          if (!policy.validatePreflightRequest(req.raw)) {
+          if (!policy!.validatePreflightRequest(req.raw!)) {
             await _sendResponse(req, Response.forbidden());
             logger.info(req.toDebugString(includeHeaders: true));
           } else {
-            await _sendResponse(req, policy.preflightResponse(req));
+            await _sendResponse(req, policy!.preflightResponse(req));
             logger.info(req.toDebugString());
           }
 
@@ -314,7 +314,7 @@ abstract class Controller
       return handleError(req, any, stacktrace);
     }
 
-    return controllerToDictatePolicy?.receive(req);
+    return controllerToDictatePolicy.receive(req);
   }
 
   Future _sendResponse(Request request, Response response,
@@ -330,7 +330,7 @@ abstract class Controller
   Controller get _lastController {
     var controller = this;
     while (controller.nextController != null) {
-      controller = controller.nextController;
+      controller = controller.nextController!;
     }
     return controller;
   }
@@ -343,30 +343,30 @@ class _ControllerRecycler<T> extends Controller {
     nextInstanceToReceive = instance;
   }
 
-  _ControllerGeneratorClosure generator;
-  CORSPolicy policyOverride;
-  T recycleState;
+  _ControllerGeneratorClosure? generator;
+  CORSPolicy? policyOverride;
+  T? recycleState;
 
-  Recyclable<T> _nextInstanceToReceive;
+  Recyclable<T>? _nextInstanceToReceive;
 
-  Recyclable<T> get nextInstanceToReceive => _nextInstanceToReceive;
+  Recyclable<T> get nextInstanceToReceive => _nextInstanceToReceive!;
 
   set nextInstanceToReceive(Recyclable<T> instance) {
     _nextInstanceToReceive = instance;
-    instance.restore(recycleState);
+    instance.restore(recycleState!);
     instance._nextController = nextController;
     if (policyOverride != null) {
-      instance.policy = policyOverride;
+      instance.policy = policyOverride!;
     }
   }
 
   @override
   CORSPolicy get policy {
-    return nextInstanceToReceive.policy;
+    return nextInstanceToReceive.policy!;
   }
 
   @override
-  set policy(CORSPolicy p) {
+  set policy(CORSPolicy? p) {
     policyOverride = p;
   }
 
@@ -378,7 +378,7 @@ class _ControllerRecycler<T> extends Controller {
   }
 
   @override
-  Linkable linkFunction(FutureOr<RequestOrResponse> handle(Request request)) {
+  Linkable linkFunction(FutureOr<RequestOrResponse?> handle(Request request)) {
     final c = super.linkFunction(handle);
     nextInstanceToReceive._nextController = c as Controller;
     return c;
@@ -387,7 +387,7 @@ class _ControllerRecycler<T> extends Controller {
   @override
   Future receive(Request req) {
     final next = nextInstanceToReceive;
-    nextInstanceToReceive = generator() as Recyclable<T>;
+    nextInstanceToReceive = generator!() as Recyclable<T>;
     return next.receive(req);
   }
 
@@ -421,11 +421,11 @@ class _ControllerRecycler<T> extends Controller {
 class _FunctionController extends Controller {
   _FunctionController(this._handler) : assert(_handler != null);
 
-  final _Handler _handler;
+  final _Handler? _handler;
 
   @override
-  FutureOr<RequestOrResponse> handle(Request request) {
-    return _handler(request);
+  FutureOr<RequestOrResponse?> handle(Request request) {
+    return _handler!(request);
   }
 
   @override
@@ -435,12 +435,12 @@ class _FunctionController extends Controller {
       return {};
     }
 
-    return nextController?.documentOperations(context, route, path);
+    return nextController!.documentOperations(context, route, path);
   }
 }
 
 abstract class ControllerRuntime {
   bool get isMutable;
 
-  ResourceControllerRuntime get resourceController;
+  ResourceControllerRuntime? get resourceController;
 }

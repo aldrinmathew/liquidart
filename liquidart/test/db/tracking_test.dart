@@ -3,20 +3,20 @@ import 'package:liquidart/liquidart.dart';
 import 'package:liquidart/src/dev/helpers.dart';
 
 void main() {
-  ManagedContext context;
+  ManagedContext? context;
   setUp(() async {
     context = await contextWithModels([Parent, Child, Grandchild]);
   });
 
   tearDown(() async {
-    await context?.close();
+    await context!.close();
     context = null;
   });
 
   group("Attribute identification", () {
     test("Identify top-level", () {
       expect(
-          context
+          context!
               .entityForType(Parent)
               .identifyAttribute((Parent x) => x.field)
               .name,
@@ -25,7 +25,7 @@ void main() {
 
     test("Cannot select relationship", () {
       try {
-        context.entityForType(Child).identifyAttribute((Child p) => p.parent);
+        context!.entityForType(Child).identifyAttribute((Child p) => p.parent);
         fail("unreachable");
       } on ArgumentError catch (e) {
         expect(e.toString(), contains("cannot be selected"));
@@ -34,9 +34,9 @@ void main() {
 
     test("Cannot nest attribute selection", () {
       try {
-        context
+        context!
             .entityForType(Child)
-            .identifyAttribute((Child p) => p.parent.field);
+            .identifyAttribute((Child p) => p.parent!.field);
         fail("unreachable");
       } on ArgumentError catch (e) {
         expect(e.toString(), contains("Cannot use relationships"));
@@ -45,7 +45,7 @@ void main() {
 
     test("cannot select multiple attributes", () {
       try {
-        context.entityForType(Child).identifyAttribute((Child p) {
+        context!.entityForType(Child).identifyAttribute((Child p) {
           // ignore: unnecessary_statements
           p.document;
           return p.field;
@@ -61,7 +61,7 @@ void main() {
 
     test("Can select document directly", () {
       expect(
-          context
+          context!
               .entityForType(Parent)
               .identifyAttribute((Parent x) => x.document)
               .name,
@@ -70,9 +70,9 @@ void main() {
 
     test("Cannot select sub-document", () {
       try {
-        context
+        context!
             .entityForType(Child)
-            .identifyAttribute((Child p) => p.document["foo"]);
+            .identifyAttribute((Child p) => p.document!["foo"]);
         fail("unreachable");
       } on ArgumentError catch (e) {
         expect(e.toString(),
@@ -84,7 +84,7 @@ void main() {
   group("Relationship identification", () {
     test("Identify top-level relationship", () {
       expect(
-          context
+          context!
               .entityForType(Parent)
               .identifyRelationship((Parent x) => x.children)
               .name,
@@ -93,7 +93,7 @@ void main() {
 
     test("Identify top-level relationship to-one", () {
       expect(
-          context
+          context!
               .entityForType(Child)
               .identifyRelationship((Child x) => x.parent)
               .name,
@@ -102,7 +102,7 @@ void main() {
 
     test("Cannot select attribute", () {
       try {
-        context
+        context!
             .entityForType(Parent)
             .identifyRelationship((Parent p) => p.document);
         fail("unreachable");
@@ -113,9 +113,9 @@ void main() {
 
     test("Cannot nest attribute selection", () {
       try {
-        context
+        context!
             .entityForType(Grandchild)
-            .identifyRelationship((Grandchild p) => p.parent.parent);
+            .identifyRelationship((Grandchild p) => p.parent!.parent);
         fail("unreachable");
       } on ArgumentError catch (e) {
         expect(e.toString(), contains("Cannot identify a nested relationship"));
@@ -124,7 +124,7 @@ void main() {
 
     test("cannot select multiple attributes", () {
       try {
-        context.entityForType(Child).identifyRelationship((Child p) {
+        context!.entityForType(Child).identifyRelationship((Child p) {
           // ignore: unnecessary_statements
           p.parent;
           return p.grandchild;
@@ -141,7 +141,7 @@ void main() {
 
   group("KeyPath identification", () {
     test("Identify multiple properties", () {
-      final props = context
+      final props = context!
           .entityForType(Parent)
           .identifyProperties((Parent x) => [x.document, x.field, x.children]);
       expect(props.length, 3);
@@ -151,9 +151,9 @@ void main() {
     });
 
     test("Identify top-level property with subdoc", () {
-      final props = context
+      final props = context!
           .entityForType(Parent)
-          .identifyProperties((Parent x) => [x.document["k"]]);
+          .identifyProperties((Parent x) => [x.document!["k"]]);
       expect(props.length, 1);
       expect(props.first.path.length, 1);
       expect(props.first.path.first.name, "document");
@@ -161,9 +161,9 @@ void main() {
     });
 
     test("Identify top-level property with subdoc", () {
-      final props = context
+      final props = context!
           .entityForType(Parent)
-          .identifyProperties((Parent x) => [x.document["k"][1]]);
+          .identifyProperties((Parent x) => [x.document!["k"][1]]);
       expect(props.length, 1);
       expect(props.first.path.length, 1);
       expect(props.first.path.first.name, "document");
@@ -171,9 +171,9 @@ void main() {
     });
 
     test("Subdoc + normal property", () {
-      final props = context
+      final props = context!
           .entityForType(Parent)
-          .identifyProperties((Parent x) => [x.document["k"][1], x.field]);
+          .identifyProperties((Parent x) => [x.document!["k"][1], x.field]);
       expect(props.length, 2);
 
       expect(props.first.path.length, 1);
@@ -186,9 +186,9 @@ void main() {
     });
 
     test("Can select nested properties", () {
-      final props = context
+      final props = context!
           .entityForType(Child)
-          .identifyProperties((Child x) => [x.parent.field]);
+          .identifyProperties((Child x) => [x.parent!.field]);
       expect(props.length, 1);
       expect(props.first.path.length, 2);
       expect(props.first.path.first.name, "parent");
@@ -203,41 +203,41 @@ class Parent extends ManagedObject<_Parent> implements _Parent {}
 
 class _Parent {
   @primaryKey
-  int id;
+  int? id;
 
-  String field;
+  String? field;
 
-  Document document;
+  Document? document;
 
-  ManagedSet<Child> children;
+  ManagedSet<Child>? children;
 }
 
 class Child extends ManagedObject<_Child> implements _Child {}
 
 class _Child {
   @primaryKey
-  int id;
+  int? id;
 
-  String field;
+  String? field;
 
-  Document document;
+  Document? document;
 
   @Relate(Symbol('children'))
-  Parent parent;
+  Parent? parent;
 
-  Grandchild grandchild;
+  Grandchild? grandchild;
 }
 
 class Grandchild extends ManagedObject<_Grandchild> implements _Grandchild {}
 
 class _Grandchild {
   @primaryKey
-  int id;
+  int? id;
 
-  String field;
+  String? field;
 
-  Document document;
+  Document? document;
 
   @Relate(Symbol('grandchild'))
-  Child parent;
+  Child? parent;
 }

@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:liquidart/src/cli/command.dart';
 import 'package:liquidart/src/cli/metadata.dart';
 import 'package:liquidart/src/cli/scripts/get_channel_type.dart';
-import 'package:isolate_executor/isolate_executor.dart';
+import 'package:loner/loner.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:yaml/yaml.dart';
 import 'package:path/path.dart' as path_lib;
@@ -12,16 +12,16 @@ import 'package:path/path.dart' as path_lib;
 abstract class CLIProject implements CLICommand {
   @Option("directory",
       abbr: "d", help: "Project directory to execute command in")
-  Directory get projectDirectory {
+  Directory? get projectDirectory {
     if (_projectDirectory == null) {
-      String dir = decode("directory");
+      String? dir = decode("directory");
       if (dir == null) {
         _projectDirectory = Directory.current.absolute;
       } else {
         _projectDirectory = Directory(dir).absolute;
       }
     }
-    return _projectDirectory;
+    return _projectDirectory!;
   }
 
   Map<String, dynamic> get projectSpecification {
@@ -29,20 +29,20 @@ abstract class CLIProject implements CLICommand {
       final file = projectSpecificationFile;
       if (!file.existsSync()) {
         throw CLIException(
-            "Failed to locate pubspec.yaml in project directory '${projectDirectory.path}'");
+            "Failed to locate pubspec.yaml in project directory '${projectDirectory!.path}'");
       }
       var yamlContents = file.readAsStringSync();
       final yaml = loadYaml(yamlContents) as Map<dynamic, dynamic>;
       _pubspec = yaml.cast<String, dynamic>();
     }
 
-    return _pubspec;
+    return _pubspec!;
   }
 
   File get projectSpecificationFile =>
-      File.fromUri(projectDirectory.uri.resolve("pubspec.yaml"));
+      File.fromUri(projectDirectory!.uri.resolve("pubspec.yaml"));
 
-  Uri get packageConfigUri => projectDirectory.uri.resolve(".packages");
+  Uri get packageConfigUri => projectDirectory!.uri.resolve(".packages");
 
   String get libraryName => packageName;
 
@@ -50,7 +50,8 @@ abstract class CLIProject implements CLICommand {
 
   Version get projectVersion {
     if (_projectVersion == null) {
-      var lockFile = File.fromUri(projectDirectory.uri.resolve("pubspec.lock"));
+      var lockFile =
+          File.fromUri(projectDirectory!.uri.resolve("pubspec.lock"));
       if (!lockFile.existsSync()) {
         throw CLIException("No pubspec.lock file. Run `pub get`.");
       }
@@ -61,12 +62,12 @@ abstract class CLIProject implements CLICommand {
       _projectVersion = Version.parse(projectVersion);
     }
 
-    return _projectVersion;
+    return _projectVersion!;
   }
 
-  Directory _projectDirectory;
-  Map<String, dynamic> _pubspec;
-  Version _projectVersion;
+  Directory? _projectDirectory;
+  Map<String, dynamic>? _pubspec;
+  Version? _projectVersion;
 
   static File fileInDirectory(Directory directory, String name) {
     if (path_lib.isRelative(name)) {
@@ -77,7 +78,7 @@ abstract class CLIProject implements CLICommand {
   }
 
   File fileInProjectDirectory(String name) {
-    return fileInDirectory(projectDirectory, name);
+    return fileInDirectory(projectDirectory!, name);
   }
 
   @override
@@ -87,11 +88,11 @@ abstract class CLIProject implements CLICommand {
         displayInfo("Liquidart project version: $projectVersion");
       }
 
-      if (projectVersion?.major != toolVersion.major) {
+      if (projectVersion.major != toolVersion.major) {
         throw CLIException(
             "CLI version is incompatible with project liquidart version.",
             instructions: [
-              "Install liquidart@${projectVersion?.toString()} or upgrade your project to liquidart${toolVersion.toString()}."
+              "Install liquidart@${projectVersion.toString()} or upgrade your project to liquidart${toolVersion.toString()}."
             ]);
       }
     } on CLIException {
@@ -100,7 +101,7 @@ abstract class CLIProject implements CLICommand {
   }
 
   Future<String> getChannelName() async {
-    final name = await IsolateExecutor.run(GetChannelExecutable({}),
+    final String? name = await Loner.run(GetChannelExecutable({}),
         packageConfigURI: packageConfigUri,
         imports: GetChannelExecutable.importsForPackage(libraryName),
         logHandler: displayProgress);

@@ -3,30 +3,30 @@ import 'package:liquidart/liquidart.dart';
 import 'package:liquidart/src/dev/helpers.dart';
 
 void main() {
-  ManagedContext ctx;
+  ManagedContext? ctx;
   setUpAll(() async {
     ctx = await contextWithModels([T, U, V, W]);
   });
 
   tearDownAll(() async {
-    await ctx.close();
+    await ctx!.close();
   });
 
   test("update runs update validations", () async {
-    var q = Query<T>(ctx)..values.aOrb = "a";
+    var q = Query<T>(ctx!)..values!.aOrb = "a";
     var objectID = (await q.insert()).id;
 
-    q = Query<T>(ctx)
+    q = Query<T>(ctx!)
       ..where((o) => o.id).equalTo(objectID)
-      ..values.equalTo2OnUpdate = 2;
+      ..values!.equalTo2OnUpdate = 2;
     var o = (await q.update()).first;
     expect(o.aOrb, "a");
     expect(o.equalTo2OnUpdate, 2);
 
-    q = Query<T>(ctx)
+    q = Query<T>(ctx!)
       ..where((o) => o.id).equalTo(objectID)
-      ..values.aOrb = "c"
-      ..values.equalTo2OnUpdate = 2;
+      ..values!.aOrb = "c"
+      ..values!.equalTo2OnUpdate = 2;
     try {
       await q.update();
       expect(true, false);
@@ -34,10 +34,10 @@ void main() {
       expect(e.toString(), contains("must be one of: 'a','b'"));
     }
 
-    q = Query<T>(ctx)
+    q = Query<T>(ctx!)
       ..where((o) => o.id).equalTo(objectID)
-      ..values.aOrb = "b"
-      ..values.equalTo2OnUpdate = 1;
+      ..values!.aOrb = "b"
+      ..values!.equalTo2OnUpdate = 1;
     try {
       await q.update();
       expect(true, false);
@@ -45,11 +45,11 @@ void main() {
       expect(e.toString(), contains("must be equal to '2'"));
     }
 
-    q = Query<T>(ctx)
+    q = Query<T>(ctx!)
       ..where((o) => o.id).equalTo(objectID)
-      ..values.aOrb = "b"
-      ..values.equalTo1OnInsert = 2
-      ..values.equalTo2OnUpdate = 2;
+      ..values!.aOrb = "b"
+      ..values!.equalTo1OnInsert = 2
+      ..values!.equalTo2OnUpdate = 2;
     o = (await q.update()).first;
     expect(o.aOrb, "b");
     expect(o.equalTo1OnInsert, 2);
@@ -57,9 +57,9 @@ void main() {
   });
 
   test("updateOne runs update validations", () async {
-    var q = Query<T>(ctx)
+    var q = Query<T>(ctx!)
       ..where((o) => o.id).equalTo(1)
-      ..values.equalTo2OnUpdate = 3;
+      ..values!.equalTo2OnUpdate = 3;
     try {
       await q.updateOne();
       expect(true, false);
@@ -69,16 +69,16 @@ void main() {
   });
 
   test("insert runs insert validations", () async {
-    var q = Query<T>(ctx)
-      ..values.aOrb = "a"
-      ..values.equalTo1OnInsert = 1;
+    var q = Query<T>(ctx!)
+      ..values!.aOrb = "a"
+      ..values!.equalTo1OnInsert = 1;
     var o = await q.insert();
     expect(o.aOrb, "a");
     expect(o.equalTo1OnInsert, 1);
 
-    q = Query<T>(ctx)
-      ..values.aOrb = "c"
-      ..values.equalTo1OnInsert = 1;
+    q = Query<T>(ctx!)
+      ..values!.aOrb = "c"
+      ..values!.equalTo1OnInsert = 1;
     try {
       await q.insert();
       expect(true, false);
@@ -86,9 +86,9 @@ void main() {
       expect(e.toString(), contains("must be one of"));
     }
 
-    q = Query<T>(ctx)
-      ..values.aOrb = "b"
-      ..values.equalTo1OnInsert = 2;
+    q = Query<T>(ctx!)
+      ..values!.aOrb = "b"
+      ..values!.equalTo1OnInsert = 2;
     try {
       await q.insert();
       expect(true, false);
@@ -96,10 +96,10 @@ void main() {
       expect(e.toString(), contains("must be equal to"));
     }
 
-    q = Query<T>(ctx)
-      ..values.aOrb = "b"
-      ..values.equalTo1OnInsert = 1
-      ..values.equalTo2OnUpdate = 1;
+    q = Query<T>(ctx!)
+      ..values!.aOrb = "b"
+      ..values!.equalTo1OnInsert = 1
+      ..values!.equalTo2OnUpdate = 1;
     o = await q.insert();
     expect(o.aOrb, "b");
     expect(o.equalTo1OnInsert, 1);
@@ -107,32 +107,32 @@ void main() {
   });
 
   test("valueMap ignores validations", () async {
-    var q = Query<T>(ctx)..valueMap = {"aOrb": "c", "equalTo1OnInsert": 10};
+    var q = Query<T>(ctx!)..valueMap = {"aOrb": "c", "equalTo1OnInsert": 10};
     var o = await q.insert();
     expect(o.aOrb, "c");
     expect(o.equalTo1OnInsert, 10);
   });
 
   test("willUpdate runs prior to update", () async {
-    var q = Query<U>(ctx);
+    var q = Query<U>(ctx!);
     var o = await q.insert();
-    q = Query<U>(ctx)..where((o) => o.id).equalTo(o.id);
+    q = Query<U>(ctx!)..where((o) => o.id).equalTo(o.id);
     o = (await q.update()).first;
     expect(o.q, "willUpdate");
   });
 
   test("willInsert runs prior to insert", () async {
-    var q = Query<U>(ctx);
+    var q = Query<U>(ctx!);
     var o = await q.insert();
     expect(o.id, isNotNull);
     expect(o.q, "willInsert");
   });
 
   test("ManagedObject onUpdate is subject to all validations", () async {
-    var q = Query<V>(ctx);
+    var q = Query<V>(ctx!);
     var o = await q.insert();
 
-    q = Query<V>(ctx)..where((o) => o.id).equalTo(o.id);
+    q = Query<V>(ctx!)..where((o) => o.id).equalTo(o.id);
     try {
       await q.update();
       expect(true, false);
@@ -143,7 +143,7 @@ void main() {
   });
 
   test("ManagedObject onInsert is subject to all validations", () async {
-    var q = Query<W>(ctx);
+    var q = Query<W>(ctx!);
     try {
       await q.insert();
       expect(true, false);
@@ -158,19 +158,19 @@ class T extends ManagedObject<_T> implements _T {}
 
 class _T {
   @primaryKey
-  int id;
+  int? id;
 
   @Validate.oneOf(["a", "b"])
   @Column(nullable: true)
-  String aOrb;
+  String? aOrb;
 
   @Validate.compare(equalTo: 1, onUpdate: false, onInsert: true)
   @Column(nullable: true)
-  int equalTo1OnInsert;
+  int? equalTo1OnInsert;
 
   @Validate.compare(equalTo: 2, onUpdate: true, onInsert: false)
   @Column(nullable: true)
-  int equalTo2OnUpdate;
+  int? equalTo2OnUpdate;
 }
 
 class U extends ManagedObject<_U> implements _U {
@@ -187,9 +187,9 @@ class U extends ManagedObject<_U> implements _U {
 
 class _U {
   @primaryKey
-  int id;
+  int? id;
 
-  String q;
+  String? q;
 }
 
 class V extends ManagedObject<_V> implements _V {
@@ -201,11 +201,11 @@ class V extends ManagedObject<_V> implements _V {
 
 class _V {
   @primaryKey
-  int id;
+  int? id;
 
   @Validate.oneOf(["a", "b"])
   @Column(nullable: true)
-  String f;
+  String? f;
 }
 
 class W extends ManagedObject<_W> implements _W {
@@ -217,9 +217,9 @@ class W extends ManagedObject<_W> implements _W {
 
 class _W {
   @primaryKey
-  int id;
+  int? id;
 
   @Validate.oneOf(["a", "b"])
   @Column(nullable: true)
-  String f;
+  String? f;
 }

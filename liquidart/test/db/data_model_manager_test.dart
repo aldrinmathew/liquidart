@@ -4,10 +4,10 @@ import 'package:liquidart/liquidart.dart';
 import 'package:liquidart/src/dev/helpers.dart';
 
 void main() {
-  ManagedContext ctx;
+  ManagedContext? ctx;
 
   tearDown(() async {
-    await ctx?.close();
+    await ctx!.close();
   });
 
   test("Throws exception if no context has been created", () {
@@ -36,7 +36,7 @@ void main() {
     o.id = 1;
     expect(o.id, 1);
 
-    await ctx.close();
+    await ctx!.close();
     ctx = null;
 
     try {
@@ -58,7 +58,7 @@ void main() {
     o.id = 1;
     expect(o.id, 1);
 
-    await ctx.close();
+    await ctx!.close();
     ctx = null;
 
     try {
@@ -73,7 +73,7 @@ void main() {
 
 class _T {
   @primaryKey
-  int id;
+  int? id;
 }
 
 class T extends ManagedObject<_T> implements _T {}

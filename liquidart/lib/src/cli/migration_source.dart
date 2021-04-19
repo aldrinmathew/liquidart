@@ -1,11 +1,11 @@
-import 'package:runtime/runtime.dart';
+import 'package:replica/replica.dart';
 import 'package:crypto/crypto.dart';
 
 class MigrationSource {
   MigrationSource(this.source, this.uri, int nameStartIndex, int nameEndIndex) {
-    originalName = source.substring(nameStartIndex, nameEndIndex);
-    name = "M${md5.convert(source.codeUnits).toString()}";
-    source = source.replaceRange(nameStartIndex, nameEndIndex, name);
+    originalName = source!.substring(nameStartIndex, nameEndIndex);
+    name = "M${md5.convert(source!.codeUnits).toString()}";
+    source = source!.replaceRange(nameStartIndex, nameEndIndex, name!);
   }
 
   MigrationSource.fromMap(Map<String, dynamic> map) {
@@ -24,7 +24,7 @@ class MigrationSource {
     }
 
     final klass = migrationTypes.first;
-    final source = klass.toSource();
+    final source = klass!.toSource();
     final offset = klass.name.offset - klass.offset;
     return MigrationSource(source, uri, offset, offset + klass.name.length);
   }
@@ -48,13 +48,13 @@ class MigrationSource {
     return int.parse(migrationName.split("_").first);
   }
 
-  String source;
+  String? source;
 
-  String originalName;
+  String? originalName;
 
-  String name;
+  String? name;
 
-  Uri uri;
+  Uri? uri;
 
-  int get versionNumber => versionNumberFromUri(uri);
+  int get versionNumber => versionNumberFromUri(uri!);
 }

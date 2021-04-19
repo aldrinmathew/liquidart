@@ -21,11 +21,11 @@ class CLIDatabaseVersion extends CLICommand
       displayError("Could not connect to database.");
       displayError("Reason: ${e.message}");
       displayProgress("Attempted database connection configuration:");
-      displayProgress("  Host: ${connectedDatabase.host}");
-      displayProgress("  Port: ${connectedDatabase.port}");
-      displayProgress("  Username: ${connectedDatabase.username}");
+      displayProgress("  Host: ${connectedDatabase!.host}");
+      displayProgress("  Port: ${connectedDatabase!.port}");
+      displayProgress("  Username: ${connectedDatabase!.username}");
       displayProgress("  Password: *** not echoed ***");
-      displayProgress("  Database: ${connectedDatabase.databaseName}");
+      displayProgress("  Database: ${connectedDatabase!.databaseName}");
 
       return 1;
     }

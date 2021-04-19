@@ -22,13 +22,13 @@ class RouteSpecification {
   }
 
   /// A list of this specification's [RouteSegment]s.
-  List<RouteSegment> segments;
+  List<RouteSegment> segments = [];
 
   /// A list of all variables in this route.
-  List<String> variableNames;
+  List<String?> variableNames = [];
 
   /// A reference back to the [Controller] to be used when this specification is matched.
-  Controller controller;
+  Controller? controller;
 
   @override
   String toString() => segments.join("/");

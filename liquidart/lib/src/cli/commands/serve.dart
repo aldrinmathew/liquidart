@@ -9,7 +9,7 @@ import 'package:liquidart/src/cli/mixins/project.dart';
 import 'package:liquidart/src/cli/running_process.dart';
 
 class CLIServer extends CLICommand with CLIProject {
-  String derivedChannelType;
+  String? derivedChannelType;
 
   @Option("timeout",
       help: "Number of seconds to wait to ensure startup succeeded.",
@@ -19,12 +19,12 @@ class CLIServer extends CLICommand with CLIProject {
   @Option("ssl-key-path",
       help:
           "The path to an SSL private key file. If provided along with --ssl-certificate-path, the application will be HTTPS-enabled.")
-  String get keyPath => decode("ssl-key-path");
+  String? get keyPath => decode("ssl-key-path");
 
   @Option("ssl-certificate-path",
       help:
           "The path to an SSL certicate file. If provided along with --ssl-certificate-path, the application will be HTTPS-enabled.")
-  String get certificatePath => decode("ssl-certificate-path");
+  String? get certificatePath => decode("ssl-certificate-path");
 
   @Flag("observe", help: "Enables Dart Observatory", defaultsTo: false)
   bool get shouldRunObservatory => decode("observe");
@@ -56,7 +56,7 @@ class CLIServer extends CLICommand with CLIProject {
       help:
           "The name of the ApplicationChannel subclass to be instantiated to serve requests. "
           "By default, this subclass is determined by reflecting on the application library in the [directory] being served.")
-  String get channelType => decode("channel") ?? derivedChannelType;
+  String? get channelType => decode("channel") ?? derivedChannelType;
 
   @Option("config-path",
       abbr: "c",
@@ -66,12 +66,12 @@ class CLIServer extends CLICommand with CLIProject {
       defaultsTo: "config.yaml")
   File get configurationFile => File(decode("config-path")).absolute;
 
-  ReceivePort messagePort;
-  ReceivePort errorPort;
+  ReceivePort? messagePort;
+  ReceivePort? errorPort;
   Completer<int> exitCode = Completer<int>();
 
   @override
-  StoppableProcess runningProcess;
+  StoppableProcess? runningProcess;
 
   @override
   Future<int> handle() async {
@@ -111,7 +111,7 @@ class CLIServer extends CLICommand with CLIProject {
 
     displayInfo("Starting application '$packageName/$libraryName'");
     displayProgress("Channel: $channelType");
-    displayProgress("Config: ${configurationFile?.path}");
+    displayProgress("Config: ${configurationFile.path}");
     displayProgress("Port: $port");
 
     errorPort = ReceivePort();
@@ -122,20 +122,20 @@ class CLIServer extends CLICommand with CLIProject {
         "data:application/dart;charset=utf-8,${Uri.encodeComponent(generatedStartScript)}");
     final startupCompleter = Completer<SendPort>();
 
-    final isolate = await Isolate.spawnUri(dataUri, [], messagePort.sendPort,
+    final isolate = await Isolate.spawnUri(dataUri, [], messagePort!.sendPort,
         errorsAreFatal: true,
-        onError: errorPort.sendPort,
+        onError: errorPort!.sendPort,
         packageConfig: fileInProjectDirectory(".packages").uri,
         paused: true);
 
-    errorPort.listen((msg) {
+    errorPort!.listen((msg) {
       if (msg is List) {
         startupCompleter.completeError(
-            msg.first, StackTrace.fromString(msg.last as String));
+            msg.first as Object, StackTrace.fromString(msg.last as String));
       }
     });
 
-    messagePort.listen((msg) {
+    messagePort!.listen((msg) {
       final message = msg as Map<dynamic, dynamic>;
       switch (message["status"] as String) {
         case "ok":
@@ -150,7 +150,7 @@ class CLIServer extends CLICommand with CLIProject {
       }
     });
 
-    isolate.resume(isolate.pauseCapability);
+    isolate.resume(isolate.pauseCapability!);
 
     if (shouldRunObservatory) {
       final observatory = await Service.controlWebServer(enable: true);

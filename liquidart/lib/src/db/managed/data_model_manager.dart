@@ -6,15 +6,18 @@ class ManagedDataModelManager {
   static ReferenceCountingList<ManagedDataModel> dataModels =
       ReferenceCountingList<ManagedDataModel>();
 
-  static ManagedEntity findEntity(Type type, {ManagedEntity orElse()}) {
+  static ManagedEntity? findEntity(Type type,
+      {required ManagedEntity? orElse()}) {
     for (final d in ManagedDataModelManager.dataModels) {
-      final entity = d.entityForType(type);
+      final ManagedEntity? entity = d.entityForType(type);
       if (entity != null) {
         return entity;
       }
     }
 
-    if (orElse == null) {
+    dynamic orElseCheck = orElse;
+
+    if (orElseCheck == null) {
       throw StateError(
           "No entity found for '$type. Did you forget to create a 'ManagedContext'?");
     }

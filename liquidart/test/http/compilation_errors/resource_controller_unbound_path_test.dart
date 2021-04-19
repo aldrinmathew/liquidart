@@ -2,7 +2,7 @@ import 'dart:async';
 import "dart:core";
 
 import 'package:liquidart/liquidart.dart';
-import 'package:runtime/runtime.dart';
+import 'package:replica/replica.dart';
 import "package:test/test.dart";
 
 void main() {

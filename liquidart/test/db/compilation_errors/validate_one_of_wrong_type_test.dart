@@ -5,10 +5,10 @@ class FailingOneOf extends ManagedObject<_FOO> {}
 
 class _FOO {
   @primaryKey
-  int id;
+  int? id;
 
   @Validate.oneOf(["x", "y"])
-  int d;
+  int? d;
 }
 
 void main() {

@@ -48,22 +48,22 @@ class ManagedType {
   /// The primitive kind of this type.
   ///
   /// All types have a kind. If kind is a map or list, it will also have [elements].
-  final ManagedPropertyType kind;
+  final ManagedPropertyType? kind;
 
   /// The primitive kind of each element of this type.
   ///
   /// If [kind] is a collection (map or list), this value stores the type of each element in the collection.
   /// Keys of map types are always [String].
-  final ManagedType elements;
+  final ManagedType? elements;
 
   /// Dart representation of this type.
-  final Type type;
+  final Type? type;
 
   /// Whether this is an enum type.
-  bool get isEnumerated => enumerationMap != null;
+  bool? get isEnumerated => enumerationMap != null;
 
   /// For enumerated types, this is a map of the name of the option to its Dart enum type.
-  final Map<String, dynamic> enumerationMap;
+  final Map<String, dynamic>? enumerationMap;
 
   /// Whether [dartValue] can be assigned to properties with this type.
   bool isAssignableWith(dynamic dartValue) {
@@ -91,13 +91,13 @@ class ManagedType {
       case ManagedPropertyType.string:
         {
           if (enumerationMap != null) {
-            return enumerationMap.values.contains(dartValue);
+            return enumerationMap!.values.contains(dartValue);
           }
           return dartValue is String;
         }
+      default:
+        return false;
     }
-
-    return false;
   }
 
   @override

@@ -34,11 +34,11 @@ abstract class ManagedBacking {
   ///
   /// Use this method to use any reference of a property from this instance.
   void removeProperty(String propertyName) {
-    contents.remove(propertyName);
+    contents!.remove(propertyName);
   }
 
   /// A map of all set values of this instance.
-  Map<String, dynamic> get contents;
+  Map<String, dynamic>? get contents;
 }
 
 /// An object that represents a database row.
@@ -69,7 +69,8 @@ abstract class ManagedObject<T> extends Serializable {
   static bool get shouldAutomaticallyDocument => false;
 
   /// The [ManagedEntity] this instance is described by.
-  ManagedEntity entity = ManagedDataModelManager.findEntity(T);
+  ManagedEntity entity =
+      ManagedDataModelManager.findEntity(T, orElse: () => null)!;
 
   /// The persistent values of this object.
   ///
@@ -118,7 +119,7 @@ abstract class ManagedObject<T> extends Serializable {
 
   /// Checks whether or not a property has been set in this instances' [backing].
   bool hasValueForProperty(String propertyName) {
-    return backing.contents.containsKey(propertyName);
+    return backing.contents!.containsKey(propertyName);
   }
 
   /// Callback to modify an object prior to updating it with a [Query].
@@ -186,7 +187,8 @@ abstract class ManagedObject<T> extends Serializable {
 
   @override
   dynamic noSuchMethod(Invocation invocation) {
-    final propertyName = entity.runtime.getPropertyName(invocation, entity);
+    final String? propertyName =
+        entity.runtime.getPropertyName(invocation, entity);
     if (propertyName != null) {
       if (invocation.isGetter) {
         return this[propertyName];
@@ -216,7 +218,7 @@ abstract class ManagedObject<T> extends Serializable {
           backing.setValueForProperty(
               property, property.convertFromPrimitiveValue(v));
         } else {
-          if (!property.transientStatus.isAvailableAsInput) {
+          if (!property.transientStatus!.isAvailableAsInput!) {
             throw ValidationException(["invalid input key '$key'"]);
           }
 
@@ -248,14 +250,14 @@ abstract class ManagedObject<T> extends Serializable {
   Map<String, dynamic> asMap() {
     var outputMap = <String, dynamic>{};
 
-    backing.contents.forEach((k, v) {
+    backing.contents!.forEach((k, v) {
       if (!_isPropertyPrivate(k)) {
-        outputMap[k] = entity.properties[k].convertToPrimitiveValue(v);
+        outputMap[k] = entity.properties[k]!.convertToPrimitiveValue(v);
       }
     });
 
     entity.attributes.values
-        .where((attr) => attr.transientStatus?.isAvailableAsOutput ?? false)
+        .where((attr) => attr.transientStatus!.isAvailableAsOutput ?? false)
         .forEach((attr) {
       var value = entity.runtime.getTransientValueForKey(this, attr.name);
       if (value != null) {

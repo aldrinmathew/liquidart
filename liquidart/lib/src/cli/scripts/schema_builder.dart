@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:liquidart/liquidart.dart';
 import 'package:liquidart/src/cli/migration_source.dart';
-import 'package:isolate_executor/isolate_executor.dart';
+import 'package:loner/loner.dart';
 
 class SchemaBuilderExecutable extends Executable<Map<String, dynamic>> {
   SchemaBuilderExecutable(Map<String, dynamic> message)
@@ -31,7 +31,7 @@ class SchemaBuilderExecutable extends Executable<Map<String, dynamic>> {
       var outputSchema = inputSchema;
       for (var source in sources) {
         Migration instance = instanceOf(
-          source.name,
+          source.name!,
           positionalArguments: const [],
           namedArguments: const <Symbol, dynamic>{},
           constructorName: const Symbol(""),
@@ -52,6 +52,6 @@ class SchemaBuilderExecutable extends Executable<Map<String, dynamic>> {
   static List<String> get imports => [
         "package:liquidart/liquidart.dart",
         "package:liquidart/src/cli/migration_source.dart",
-        "package:runtime/runtime.dart"
+        "package:replica/replica.dart"
       ];
 }

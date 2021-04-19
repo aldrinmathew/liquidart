@@ -23,10 +23,10 @@ class ComparisonExpression implements PredicateExpression {
 
   @override
   PredicateExpression get inverse {
-    return ComparisonExpression(value, inverseOperator);
+    return ComparisonExpression(value, inverseOperator!);
   }
 
-  PredicateOperator get inverseOperator {
+  PredicateOperator? get inverseOperator {
     switch (operator) {
       case PredicateOperator.lessThan:
         return PredicateOperator.greaterThanEqualTo;
@@ -40,10 +40,10 @@ class ComparisonExpression implements PredicateExpression {
         return PredicateOperator.lessThan;
       case PredicateOperator.equalTo:
         return PredicateOperator.notEqual;
+      default:
+        // this line just shuts up the analyzer
+        return null;
     }
-
-    // this line just shuts up the analyzer
-    return null;
   }
 }
 

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:liquidart/liquidart.dart';
 import 'package:liquidart/src/cli/command.dart';
 import 'package:liquidart/src/cli/mixins/project.dart';
-import 'package:isolate_executor/isolate_executor.dart';
+import 'package:loner/loner.dart';
 
 class GetSchemaExecutable extends Executable<Map<String, dynamic>> {
   GetSchemaExecutable(Map<String, dynamic> message) : super(message);
@@ -24,12 +24,12 @@ class GetSchemaExecutable extends Executable<Map<String, dynamic>> {
   static List<String> importsForPackage(String packageName) => [
         "package:liquidart/liquidart.dart",
         "package:$packageName/$packageName.dart",
-        "package:runtime/runtime.dart"
+        "package:replica/replica.dart"
       ];
 }
 
 Future<Schema> getProjectSchema(CLIProject project) async {
-  final response = await IsolateExecutor.run(GetSchemaExecutable({}),
+  final response = await Loner.run(GetSchemaExecutable({}),
       imports: GetSchemaExecutable.importsForPackage(project.libraryName),
       packageConfigURI: project.packageConfigUri,
       logHandler: project.displayProgress);

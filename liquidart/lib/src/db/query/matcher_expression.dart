@@ -31,7 +31,7 @@ class QueryExpression<T, InstanceType> {
   final KeyPath keyPath;
 
   // todo: This needs to be extended to an expr tree
-  PredicateExpression get expression => _expression;
+  PredicateExpression get expression => _expression!;
 
   set expression(PredicateExpression expr) {
     if (_invertNext) {
@@ -43,7 +43,7 @@ class QueryExpression<T, InstanceType> {
   }
 
   bool _invertNext = false;
-  PredicateExpression _expression;
+  PredicateExpression? _expression;
 
   // ignore: use_to_and_as_if_applicable
   QueryExpressionJunction<T, InstanceType> _createJunction() =>
@@ -301,7 +301,7 @@ class QueryExpression<T, InstanceType> {
   ///       var query = new Query<Employee>()
   ///         ..where((e) => e.department).oneOf(["Engineering", "HR"]);
   QueryExpressionJunction<T, InstanceType> oneOf(Iterable<T> values) {
-    if (values?.isEmpty ?? true) {
+    if (values.isEmpty) {
       throw ArgumentError(
           "'Query.where.oneOf' cannot be the empty set or null.");
     }

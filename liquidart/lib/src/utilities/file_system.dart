@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:meta/meta.dart';
+// import 'package:meta/meta.dart';
 
-void copyDirectory({@required Uri src, @required Uri dst}) {
+void copyDirectory({required Uri src, required Uri dst}) {
   final srcDir = Directory.fromUri(src);
   final dstDir = Directory.fromUri(dst);
   if (!dstDir.existsSync()) {

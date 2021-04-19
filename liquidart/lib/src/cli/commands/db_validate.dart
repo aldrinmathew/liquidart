@@ -11,7 +11,7 @@ class CLIDatabaseValidate extends CLICommand
   Future<int> handle() async {
     var migrations = projectMigrations;
     if (migrations.isEmpty) {
-      displayError("No migration files found in ${migrationDirectory.path}.");
+      displayError("No migration files found in ${migrationDirectory!.path}.");
       return 1;
     }
 

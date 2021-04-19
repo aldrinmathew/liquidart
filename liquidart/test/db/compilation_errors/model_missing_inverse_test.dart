@@ -5,16 +5,16 @@ class MissingInverse2 extends ManagedObject<_MissingInverse2> {}
 
 class _MissingInverse2 {
   @primaryKey
-  int id;
+  int? id;
 
-  ManagedSet<MissingInverseAbsent> inverseMany;
+  ManagedSet<MissingInverseAbsent>? inverseMany;
 }
 
 class MissingInverseAbsent extends ManagedObject<_MissingInverseAbsent> {}
 
 class _MissingInverseAbsent {
   @primaryKey
-  int id;
+  int? id;
 }
 
 void main() {

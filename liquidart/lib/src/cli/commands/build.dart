@@ -6,7 +6,7 @@ import 'package:liquidart/liquidart.dart';
 import 'package:liquidart/src/cli/command.dart';
 import 'package:liquidart/src/cli/metadata.dart';
 import 'package:liquidart/src/cli/mixins/project.dart';
-import 'package:runtime/runtime.dart';
+import 'package:replica/replica.dart';
 import 'package:args/args.dart' as arg_package;
 
 class CLIBuild extends CLICommand with CLIProject {
@@ -24,7 +24,7 @@ class CLIBuild extends CLICommand with CLIProject {
 
   @override
   Future<int> handle() async {
-    final root = projectDirectory.uri;
+    final root = projectDirectory!.uri;
     final libraryUri = root.resolve("lib/").resolve("$libraryName.dart");
     final ctx = BuildContext(
         libraryUri,
@@ -69,7 +69,7 @@ import 'package:liquidart/liquidart.dart';
 import 'package:args/args.dart' as arg_package;
 import 'package:$packageName/$libraryName.dart';
 
-${method.source.replaceFirst("Application<ApplicationChannel>", "Application<$channelName>").replaceFirst("_runnerFunc", "main")}
+${method.source!.replaceFirst("Application<ApplicationChannel>", "Application<$channelName>").replaceFirst("_runnerFunc", "main")}
 """;
   }
 }

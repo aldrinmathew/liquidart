@@ -5,10 +5,10 @@ import 'package:test/test.dart';
 import 'package:liquidart/src/dev/helpers.dart';
 
 void main() {
-  ManagedContext context;
+  ManagedContext? context;
 
   tearDown(() async {
-    await context?.close();
+    await context!.close();
     context = null;
   });
 
@@ -16,15 +16,15 @@ void main() {
       () async {
     context = await contextWithModels([TestModel]);
 
-    var q = Query<TestModel>(context)..values.id = 1;
+    var q = Query<TestModel>(context!)..values!.id = 1;
 
-    expect(q.values.id, 1);
+    expect(q.values!.id, 1);
   });
 
   test("May set values to null, but the query will fail", () async {
     context = await contextWithModels([TestModel]);
 
-    final q = Query<TestModel>(context);
+    final q = Query<TestModel>(context!);
     q.values = null;
 
     try {
@@ -44,7 +44,7 @@ void main() {
       ..name = null
       ..emailAddress = "dup@a.com";
 
-    final q = Query<TestModel>(context)..values = m;
+    final q = Query<TestModel>(context!)..values = m;
 
     try {
       await q.insert();
@@ -58,7 +58,7 @@ void main() {
   test("Insert Bad Key", () async {
     context = await contextWithModels([TestModel]);
 
-    var insertReq = Query<TestModel>(context)
+    var insertReq = Query<TestModel>(context!)
       ..valueMap = {
         "name": "bob",
         "emailAddress": "bk@a.com",
@@ -76,7 +76,7 @@ void main() {
 
   test("Insert from static method", () async {
     context = await contextWithModels([TestModel]);
-    final o = await Query.insertObject(context, TestModel()..name = "Bob");
+    final o = await Query.insertObject(context!, TestModel()..name = "Bob");
     expect(o.id, isNotNull);
     expect(o.name, "Bob");
   });
@@ -88,10 +88,10 @@ void main() {
       ..name = "bob"
       ..emailAddress = "dup@a.com";
 
-    var insertReq = Query<TestModel>(context)..values = m;
+    var insertReq = Query<TestModel>(context!)..values = m;
     await insertReq.insert();
 
-    var insertReqDup = Query<TestModel>(context)..values = m;
+    var insertReqDup = Query<TestModel>(context!)..values = m;
 
     var successful = false;
     try {
@@ -104,7 +104,7 @@ void main() {
     expect(successful, false);
 
     m.emailAddress = "dup1@a.com";
-    var insertReqFollowup = Query<TestModel>(context)..values = m;
+    var insertReqFollowup = Query<TestModel>(context!)..values = m;
 
     var result = await insertReqFollowup.insert();
 
@@ -116,21 +116,21 @@ void main() {
       () async {
     context = await contextWithModels([MultiUnique]);
 
-    var q = Query<MultiUnique>(context)
-      ..values.a = "a"
-      ..values.b = "b";
+    var q = Query<MultiUnique>(context!)
+      ..values!.a = "a"
+      ..values!.b = "b";
 
     await q.insert();
 
-    q = Query<MultiUnique>(context)
-      ..values.a = "a"
-      ..values.b = "a";
+    q = Query<MultiUnique>(context!)
+      ..values!.a = "a"
+      ..values!.b = "a";
 
     await q.insert();
 
-    q = Query<MultiUnique>(context)
-      ..values.a = "a"
-      ..values.b = "b";
+    q = Query<MultiUnique>(context!)
+      ..values!.a = "a"
+      ..values!.b = "b";
     try {
       await q.insert();
       expect(true, false);
@@ -146,7 +146,7 @@ void main() {
       ..name = "bob"
       ..emailAddress = "1@a.com";
 
-    var insertReq = Query<TestModel>(context)..values = m;
+    var insertReq = Query<TestModel>(context!)..values = m;
 
     var result = await insertReq.insert();
 
@@ -167,7 +167,7 @@ void main() {
       ..name = "jay"
       ..emailAddress = "2@a.com";
 
-    final models = await Query.insertObjects(context, [m, n]);
+    final models = await Query.insertObjects(context!, [m, n]);
     final bob = models[0];
     final jay = models[1];
 
@@ -196,13 +196,13 @@ void main() {
       ..emailAddress = "2@a.com";
 
     try {
-      await Query.insertObjects(context, [goodModel, badModel]);
+      await Query.insertObjects(context!, [goodModel, badModel]);
       fail("unreachable");
     } catch (e) {
       expect(e, isNotNull);
     }
 
-    final insertedModels = await Query<TestModel>(context).fetch();
+    final insertedModels = await Query<TestModel>(context!).fetch();
     expect(insertedModels.length, isZero);
   });
 
@@ -213,16 +213,16 @@ void main() {
       ..name = "bob"
       ..emailAddress = "2@a.com";
 
-    var insertReq = Query<TestModel>(context)..values = m;
+    var insertReq = Query<TestModel>(context!)..values = m;
 
-    var result = await insertReq.insert();
+    TestModel? result = await insertReq.insert();
 
-    var readReq = Query<TestModel>(context)
+    var readReq = Query<TestModel>(context!)
       ..predicate =
           QueryPredicate("emailAddress = @email", {"email": "2@a.com"});
 
     result = await readReq.fetchOne();
-    expect(result.name, "bob");
+    expect(result!.name, "bob");
   });
 
   test("Inserting an object without required key fails", () async {
@@ -230,7 +230,7 @@ void main() {
 
     var m = TestModel()..emailAddress = "required@a.com";
 
-    var insertReq = Query<TestModel>(context)..values = m;
+    var insertReq = Query<TestModel>(context!)..values = m;
 
     var successful = false;
     try {
@@ -248,7 +248,7 @@ void main() {
       () async {
     context = await contextWithModels([TestModel]);
 
-    var insertReq = Query<TestModel>(context)
+    var insertReq = Query<TestModel>(context!)
       ..valueMap = {"id": 20, "name": "Bob"}
       ..returningProperties((t) => [t.id, t.name]);
 
@@ -257,7 +257,7 @@ void main() {
     expect(value.name, "Bob");
     expect(value.asMap().containsKey("emailAddress"), false);
 
-    insertReq = Query<TestModel>(context)
+    insertReq = Query<TestModel>(context!)
       ..valueMap = {"id": 21, "name": "Bob"}
       ..returningProperties((t) => [t.id, t.name, t.emailAddress]);
 
@@ -273,17 +273,17 @@ void main() {
     context = await contextWithModels([GenUser, GenPost]);
 
     var u = GenUser()..name = "Joe";
-    var q = Query<GenUser>(context)..values = u;
+    var q = Query<GenUser>(context!)..values = u;
     u = await q.insert();
 
     var p = GenPost()
       ..owner = u
       ..text = "1";
-    var pq = Query<GenPost>(context)..values = p;
+    var pq = Query<GenPost>(context!)..values = p;
     p = await pq.insert();
 
     expect(p.id, greaterThan(0));
-    expect(p.owner.id, greaterThan(0));
+    expect(p.owner!.id, greaterThan(0));
   });
 
   test("Timestamp inserted correctly by default", () async {
@@ -291,12 +291,12 @@ void main() {
 
     var t = GenTime()..text = "hey";
 
-    var q = Query<GenTime>(context)..values = t;
+    var q = Query<GenTime>(context!)..values = t;
 
     var result = await q.insert();
 
     expect(result.dateCreated is DateTime, true);
-    expect(result.dateCreated.difference(DateTime.now()).inSeconds <= 0, true);
+    expect(result.dateCreated!.difference(DateTime.now()).inSeconds <= 0, true);
   });
 
   test("Can insert timestamp manually", () async {
@@ -307,12 +307,12 @@ void main() {
       ..dateCreated = dt
       ..text = "hey";
 
-    var q = Query<GenTime>(context)..values = t;
+    var q = Query<GenTime>(context!)..values = t;
 
     var result = await q.insert();
 
     expect(result.dateCreated is DateTime, true);
-    expect(result.dateCreated.difference(dt).inSeconds == 0, true);
+    expect(result.dateCreated!.difference(dt).inSeconds == 0, true);
   });
 
   test("Transient values work correctly", () async {
@@ -320,7 +320,7 @@ void main() {
 
     var t = TransientModel()..value = "foo";
 
-    var q = Query<TransientModel>(context)..values = t;
+    var q = Query<TransientModel>(context!)..values = t;
     var result = await q.insert();
     expect(result.transientValue, null);
   });
@@ -337,21 +337,21 @@ void main() {
 
     var u = GenUser()..readFromMap(json);
 
-    var q = Query<GenUser>(context)..values = u;
+    var q = Query<GenUser>(context!)..values = u;
 
     var result = await q.insert();
     expect(result.id, greaterThan(0));
     expect(result.name, "Bob");
     expect(result.posts, isNull);
 
-    var pq = Query<GenPost>(context);
+    var pq = Query<GenPost>(context!);
     expect(await pq.fetch(), hasLength(0));
   });
 
   test("Insert object with no keys", () async {
     context = await contextWithModels([BoringObject]);
 
-    var q = Query<BoringObject>(context);
+    var q = Query<BoringObject>(context!);
     var result = await q.insert();
     expect(result.id, greaterThan(0));
   });
@@ -359,8 +359,8 @@ void main() {
   test("Can use insert private properties", () async {
     context = await contextWithModels([PrivateField]);
 
-    await (Query<PrivateField>(context)..values.public = "abc").insert();
-    var q = Query<PrivateField>(context);
+    await (Query<PrivateField>(context!)..values!.public = "abc").insert();
+    var q = Query<PrivateField>(context!);
     var result = await q.fetch();
     expect(result.first.public, "abc");
   });
@@ -368,7 +368,7 @@ void main() {
   test("Can use enum to set property to be stored in db", () async {
     context = await contextWithModels([EnumObject]);
 
-    var q = Query<EnumObject>(context)..values.enumValues = EnumValues.efgh;
+    var q = Query<EnumObject>(context!)..values!.enumValues = EnumValues.efgh;
 
     var result = await q.insert();
     expect(result.enumValues, EnumValues.efgh);
@@ -377,7 +377,7 @@ void main() {
   test("Can insert enum value that is null", () async {
     context = await contextWithModels([EnumObject]);
 
-    var q = Query<EnumObject>(context)..values.enumValues = null;
+    var q = Query<EnumObject>(context!)..values!.enumValues = null;
 
     var result = await q.insert();
     expect(result.enumValues, isNull);
@@ -389,7 +389,7 @@ void main() {
     final tm = TestModel()
       ..id = 1
       ..name = "Fred";
-    final q = Query(context, values: tm);
+    final q = Query(context!, values: tm);
     final t = await q.insert();
     expect(t.id, 1);
     expect(t.name, "Fred");
@@ -400,13 +400,14 @@ class TestModel extends ManagedObject<_TestModel> implements _TestModel {}
 
 class _TestModel {
   @primaryKey
-  int id;
+  int? id;
 
-  String name;
+  String? name;
 
   @Column(nullable: true, unique: true)
-  String emailAddress;
+  String? emailAddress;
 
+  // ignore: unused_element
   static String tableName() {
     return "simple";
   }
@@ -416,45 +417,45 @@ class GenUser extends ManagedObject<_GenUser> implements _GenUser {}
 
 class _GenUser {
   @primaryKey
-  int id;
-  String name;
+  int? id;
+  String? name;
 
-  ManagedSet<GenPost> posts;
+  ManagedSet<GenPost>? posts;
 }
 
 class GenPost extends ManagedObject<_GenPost> implements _GenPost {}
 
 class _GenPost {
   @primaryKey
-  int id;
-  String text;
+  int? id;
+  String? text;
 
   @Relate(Symbol('posts'))
-  GenUser owner;
+  GenUser? owner;
 }
 
 class GenTime extends ManagedObject<_GenTime> implements _GenTime {}
 
 class _GenTime {
   @primaryKey
-  int id;
+  int? id;
 
-  String text;
+  String? text;
 
   @Column(defaultValue: "(now() at time zone 'utc')")
-  DateTime dateCreated;
+  DateTime? dateCreated;
 }
 
 class TransientModel extends ManagedObject<_Transient> implements _Transient {
   @Serialize()
-  String transientValue;
+  String? transientValue;
 }
 
 class _Transient {
   @primaryKey
-  int id;
+  int? id;
 
-  String value;
+  String? value;
 }
 
 class BoringObject extends ManagedObject<_BoringObject>
@@ -462,7 +463,7 @@ class BoringObject extends ManagedObject<_BoringObject>
 
 class _BoringObject {
   @primaryKey
-  int id;
+  int? id;
 }
 
 class PrivateField extends ManagedObject<_PrivateField>
@@ -471,24 +472,24 @@ class PrivateField extends ManagedObject<_PrivateField>
     _private = p;
   }
 
-  String get public => _private;
+  String get public => _private!;
 }
 
 class _PrivateField {
   @primaryKey
-  int id;
+  int? id;
 
-  String _private;
+  String? _private;
 }
 
 class EnumObject extends ManagedObject<_EnumObject> implements _EnumObject {}
 
 class _EnumObject {
   @primaryKey
-  int id;
+  int? id;
 
   @Column(nullable: true)
-  EnumValues enumValues;
+  EnumValues? enumValues;
 }
 
 class MultiUnique extends ManagedObject<_MultiUnique> implements _MultiUnique {}
@@ -496,10 +497,10 @@ class MultiUnique extends ManagedObject<_MultiUnique> implements _MultiUnique {}
 @Table.unique([Symbol('a'), Symbol('b')])
 class _MultiUnique {
   @primaryKey
-  int id;
+  int? id;
 
-  String a;
-  String b;
+  String? a;
+  String? b;
 }
 
 enum EnumValues { abcd, efgh, other18 }

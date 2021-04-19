@@ -5,10 +5,10 @@ class FailingEmptyOneOf extends ManagedObject<_FEO> {}
 
 class _FEO {
   @primaryKey
-  int id;
+  int? id;
 
   @Validate.oneOf([])
-  int d;
+  int? d;
 }
 
 void main() {

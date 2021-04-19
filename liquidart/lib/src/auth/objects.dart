@@ -15,13 +15,13 @@ class AuthClient {
   ///
   /// If this client supports scopes, [allowedScopes] must contain a list of scopes that tokens may request when authorized
   /// by this client.
-  AuthClient(String id, String hashedSecret, String salt,
-      {List<AuthScope> allowedScopes})
-      : this.withRedirectURI(id, hashedSecret, salt, null,
-            allowedScopes: allowedScopes);
+  AuthClient(String id, String? hashedSecret, String? salt,
+      {List<AuthScope>? allowedScopes})
+      : this.withRedirectURI(id, hashedSecret!, salt!, null,
+            allowedScopes: allowedScopes!);
 
   /// Creates an instance of a public [AuthClient].
-  AuthClient.public(String id, {List<AuthScope> allowedScopes})
+  AuthClient.public(String id, {List<AuthScope>? allowedScopes})
       : this.withRedirectURI(id, null, null, null,
             allowedScopes: allowedScopes);
 
@@ -30,41 +30,41 @@ class AuthClient {
   /// All values must be non-null. This is confidential client.
   AuthClient.withRedirectURI(
       this.id, this.hashedSecret, this.salt, this.redirectURI,
-      {List<AuthScope> allowedScopes}) {
-    this.allowedScopes = allowedScopes;
+      {List<AuthScope>? allowedScopes}) {
+    this.allowedScopes = allowedScopes!;
   }
 
-  List<AuthScope> _allowedScopes;
+  List<AuthScope>? _allowedScopes;
 
   /// The ID of the client.
-  String id;
+  String? id;
 
   /// The hashed secret of the client.
   ///
   /// This value may be null if the client is public. See [isPublic].
-  String hashedSecret;
+  String? hashedSecret;
 
   /// The salt [hashedSecret] was hashed with.
   ///
   /// This value may be null if the client is public. See [isPublic].
-  String salt;
+  String? salt;
 
   /// The redirection URI for authorization codes and/or tokens.
   ///
   /// This value may be null if the client doesn't support the authorization code flow.
-  String redirectURI;
+  String? redirectURI;
 
   /// The list of scopes available when authorizing with this client.
   ///
   /// Scoping is determined by this instance; i.e. the authorizing client determines which scopes a token
   /// has. This list contains all valid scopes for this client. If null, client does not support scopes
   /// and all access tokens have same authorization.
-  List<AuthScope> get allowedScopes => _allowedScopes;
-  set allowedScopes(List<AuthScope> scopes) {
-    _allowedScopes = scopes?.where((s) {
+  List<AuthScope>? get allowedScopes => _allowedScopes!;
+  set allowedScopes(List<AuthScope>? scopes) {
+    _allowedScopes = scopes!.where((s) {
       return !scopes.any((otherScope) =>
           s.isSubsetOrEqualTo(otherScope) && !s.isExactlyScope(otherScope));
-    })?.toList();
+    }).toList();
   }
 
   /// Whether or not this instance allows scoping or not.
@@ -75,9 +75,8 @@ class AuthClient {
 
   /// Whether or not this client can issue tokens for the provided [scope].
   bool allowsScope(AuthScope scope) {
-    return allowedScopes
-            ?.any((clientScope) => scope.isSubsetOrEqualTo(clientScope)) ??
-        false;
+    return allowedScopes!
+        .any((clientScope) => scope.isSubsetOrEqualTo(clientScope));
   }
 
   /// Whether or not this is a public or confidential client.
@@ -107,36 +106,36 @@ class AuthClient {
 /// See the `package:liquidart/managed_auth` library for a concrete implementation of this type.
 class AuthToken {
   /// The value to be passed as a Bearer Authorization header.
-  String accessToken;
+  String? accessToken;
 
   /// The value to be passed for refreshing a token.
-  String refreshToken;
+  String? refreshToken;
 
   /// The time this token was issued on.
-  DateTime issueDate;
+  DateTime? issueDate;
 
   /// The time when this token expires.
-  DateTime expirationDate;
+  DateTime? expirationDate;
 
   /// The type of token, currently only 'bearer' is valid.
-  String type;
+  String? type;
 
   /// The identifier of the resource owner.
   ///
   /// Tokens are owned by a resource owner, typically a User, Profile or Account
   /// in an application. This value is the primary key or identifying value of those
   /// instances.
-  int resourceOwnerIdentifier;
+  int? resourceOwnerIdentifier;
 
   /// The client ID this token was issued from.
-  String clientID;
+  String? clientID;
 
   /// Scopes this token has access to.
-  List<AuthScope> scopes;
+  List<AuthScope>? scopes;
 
   /// Whether or not this token is expired by evaluated [expirationDate].
   bool get isExpired {
-    return expirationDate.difference(DateTime.now().toUtc()).inSeconds <= 0;
+    return expirationDate!.difference(DateTime.now().toUtc()).inSeconds <= 0;
   }
 
   /// Emits this instance as a [Map] according to the OAuth 2.0 specification.
@@ -144,7 +143,8 @@ class AuthToken {
     final map = {
       "access_token": accessToken,
       "token_type": type,
-      "expires_in": expirationDate.difference(DateTime.now().toUtc()).inSeconds,
+      "expires_in":
+          expirationDate!.difference(DateTime.now().toUtc()).inSeconds,
     };
 
     if (refreshToken != null) {
@@ -152,7 +152,7 @@ class AuthToken {
     }
 
     if (scopes != null) {
-      map["scope"] = scopes.map((s) => s.toString()).join(" ");
+      map["scope"] = scopes!.map((s) => s.toString()).join(" ");
     }
 
     return map;
@@ -167,33 +167,33 @@ class AuthToken {
 /// See the liquidart/managed_auth library for a concrete implementation of this type.
 class AuthCode {
   /// The actual one-time code used to exchange for tokens.
-  String code;
+  String? code;
 
   /// The client ID the authorization code was issued under.
-  String clientID;
+  String? clientID;
 
   /// The identifier of the resource owner.
   ///
   /// Authorization codes are owned by a resource owner, typically a User, Profile or Account
   /// in an application. This value is the primary key or identifying value of those
   /// instances.
-  int resourceOwnerIdentifier;
+  int? resourceOwnerIdentifier;
 
   /// The timestamp this authorization code was issued on.
-  DateTime issueDate;
+  DateTime? issueDate;
 
   /// When this authorization code expires, recommended for 10 minutes after issue date.
-  DateTime expirationDate;
+  DateTime? expirationDate;
 
   /// Whether or not this authorization code has already been exchanged for a token.
-  bool hasBeenExchanged;
+  bool? hasBeenExchanged;
 
   /// Scopes the exchanged token will have.
-  List<AuthScope> requestedScopes;
+  List<AuthScope>? requestedScopes;
 
   /// Whether or not this code has expired yet, according to its [expirationDate].
   bool get isExpired {
-    return expirationDate.difference(DateTime.now().toUtc()).inSeconds <= 0;
+    return expirationDate!.difference(DateTime.now().toUtc()).inSeconds <= 0;
   }
 }
 
@@ -209,7 +209,7 @@ class Authorization {
       {this.credentials, this.scopes});
 
   /// The client ID the permission was granted under.
-  final String clientID;
+  final String? clientID;
 
   /// The identifier for the owner of the resource, if provided.
   ///
@@ -218,22 +218,22 @@ class Authorization {
   /// this value would be the primary key of that user.
   ///
   /// If this authorization does not refer to a specific resource owner, this value will be null.
-  final int ownerID;
+  final int? ownerID;
 
   /// The [AuthValidator] that granted this permission.
-  final AuthValidator validator;
+  final AuthValidator? validator;
 
   /// Basic authorization credentials, if provided.
   ///
   /// If this instance represents the authorization header of a request with basic authorization credentials,
   /// the parsed credentials will be available in this property. Otherwise, this value is null.
-  final AuthBasicCredentials credentials;
+  final AuthBasicCredentials? credentials;
 
   /// The list of scopes this authorization has access to.
   ///
   /// If the access token used to create this instance has scope,
   /// those scopes will be available here. Otherwise, null.
-  List<AuthScope> scopes;
+  List<AuthScope>? scopes;
 
   /// Whether or not this instance has access to a specific scope.
   ///
@@ -241,7 +241,7 @@ class Authorization {
   /// to access [scope].
   bool isAuthorizedForScope(String scope) {
     final asScope = AuthScope(scope);
-    return scopes?.any(asScope.isSubsetOrEqualTo) ?? false;
+    return scopes!.any(asScope.isSubsetOrEqualTo);
   }
 }
 
@@ -283,19 +283,19 @@ class AuthScope {
   /// list of valid characters. A modifier adds an additional restriction to a scope, without having to make up a new segment.
   /// An example is the 'readonly' modifier above. A route that requires `user:posts.readonly` would allow passage when the token
   /// has `user`, `user:posts` or `user:posts.readonly`. A route that required `user:posts` would not allow `user:posts.readonly`.
-  factory AuthScope(String scopeString) {
+  factory AuthScope(String? scopeString) {
     final cached = _cache[scopeString];
     if (cached != null) {
       return cached;
     }
 
-    final scope = AuthScope._parse(scopeString);
+    final scope = AuthScope._parse(scopeString!);
     _cache[scopeString] = scope;
     return scope;
   }
 
   factory AuthScope._parse(String scopeString) {
-    if (scopeString?.isEmpty ?? true) {
+    if (scopeString.isEmpty) {
       throw FormatException(
           "Invalid AuthScope. May not be null or empty string.", scopeString);
     }
@@ -331,16 +331,16 @@ class AuthScope {
   /// that scope for this method to return true. If [requiredScopes] is null, this method
   /// return true regardless of [providedScopes].
   static bool verify(
-      List<AuthScope> requiredScopes, List<AuthScope> providedScopes) {
+      List<AuthScope>? requiredScopes, List<AuthScope> providedScopes) {
     if (requiredScopes == null) {
       return true;
     }
 
     return requiredScopes.every((requiredScope) {
       final tokenHasValidScope = providedScopes
-          ?.any((tokenScope) => requiredScope.isSubsetOrEqualTo(tokenScope));
+          .any((tokenScope) => requiredScope.isSubsetOrEqualTo(tokenScope));
 
-      return tokenHasValidScope ?? false;
+      return tokenHasValidScope;
     });
   }
 
@@ -351,17 +351,17 @@ class AuthScope {
   /// Individual segments, separated by `:` character, of this instance.
   ///
   /// Will always have a length of at least 1.
-  Iterable<String> get segments => _segments.map((s) => s.name);
+  Iterable<String> get segments => _segments!.map((s) => s.name!);
 
   /// The modifier of this scope, if it exists.
   ///
   /// If this instance does not have a modifier, returns null.
-  String get modifier => _lastModifier;
+  String get modifier => _lastModifier!;
 
-  final List<_AuthScopeSegment> _segments;
-  final String _lastModifier;
+  final List<_AuthScopeSegment>? _segments;
+  final String? _lastModifier;
 
-  static List<_AuthScopeSegment> _parseSegments(String scopeString) {
+  static List<_AuthScopeSegment> _parseSegments(String? scopeString) {
     if (scopeString == null || scopeString == "") {
       throw FormatException(
           "Invalid AuthScope. May not be null or empty string.", scopeString);
@@ -422,10 +422,10 @@ class AuthScope {
     }
 
     // If we aren't restricted by modifier, let's make sure we have access.
-    final thisIterator = _segments.iterator;
-    for (var incomingSegment in incomingScope._segments) {
+    final thisIterator = _segments!.iterator;
+    for (var incomingSegment in incomingScope._segments!) {
       thisIterator.moveNext();
-      final current = thisIterator.current;
+      final _AuthScopeSegment? current = thisIterator.current;
 
       // If the incoming scope is more restrictive than this scope,
       // then it's not allowed.
@@ -455,10 +455,10 @@ class AuthScope {
 
   /// Whether or not two scopes are exactly the same.
   bool isExactlyScope(AuthScope scope) {
-    final incomingIterator = scope._segments.iterator;
-    for (var segment in _segments) {
+    final incomingIterator = scope._segments!.iterator;
+    for (var segment in _segments!) {
       incomingIterator.moveNext();
-      final incomingSegment = incomingIterator.current;
+      final _AuthScopeSegment? incomingSegment = incomingIterator.current;
       if (incomingSegment == null) {
         return false;
       }
@@ -494,13 +494,13 @@ class _AuthScopeSegment {
     }
   }
 
-  String name;
-  String modifier;
+  String? name;
+  String? modifier;
 
   @override
   String toString() {
     if (modifier == null) {
-      return name;
+      return name!;
     }
     return "$name.$modifier";
   }

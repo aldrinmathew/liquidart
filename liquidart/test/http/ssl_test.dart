@@ -6,10 +6,10 @@ import 'package:test/test.dart';
 
 void main() {
   group("SSL", () {
-    Application app;
+    Application? app;
 
     tearDown(() async {
-      await app?.stop();
+      await app!.stop();
     });
 
     test("Start with HTTPS", () async {
@@ -23,7 +23,7 @@ void main() {
             .resolve("liquidart.key.pem")
             .toFilePath(windows: Platform.isWindows);
 
-      await app.start(numberOfInstances: 1);
+      await app!.start(numberOfInstances: 1);
 
       var completer = Completer<List<int>>();
       var socket = await SecureSocket.connect("localhost", 8888,
