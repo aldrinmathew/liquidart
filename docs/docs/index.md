@@ -4,7 +4,7 @@
 
 **Liquidart** is an HTTP web server framework for building REST Applications written in Dart. We offer built-in support for PostgreSQL, a valuable open source database engine.
 
-This is a revival of the Liquidart project, which was abandoned by the StableKernel team. They did a great job with the Liquidart package, but reached a point where they can no longer support its active development.
+This is a revival of the Aqueduct project, which was abandoned by the StableKernel team. They did a great job with the Aqueduct package, but reached a point where they can no longer support its active development.
 
 To download the latest version of the Liquidart package for Dart and Flutter, go to [Liquidart on pub.dev](https://pub.dev/packages/liquidart)
 
