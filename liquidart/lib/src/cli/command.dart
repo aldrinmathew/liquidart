@@ -36,8 +36,8 @@ abstract class CLICommand {
             "has CLI annotation, but is not a getter.");
       }
 
-      final Argument argType = firstMetadataOfType(arg);
-      argType.addToParser(options);
+      final Argument? argType = firstMetadataOfType(arg) as Argument?;
+      argType!.addToParser(options);
     });
   }
 
