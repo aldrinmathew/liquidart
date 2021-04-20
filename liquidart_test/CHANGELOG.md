@@ -1,3 +1,6 @@
+## 3.0.0-b2
+- Updated dependencies
+
 ## 3.0.0-b1
 - Migrated to Null Safety
 - Minor Code Refactors

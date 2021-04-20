@@ -12,7 +12,7 @@ environment:
 dependencies:
   test: ^1.16.8
   matcher: ^0.12.10
-  liquidart: ^5.0.0-b1
+  liquidart: ^5.0.0-b3
 
 # This is removed before being published.
 # dependency_overrides:
