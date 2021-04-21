@@ -1,0 +1,738 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Official Documentation of the Liquidart Project.">
+      
+      
+      
+        <meta name="author" content="Aldrin Mathew">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.2">
+    
+    
+      
+        <title>3. Storing Data in a Database - Liquidart Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6f955dcd.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ef6f36e2.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CFira+Code&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Fira Code"}</style>
+      
+    
+    
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="purple">
+  
+    
+    <script>function __prefix(e){return new URL("../..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+      <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#3-storing-data-in-a-database" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Liquidart Documentation" class="md-header__button md-logo" aria-label="Liquidart Documentation" data-md-component="logo">
+      
+  <img src="../../images/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Liquidart Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              3. Storing Data in a Database
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="purple" type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3 3.19.09m3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95 2.06.05m-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="purple" type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5c-.84 0-1.65.15-2.39.42L12 2M3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29L3.34 7m.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14L3.36 17M20.65 7l-1.77 3.79a7.023 7.023 0 0 0-2.38-4.15l4.15.36m-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29L20.64 17M12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44L12 22z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/aldrinsartfactory/liquidart/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Liquidart Documentation" class="md-nav__button md-logo" aria-label="Liquidart Documentation" data-md-component="logo">
+      
+  <img src="../../images/logo.png" alt="logo">
+
+    </a>
+    Liquidart Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/aldrinsartfactory/liquidart/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Welcome
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core_concepts/" class="md-nav__link">
+        Core Concepts
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tour/" class="md-nav__link">
+        Tour
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../best_practices/" class="md-nav__link">
+        Best Practices
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../intellij/" class="md-nav__link">
+        IntelliJ IDEA Templates
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7" type="checkbox" id="__nav_7" checked>
+      
+      <label class="md-nav__link" for="__nav_7">
+        Tutorial
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Tutorial" data-md-level="1">
+        <label class="md-nav__title" for="__nav_7">
+          <span class="md-nav__icon md-icon"></span>
+          Tutorial
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting_started/" class="md-nav__link">
+        1. Getting Started
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../executing_queries/" class="md-nav__link">
+        2. Reading from a Database
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          3. Storing Data in a Database
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        3. Storing Data in a Database
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#http-resources-and-methods" class="md-nav__link">
+    HTTP Resources and Methods
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inserting-data" class="md-nav__link">
+    Inserting Data
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#request-and-response-bodies" class="md-nav__link">
+    Request and Response Bodies
+  </a>
+  
+    <nav class="md-nav" aria-label="Request and Response Bodies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#response-body-encoding" class="md-nav__link">
+    Response Body Encoding
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#request-body-decoding" class="md-nav__link">
+    Request Body Decoding
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writing_tests/" class="md-nav__link">
+        4. Configuration and Testing
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#http-resources-and-methods" class="md-nav__link">
+    HTTP Resources and Methods
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inserting-data" class="md-nav__link">
+    Inserting Data
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#request-and-response-bodies" class="md-nav__link">
+    Request and Response Bodies
+  </a>
+  
+    <nav class="md-nav" aria-label="Request and Response Bodies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#response-body-encoding" class="md-nav__link">
+    Response Body Encoding
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#request-body-decoding" class="md-nav__link">
+    Request Body Decoding
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/aldrinsartfactory/liquidart/edit/master/docs/tutorial/storing_data.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="3-storing-data-in-a-database">3. Storing Data in a Database</h1>
+<p>In the previous exercise, we loaded some heroes into the database our application reads from. Now, we will allow our application to store, delete and modify heroes in the database. Before we embark on this part of the journey, it's important that we understand how an HTTP API is intended to work.</p>
+<h2 id="http-resources-and-methods">HTTP Resources and Methods</h2>
+<p>The <a href="https://tools.ietf.org/html/rfc7231">HTTP specification</a> defines the concept of a <em>resource</em>. A resource can be anything - a hero, a bank account, a light switch in your home, a temperature sensor in Antarctica, etc. Some of these things are physical objects (the light switch), and some are digital - and they are all resources. An HTTP server application is an interface to these resources; a client requests that something be done with a resource, and the server finds a way to get it done.</p>
+<p>Resources are identified with a URI. A URI <em>universally identifies</em> a resource: it has the address of a server to connect to, and a path that identifies the resource on that server. When writing Liquidart applications, we don't care much about the server part of a URL - the internet figures out that part. What we do care about is the path of the URL - like <code>/heroes</code>.</p>
+<p>An application uses the URL path to determine which resource the request wants to work with. Right now, our application works with hero resources. A request with the path <code>/heroes/1</code> wants to do something with an individual hero (that is identified by the number 1). A request with the path <code>/heroes</code> will act on the entire collection of heroes.</p>
+<p>These actions are primarily described by the request method (like GET, POST, OR DELETE). Each of these methods has a general meaning that describes an action that can be applied to a resource. For example, a <code>GET /heroes</code> means "get me all of the hero resources". The meaning for each of these methods are as follows:</p>
+<p>GET: returns a collection of some resource or an individual resource
+POST: inserts or appends a resource to a collection of some resource; a representation of the resource is in the request body
+PUT: replaces a resource with the contents of the request body (or in some cases, replaces the entire collection of some resource)
+DELETE: deletes a resource (or in some cases, deletes the entire collection of some resource)
+It turns out, we can create a lot of incredible behavior by just combining these methods and a request path. More importantly, by following these specifications, client applications can use generic libraries to access any HTTP API with very little effort. This allows us to create complex systems that are easily made available to a browser, mobile phone or any other internet-connected device.</p>
+<h2 id="inserting-data">Inserting Data</h2>
+<p>We'll start by adding behavior that allows for new heroes to be inserted into the database. Following our previous discussion, the HTTP request must take the form <code>POST /heroes</code> - we are appending a new hero to the collection of heroes. This request will contain the JSON representation of a hero in its body, for example:</p>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;Master of Liquidarts&quot;
+}
+</code></pre>
+<p>Our <code>HeroesController</code> will handle this operation. In general, a single endpoint controller should handle every operation on a resource collection and its individual resources. In <code>heroes_controller.dart</code>, add the following operation method:</p>
+<pre><code class="language-dart">@Operation.post()
+Future&lt;Response&gt; createHero() async {
+  final Map&lt;String, dynamic&gt; body = await request.body.decode();
+  final query = Query&lt;Hero&gt;(context)
+    ..values.name = body['name'] as String;
+
+  final insertedHero = await query.insert();
+
+  return Response.ok(insertedHero);
+}
+</code></pre>
+<p>There are three important things happening here: this method decodes the JSON object from the request's body, constructs a query that inserts a new hero with the name in the JSON object, and then returns the newly inserted hero in the response.</p>
+<p>If the decoded body doesn't match the type of the variable or parameter it is being assigned to, a status code 400 exception is thrown. This means that decoding the body in this way checks that the body is the expected format and returns an error to the client on your behalf if it is not. For example, if someone posts a list of JSON objects, they will get a 400 Bad Request response because we expect a single JSON object in our method.</p>
+<p>An insertion query sets the properties of its <code>values</code> object. The <code>values</code> object is an instance of the type being inserted. Invoking <code>insert</code> on a query inserts a row with its values. A new hero, with its primary key set by the database, is returned and returned as the body of the response. The generated SQL for the above would be something like:</p>
+<pre><code class="language-sql">INSERT INTO _Hero (name) VALUES ('Hero Name');
+</code></pre>
+<div class="admonition tip">
+<p class="admonition-title">Column Attributes</p>
+<p>The id of a hero is automatically generated because of its @primaryKey annotation. This annotation is a Column that configures the id to be both a primary key and be 'auto-incrementing'. Auto-incremented columns values are generated automatically (1, 2, 3...). See <a href="https://pub.dev/documentation/liquidart/latest/liquidart/Column-class.html">the API reference for Column</a> for column options.</p>
+</div>
+<p>Re-run your application. In the browser application, click on <code>Heroes</code> near the top of the page. Then, enter a name into the <code>Hero name:</code> field and click <code>Add</code>. The new hero will appear. You can re-run the application and that hero will still be available, because it has been stored in the database on your machine.</p>
+<p><img alt="Fourth Run" src="../../images/run4.png" /></p>
+<p>Assigning values one-by-one from a request body to a query is cumbersome. You can also auto-magically ingest a request body into a managed object and assign it to the <code>values</code> of a query:</p>
+<pre><code class="language-dart">@Operation.post()
+Future&lt;Response&gt; createHero() async {
+  final hero = Hero()
+    ..read(await request.body.decode(), ignore: [&quot;id&quot;]);
+  final query = Query&lt;Hero&gt;(context)..values = hero;
+
+  final insertedHero = await query.insert();
+
+  return Response.ok(insertedHero);
+}
+</code></pre>
+<p>The <code>read</code> method reads a <code>Map&lt;String, dynamic&gt;</code> into a managed object. Each key's value is assigned to the property of the same name. The <code>ignore:</code> optional parameter removes values for that key from the map before reading it. You can also reject or require keys in this way. If a request body contains a key that isn't declared as property of the managed object, a 400 status code exception is thrown.</p>
+<div class="admonition tip">
+<p class="admonition-title">Sub-resources</p>
+<p>We mentioned that a single controller should handle every operation for a resource collection and its individual resources. Some resources are complex enough that they can have sub-resources. For example, an organization of heroes (like the X-Men or Fantastic Four) contains heroes, but it might also contain buildings and equipment owned by the organization. The heroes, buildings and equipment are sub-resources of an organization. Each sub-resource should have its own route and controller instead of trying to shove everything into a single route and controller. See the following code snippet for an example.</p>
+</div>
+<pre><code class="language-dart">@override
+Controller get entryPoint {
+  return Router()
+    ..route(&quot;/organizations/[:orgName]&quot;)
+      .link(() =&gt; OrganizationController());
+    ..route(&quot;/organizations/:orgName/heroes/[:heroID]&quot;)
+      .link(() =&gt; OrgHeroesController());
+    ..route(&quot;/organizations/:orgName/buildings/[:buildingID]&quot;)
+      .link(() =&gt; OrgBuildingController());
+}
+</code></pre>
+<h2 id="request-and-response-bodies">Request and Response Bodies</h2>
+<p>So far, we've largely glossed over how request and response bodies are handled, and now is a good time to dig in to this topic.</p>
+<h3 id="response-body-encoding">Response Body Encoding</h3>
+<p>When we create a response, we specify its status code and optionally its headers and body. For example, the following creates a response with a status code of 200 OK with an empty list body:</p>
+<pre><code class="language-dart">Response.ok([])
+</code></pre>
+<p>The first argument to <code>Response.ok</code> is a <em>body object</em>. A body object is automatically encoded according to the <code>contentType</code> of its response. By default, the content type of a response is <code>application/json</code> - so by default, all of our response body objects are JSON-encoded in the response body.</p>
+<p>!!! "Other Response Constructors"
+    The default constructor for a Response takes a status code, map of headers and a body object: <code>Response(200, {}, "body")</code>. There are many named constructors for Response, like <code>Response.ok</code> or <code>Response.notFound</code>. These constructors set the status code and expose parameters that are intended for that type of response. For example, a 200 OK response should have a body, so Response.ok has a required body object argument. See <a href="https://pub.dev/documentation/liquidart/latest/liquidart/Response-class.html">the API reference for Response</a> for possible constructors and properties of a response.</p>
+<p>To change the format a body object is encoded into, you set the <code>contentType</code> of the response. For example,</p>
+<pre><code class="language-dart">Response.ok([])
+  ..contentType = new ContentType(&quot;application&quot;, &quot;xml&quot;);
+</code></pre>
+<p>The default supported content types are JSON, <code>application/x-www-form-urlencoded</code> and all <code>text/*</code> types. To encode other content-types, you must register a <code>Codec</code> with <code>CodecRegistry</code>. A body object is only valid if the codec selected by the response's content-type can encode it. If it can't, an error will be thrown and a 500 Server Error response is sent instead.</p>
+<p>Types that implement <code>Serializable</code> may also be body objects. Objects that implement this type provide an <code>asMap()</code> method that converts their properties into a <code>Map</code> before being passed to the encoder. This <code>Map</code> must be encodable for the response's content-type codec. You may also provide a <code>List</code> of <code>Serializable</code>, for which the list of each object's <code>asMap()</code> is passed to the encoder.</p>
+<p><code>ManagedObject</code> implements the <code>Serializable</code> interface, and therefore all managed objects (and lists of managed objects) can be body objects.</p>
+<h3 id="request-body-decoding">Request Body Decoding</h3>
+<p>Every <code>Request</code> has a <code>body</code> property of type <code>RequestBody</code>. A <code>RequestBody</code> decodes the contents of the request body into Dart objects that you use in your application. This decoding is performed by the <code>Codec</code> that is associated with the request's content-type. The decoded object is determined by the format of the data - for example, a JSON array decodes into a <code>List</code>, a JSON object into a <code>Map</code>.</p>
+<p>When you write code to decode a request body, you are also validating the request body is in the expected format. For example, your <code>HeroesController</code> invokes <code>decode</code> like this:</p>
+<pre><code class="language-dart">Map&lt;String, dynamic&gt; body = await request.body.decode();
+</code></pre>
+<p>The <code>decode</code> method has a type argument that is inferred to be a <code>Map&lt;String, dynamic&gt;</code>. If the decoded body is not a <code>Map</code>, an exception is thrown that sends an appropriate error response to the client.</p>
+<p>You may also bind the body of a request to an operation method parameter. Let's bind a <code>Hero</code> instance to a request body in our <code>HeroesController</code>. Update the code in that file to the following:</p>
+<pre><code class="language-dart">@Operation.post()
+Future&lt;Response&gt; createHero(@Bind.body(ignore: [&quot;id&quot;]) Hero inputHero) async {
+  final query = Query&lt;Hero&gt;(context)
+    ..values = inputHero;
+
+  final insertedHero = await query.insert();
+
+  return Response.ok(insertedHero);
+}
+</code></pre>
+<p>Values in the request body object are decoded into a <code>Hero</code> object - each key in the request body maps to a property of our <code>Hero</code>. For example, the value for the key 'name' is stored in the <code>inputHero.name</code>. If decoding the request body into a <code>Hero</code> instance fails for any reason, a 400 Bad Request response is sent and the operation method is not called.</p>
+<div class="admonition tip">
+<p class="admonition-title">Binding Serializables</p>
+<p>A body can be bound to any type - a request will only succeed if the decoded body matches the expected type. When a <code>Serializable</code> subclass (or <code>List&lt;Serializable&gt;</code>) is bound to a body, it enforces the body to be decoded into a <code>Map&lt;String, dynamic&gt;</code> (or a <code>List&lt;Map&lt;String, dynamic&gt;&gt;</code>). All <code>ManagedObjects</code> implement <code>Serializable</code>, and therefore you may bind managed objects (and lists of such) using body binding.</p>
+</div>
+<p>Re-run your heroes application. On <a href="http://aqueduct-tutorial.stablekernel.io">http://aqueduct-tutorial.stablekernel.io</a>, click on the <code>Heroes</code> button on the top of the screen. In the text field, enter a new hero name and click <code>Add</code>. You'll see your new hero added to the list! You can shutdown your application and run it again and you'll still be able to fetch your new hero.</p>
+<p><img alt="Fifth Run" src="../../images/run5.png" /></p>
+<div class="admonition tip">
+<p class="admonition-title">Query Construction</p>
+<p>Properties like <code>values</code> and <code>where</code> prevent errors by type and name checking columns with the analyzer. They're also great for speeding up writing code because your IDE will autocomplete property names. There is <a href="https://aldrinsartfactory.github.io/liquidart/db/advanced_queries/">specific behavior</a> a query uses to decide whether it should include a value from these two properties in the SQL it generates.</p>
+</div>
+<h1 id="next-section-writing-tests"><a href="https://aldrinsartfactory.github.io/liquidart/tutorial/writing_tests/"><strong>Next Section: Writing Tests</strong></a></h1>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        <a href="../executing_queries/" class="md-footer__link md-footer__link--prev" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              2. Reading from a Database
+            </div>
+          </div>
+        </a>
+      
+      
+        <a href="../writing_tests/" class="md-footer__link md-footer__link--next" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              4. Configuration and Testing
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Original documentation of Liquidart (previously Aqueduct) written by the StableKernel Team
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../../assets/javascripts/workers/search.fe42c31b.min.js", "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.4ea5477f.min.js"></script>
+      
+    
+  </body>
+</html>

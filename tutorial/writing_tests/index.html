@@ -1,0 +1,872 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Official Documentation of the Liquidart Project.">
+      
+      
+      
+        <meta name="author" content="Aldrin Mathew">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.2">
+    
+    
+      
+        <title>4. Configuration and Testing - Liquidart Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6f955dcd.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ef6f36e2.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CFira+Code&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Fira Code"}</style>
+      
+    
+    
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="purple">
+  
+    
+    <script>function __prefix(e){return new URL("../..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+      <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#4-configuration-and-writing-tests" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Liquidart Documentation" class="md-header__button md-logo" aria-label="Liquidart Documentation" data-md-component="logo">
+      
+  <img src="../../images/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Liquidart Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              4. Configuration and Testing
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="purple" type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3 3.19.09m3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95 2.06.05m-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="purple" type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5c-.84 0-1.65.15-2.39.42L12 2M3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29L3.34 7m.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14L3.36 17M20.65 7l-1.77 3.79a7.023 7.023 0 0 0-2.38-4.15l4.15.36m-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29L20.64 17M12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44L12 22z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/aldrinsartfactory/liquidart/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Liquidart Documentation" class="md-nav__button md-logo" aria-label="Liquidart Documentation" data-md-component="logo">
+      
+  <img src="../../images/logo.png" alt="logo">
+
+    </a>
+    Liquidart Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/aldrinsartfactory/liquidart/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Welcome
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core_concepts/" class="md-nav__link">
+        Core Concepts
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tour/" class="md-nav__link">
+        Tour
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../best_practices/" class="md-nav__link">
+        Best Practices
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../intellij/" class="md-nav__link">
+        IntelliJ IDEA Templates
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7" type="checkbox" id="__nav_7" checked>
+      
+      <label class="md-nav__link" for="__nav_7">
+        Tutorial
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Tutorial" data-md-level="1">
+        <label class="md-nav__title" for="__nav_7">
+          <span class="md-nav__icon md-icon"></span>
+          Tutorial
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting_started/" class="md-nav__link">
+        1. Getting Started
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../executing_queries/" class="md-nav__link">
+        2. Reading from a Database
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../storing_data/" class="md-nav__link">
+        3. Storing Data in a Database
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          4. Configuration and Testing
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        4. Configuration and Testing
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#application-configuration" class="md-nav__link">
+    Application Configuration
+  </a>
+  
+    <nav class="md-nav" aria-label="Application Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-template" class="md-nav__link">
+    Configuration Template
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-in-liquidart" class="md-nav__link">
+    Testing in Liquidart
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing in Liquidart">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setting-up-your-development-environment" class="md-nav__link">
+    Setting up your Development Environment
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#writing-your-first-test" class="md-nav__link">
+    Writing Your First Test
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#writing-more-tests" class="md-nav__link">
+    Writing More Tests
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#application-configuration" class="md-nav__link">
+    Application Configuration
+  </a>
+  
+    <nav class="md-nav" aria-label="Application Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-template" class="md-nav__link">
+    Configuration Template
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-in-liquidart" class="md-nav__link">
+    Testing in Liquidart
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing in Liquidart">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setting-up-your-development-environment" class="md-nav__link">
+    Setting up your Development Environment
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#writing-your-first-test" class="md-nav__link">
+    Writing Your First Test
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#writing-more-tests" class="md-nav__link">
+    Writing More Tests
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/aldrinsartfactory/liquidart/edit/master/docs/tutorial/writing_tests.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="4-configuration-and-writing-tests">4. Configuration and Writing Tests</h1>
+<p>We will continue to build on the last chapter's project, <code>heroes</code>, by writing automated tests for it. We will also set up configurable environments for our application.</p>
+<h2 id="application-configuration">Application Configuration</h2>
+<p>Right now, our application hardcodes its database connection information. This is bad because we want to use a different database when we're testing, running locally and running in production. It's also bad because we'd have to check our database password into version control.</p>
+<p>We can create a configuration file to store values like database connection information, and use a different configuration file for each environment. The heroes application needs to be able to configure the username, password, host port and name of the database it uses. Open the file <code>config.yaml</code>, which is empty, and enter the following key-value pairs:</p>
+<pre><code class="language-yaml">database:
+  host: localhost
+  port: 5432
+  username: heroes_user
+  password: password
+  databaseName: heroes
+</code></pre>
+<p>These are the same values we used in our application channel. We'll want to replace the hardcoded values with whatever values are in this file. In <code>lib/channel.dart</code>, declare a new class at the bottom of the file:</p>
+<pre><code class="language-dart">class HeroConfig extends Configuration {
+  HeroConfig(String path): super.fromFile(File(path));
+
+  DatabaseConfiguration database;
+}
+</code></pre>
+<p>A <code>Configuration</code> subclass declares the expected properties of a configuration file. <code>HeroConfig</code> has one property named <code>database</code> - this matches the name of our top-level key in <code>config.yaml</code>. A <code>DatabaseConfiguration</code> is a built-in configuration type that has properties for <code>host</code>, <code>port</code>, <code>username</code>, <code>password</code> and <code>databaseName</code>. We can load <code>config.yaml</code> into a <code>HeroConfig</code> because they have the same structure and all of the key names match the property names in our configuration types.</p>
+<div class="admonition tip">
+<p class="admonition-title">Invalid Configuration</p>
+<p>If your configuration file and configuration object don't have a matching structure, an error will be thrown when your application starts and tell you which values are missing.</p>
+</div>
+<p>Let's load <code>config.yaml</code> and use its values to set up our database connection by replacing the <code>prepare</code> method in <code>lib/channel.dart</code>:</p>
+<pre><code class="language-dart">@override
+Future prepare() async {
+  logger.onRecord.listen(
+      (rec) =&gt; print(&quot;$rec ${rec.error ?? &quot;&quot;} ${rec.stackTrace ?? &quot;&quot;}&quot;));
+
+  final config = HeroConfig(options.configurationFilePath);
+  final dataModel = ManagedDataModel.fromCurrentMirrorSystem();
+  final persistentStore = PostgreSQLPersistentStore.fromConnectionInfo(
+      config.database.username,
+      config.database.password,
+      config.database.host,
+      config.database.port,
+      config.database.databaseName);
+
+  context = ManagedContext(dataModel, persistentStore);
+}
+</code></pre>
+<p>When our application starts, our channel has access to an <code>options</code> property that has the command-line arguments that started the application. By default, the value of <code>configurationFilePath</code> is <code>config.yaml</code> (it corresponds to <code>--config-path</code> in <code>liquidart serve</code>). When <code>config.yaml</code> is read, its values are read into a <code>HeroConfig</code> and are used to configure our database connection.</p>
+<p>Re-run your application and it'll work exactly the same as it did before - except now, we can substitute databases depending on how we run the application.</p>
+<h3 id="configuration-template">Configuration Template</h3>
+<p>You shouldn't check <code>config.yaml</code> into version control because it contains sensitive information. However, it is important to check in a <em>configuration source file</em>. A configuration source file has the same structure as <code>HeroConfig</code>, but it has values for your test environment - both locally and with continuous integration tools. It is also used as a template for your deployed configuration files.</p>
+<div class="admonition warning">
+<p class="admonition-title">Sensitive Information</p>
+<p>Use a platform like <code>Heroku</code> or <code>Kubernetes</code>. You can store sensitive information in secured environment variables. You can substitute environment variables in a configuration file by using the variable's name with a <code>$</code> prefix as a value, e.g. password: <code>$DATABASE_PASSWORD</code>.</p>
+</div>
+<p>A configuration source file should be named <code>config.src.yaml</code>, and one currently exists as an empty file in your project. Enter the following configuration into this file:</p>
+<pre><code class="language-yaml">database:
+  host: localhost
+  port: 5432
+  username: dart
+  password: dart
+  databaseName: dart_test
+</code></pre>
+<p>This file has the expected structure, but has different values for the database information (for a database that we will create shortly). In the next section, we'll use this configuration file to run our automated tests.</p>
+<h2 id="testing-in-liquidart">Testing in Liquidart</h2>
+<p>So far, we've tested our application by using a web application. This isn't a good way to test an application. A better way is to write automated test cases. An automated test case not only tests the code you are working on, but makes sure the code you've worked on in the past continues to work as you make changes. A good development practice is to configure <a href="https://travis-ci.com/">TravisCI</a> to run all of your tests for every code change.</p>
+<p>Because testing is so important, there is a package for writing Liquidart application tests. In this chapter, we will use this package to make sure our hero endpoints are working correctly.</p>
+<div class="admonition info">
+<p class="admonition-title">package:liquidart_test</p>
+<p>The package <code>liquidart_test</code> and <code>test</code> was already added to your <code>pubspec.yaml</code> file as a test dependency by the template generator.</p>
+</div>
+<p>In all Dart applications, a test suite is a Dart script with a <code>main</code> function. In this function, the <code>test</code> function is called multiple times to register expectations. A test passes if all of your expectations are met. An example Dart test looks like this:</p>
+<pre><code class="language-dart">import 'package:test/test.dart';
+
+void main() {
+  test(&quot;1+1 = 2&quot;, () {
+    // Expect that 1 + 1 = 2
+    expect(1 + 1, equals(2));
+  });
+}
+</code></pre>
+<h3 id="setting-up-your-development-environment">Setting up your Development Environment</h3>
+<p>In <code>config.src.yaml</code>, we target the database <code>dart:dart@localhost:5432/dart_test</code>. This is a 'special' database that is used by all Liquidart applications for automated testing (by default). When your application is tested, its tables are temporarily added to this database and then discarded after tests complete. This means that no data is stored in between test runs.</p>
+<p>Create this database by running psql and enter the following SQL:</p>
+<pre><code class="language-sql">CREATE DATABASE dart_test;
+CREATE USER dart WITH createdb;
+ALTER USER dart WITH password 'dart';
+GRANT all ON database dart_test TO dart;
+</code></pre>
+<div class="admonition tip">
+<p class="admonition-title">dart_test Database</p>
+<p>You only have to create this database once per machine, and in any continuous integration scripts. All of your Liquidart applications will use this database for automated testing. Fun fact - you can run multiple application's tests simultaneously using this database because the tables only exist for the database connection that created them.</p>
+</div>
+<h3 id="writing-your-first-test">Writing Your First Test</h3>
+<p>We will create a test suite to make sure that all hero endpoints return the right data, and make the right changes. Create a new file named <code>test/hero_controller_test.dart</code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Test Files Names and Locations</p>
+<p>A test file must end in <code>_test.dart</code> and must be in the <code>test/</code> directory of your project, or it won't be run.</p>
+</div>
+<p>At the top of this file, import your application's <em>test harness</em> and enter the following <code>main</code> function:</p>
+<pre><code class="language-dart">import 'harness/app.dart';
+
+void main() {
+  final harness = Harness()..install();
+}
+</code></pre>
+<p>A test harness is an object that starts and stops your application when running a test suite, as long as you call its <code>install</code> method. This harness can then send requests to your application, and you can expect that the response is correct. Add a test to the main function that makes sure we get back a 200 OK when we call <code>GET /heroes</code>:</p>
+<pre><code class="language-dart">void main() {
+  final harness = Harness()..install();
+
+  test(&quot;GET /heroes returns 200 OK&quot;, () async {
+    final response = await harness.agent.get(&quot;/heroes&quot;);
+    expectResponse(response, 200);
+  });
+}
+</code></pre>
+<p>A harness has an <code>Agent</code> that can send requests to the application it started. Methods like get and <code>post</code> take a path (and optionally headers and a body) and return a response object. This object is used in <code>expectResponse</code> to validate the status code and other values. Tests in Liquidart are written in this way: make a request, expect that the response is intended.</p>
+<p>Because our application makes database queries, we have to to upload our database schema to the test database before each test. Fortunately, this is something our test harness can also do. In <code>test/harness/app.dart</code>, mixin <code>TestHarnessORMMixin</code> and override two methods:</p>
+<pre><code class="language-dart">class Harness extends TestHarness&lt;HeroesChannel&gt; with TestHarnessORMMixin {
+  @override
+  ManagedContext get context =&gt; channel.context;
+
+  @override
+  Future onSetUp() async {
+    await resetData();
+  }
+}
+</code></pre>
+<p>The mixin gives our harness the method <code>resetData</code>. This method deletes everything from the test database and uploads the schema in a pristine state. By calling this method in <code>onSetUp</code>, our test harness will reset data before each test.</p>
+<div class="admonition tip">
+<p class="admonition-title">New Project Templates</p>
+<p>Using the <code>-t</code> command-line argument with <code>liquidart create</code> allows you to select a template. Templates like <code>db</code> and <code>db_and_auth</code> have a test harness that already mixes in <code>TestHarnessORMMixin</code>.</p>
+</div>
+<p>Now, we can run this test by right-clicking on the <code>main</code> function in <code>hero_controller_test.dart</code> and selecting Run tests in '<code>hero_controller_test.dart</code>'. A panel will appear that shows the results of your tests. You'll see a green checkmark next to the test in this panel to show that your test succeeded. If your test did not succeed, the reason will be printed to the console. If your test failed because of an error in your code, you will also be able to see the stack trace of the error.</p>
+<div class="admonition tip">
+<p class="admonition-title">Running Tests</p>
+<p>You can also run all of your tests for an application by running <code>pub run test</code> from your project's directory. You can re-run a test with the green play button at the top right corner of the screen, or the keyboard shortcut associated with it (this shortcut varies depending on your installation).</p>
+</div>
+<p>We should expect that more than just the status code is correct. Let's verify that the body is a list, where every element is an object that contains an id and name. Update your test:</p>
+<pre><code class="language-dart">test(&quot;GET /heroes returns 200 OK&quot;, () async {
+  final response = await harness.agent.get(&quot;/heroes&quot;);
+  expectResponse(response, 200, body: everyElement({
+    &quot;id&quot;: greaterThan(0),
+    &quot;name&quot;: isString,
+  }));
+});
+</code></pre>
+<p>This expectation ensures that the body is a list and that every element is an object with a <code>id</code> greater than <code>0</code>, and a <code>name</code> that is a string. When expecting a body value, the body is first decoded from its content-type before the expectation. In practice, this means that your JSON response body is deserialized into an object or list. Your expectations of the body are built from Dart objects like <code>List</code> and <code>Object</code> that deserialized from JSON.</p>
+<div class="admonition tip">
+<p class="admonition-title">Matchers</p>
+<p>The function <code>everyElement</code> is a <code>Matcher</code> from <code>package:matcher</code>. There are many types of matchers for all kinds of scenarios, and <code>package:liquidart_test</code> includes Liquidart-specific matchers. See <a href="https://www.pub.dev/documentation/liquidart_test/latest/">the liquidart_test API Reference</a> for all Liquidart matchers.</p>
+</div>
+<p>This test actually has an error that we will fix in it by using another matcher. Right now, this endpoint returns an <em>empty list</em> because there are no heroes in the database! Let's insert a hero before we make this request, and also expect that there is at least one element in the body. Make sure to import <code>hero.dart</code> at the top of the file!</p>
+<pre><code class="language-dart">import 'package:heroes/model/hero.dart';
+
+import 'harness/app.dart';
+
+void main() {
+  final harness = Harness()..install();
+
+  test(&quot;GET /heroes returns 200 OK&quot;, () async {
+    final query = Query&lt;Hero&gt;(harness.application.channel.context)
+      ..values.name = &quot;Bob&quot;;
+
+    await query.insert();
+
+    final response = await harness.agent.get(&quot;/heroes&quot;);
+    expectResponse(response, 200,
+        body: allOf([
+          hasLength(greaterThan(0)),
+          everyElement({
+            &quot;id&quot;: greaterThan(0),
+            &quot;name&quot;: isString,
+          })
+        ]));
+  });
+}
+</code></pre>
+<p>This test first inserts a hero named 'Bob' before getting all heroes. We compose a matcher where each element has to match the expected list, but also have a length greater than 0. Re-run your tests, and they should still pass.</p>
+<h2 id="writing-more-tests">Writing More Tests</h2>
+<p>Let's write a few more tests for when we POST /heroes. In the first test, we'll make a mistake on purpose to see how tests fail. Add the following test:</p>
+<pre><code class="language-dart">test(&quot;POST /heroes returns 200 OK&quot;, () async {
+  final response = await harness.agent.post(&quot;/heroes&quot;, body: {
+    &quot;name&quot;: &quot;Fred&quot;
+  });
+  expectResponse(response, 200, body: {
+    &quot;id&quot;: greaterThan(0),
+    &quot;name&quot;: &quot;Bob&quot;
+  });
+});
+</code></pre>
+<p>This test creates a hero named 'Fred', but expects that the returned hero has the name 'Bob'. When we run the test, we see this test failure:</p>
+<pre><code class="language-s">Expected: --- HTTP Response ---
+          - Status code must be 200
+          - Headers can be anything
+          - Body after decoding must be:
+
+            {'id': &lt;a value greater than &lt;0&gt;&gt;, 'name': 'Bob'}
+          ---------------------
+  Actual: TestResponse:&lt;-----------
+          - Status code is 200
+          - Headers are the following:
+            - content-encoding: gzip
+            - content-length: 42
+            - x-frame-options: SAMEORIGIN
+            - content-type: application/json; charset=utf-8
+            - x-xss-protection: 1; mode=block
+            - x-content-type-options: nosniff
+            - server: liquidart/1
+          Decoded body is:
+          {id: 1, name: Fred}
+          -------------------------
+          &gt;
+   Which: the body differs for the following reasons:
+          was 'Fred' instead of 'Bob' at location ['name']
+</code></pre>
+<p>The 'Expected' value tells us the response we expected - that it has a status code of 200, any headers and the body must have a certain structure. The 'Actual' value tells us what the actual response was - a 200 OK, a bunch of headers, and a body a hero named 'Fred'. 'Which' tells us exactly what went wrong - we were expecting 'Bob', not 'Fred'. Let's update our test to expect 'Fred'.</p>
+<pre><code class="language-dart">test(&quot;POST /heroes returns 200 OK&quot;, () async {
+  final response = await harness.agent.post(&quot;/heroes&quot;, body: {
+    &quot;name&quot;: &quot;Fred&quot;
+  });
+  expectResponse(response, 200, body: {
+    &quot;id&quot;: greaterThan(0),
+    &quot;name&quot;: &quot;Fred&quot;
+  });
+});
+</code></pre>
+<p>We shouldn't just test success cases. Let's also expect that if we try and insert a hero with the same name, we get a 409 error response.</p>
+<pre><code class="language-dart">test(&quot;POST /heroes returns 200 OK&quot;, () async {
+  await harness.agent.post(&quot;/heroes&quot;, body: {
+    &quot;name&quot;: &quot;Fred&quot;
+  });
+
+  final badResponse = await harness.agent.post(&quot;/heroes&quot;, body: {
+    &quot;name&quot;: &quot;Fred&quot;
+  });
+  expectResponse(badResponse, 409);
+});
+</code></pre>
+<p>In this test, we request two 'Fred' heroes be created, and the second request fails with a 409 because name is a unique property of a hero. Notice that the first request didn't fail, even though we had created a 'Fred' hero in the previous test - that's because we reset the database for each test in our harness.</p>
+<h1 id="next-section-authentication-and-authorization"><a href="https://aldrinsartfactory.github.io/liquidart/tutorial/oauth2/"><strong>Next Section: Authentication and Authorization</strong></a></h1>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        <a href="../storing_data/" class="md-footer__link md-footer__link--prev" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              3. Storing Data in a Database
+            </div>
+          </div>
+        </a>
+      
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Original documentation of Liquidart (previously Aqueduct) written by the StableKernel Team
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../../assets/javascripts/workers/search.fe42c31b.min.js", "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.4ea5477f.min.js"></script>
+      
+    
+  </body>
+</html>

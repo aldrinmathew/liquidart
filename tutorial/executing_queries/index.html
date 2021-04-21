@@ -1,0 +1,887 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Official Documentation of the Liquidart Project.">
+      
+      
+      
+        <meta name="author" content="Aldrin Mathew">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.2">
+    
+    
+      
+        <title>2. Reading from a Database - Liquidart Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6f955dcd.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ef6f36e2.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CFira+Code&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Fira Code"}</style>
+      
+    
+    
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="purple">
+  
+    
+    <script>function __prefix(e){return new URL("../..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+      <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#2-reading-from-a-database" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Liquidart Documentation" class="md-header__button md-logo" aria-label="Liquidart Documentation" data-md-component="logo">
+      
+  <img src="../../images/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Liquidart Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              2. Reading from a Database
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="purple" type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3 3.19.09m3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95 2.06.05m-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="purple" type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5c-.84 0-1.65.15-2.39.42L12 2M3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29L3.34 7m.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14L3.36 17M20.65 7l-1.77 3.79a7.023 7.023 0 0 0-2.38-4.15l4.15.36m-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29L20.64 17M12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44L12 22z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/aldrinsartfactory/liquidart/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Liquidart Documentation" class="md-nav__button md-logo" aria-label="Liquidart Documentation" data-md-component="logo">
+      
+  <img src="../../images/logo.png" alt="logo">
+
+    </a>
+    Liquidart Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/aldrinsartfactory/liquidart/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Welcome
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core_concepts/" class="md-nav__link">
+        Core Concepts
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tour/" class="md-nav__link">
+        Tour
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../best_practices/" class="md-nav__link">
+        Best Practices
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../intellij/" class="md-nav__link">
+        IntelliJ IDEA Templates
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7" type="checkbox" id="__nav_7" checked>
+      
+      <label class="md-nav__link" for="__nav_7">
+        Tutorial
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Tutorial" data-md-level="1">
+        <label class="md-nav__title" for="__nav_7">
+          <span class="md-nav__icon md-icon"></span>
+          Tutorial
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting_started/" class="md-nav__link">
+        1. Getting Started
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          2. Reading from a Database
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        2. Reading from a Database
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#object-relational-mapping" class="md-nav__link">
+    Object-Relational Mapping
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-a-data-model" class="md-nav__link">
+    Building a Data Model
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#defining-a-context" class="md-nav__link">
+    Defining a Context
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#executing-queries" class="md-nav__link">
+    Executing Queries
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-up-a-database" class="md-nav__link">
+    Setting Up a Database
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#query-parameters-and-http-headers" class="md-nav__link">
+    Query Parameters and HTTP Headers
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../storing_data/" class="md-nav__link">
+        3. Storing Data in a Database
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writing_tests/" class="md-nav__link">
+        4. Configuration and Testing
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#object-relational-mapping" class="md-nav__link">
+    Object-Relational Mapping
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-a-data-model" class="md-nav__link">
+    Building a Data Model
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#defining-a-context" class="md-nav__link">
+    Defining a Context
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#executing-queries" class="md-nav__link">
+    Executing Queries
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-up-a-database" class="md-nav__link">
+    Setting Up a Database
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#query-parameters-and-http-headers" class="md-nav__link">
+    Query Parameters and HTTP Headers
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/aldrinsartfactory/liquidart/edit/master/docs/tutorial/executing_queries.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="2-reading-from-a-database">2. Reading from a Database</h1>
+<p>We will continue to build on the last chapter's project, <code>heroes</code>, by storing our heroes in a database. This will let us to edit our heroes and keep the changes when we restart the application.</p>
+<h2 id="object-relational-mapping">Object-Relational Mapping</h2>
+<p>A relational database management system (like PostgreSQL or MySQL) stores its data in the form of tables. A table represents some sort of entity - like a person or a bank account. Each table has columns that describe the attributes of that entity - like a name or a balance. Every row in a table is an instance of that entity - like a single person named Bob or a bank account.</p>
+<p>In an object-oriented framework like Liquidart, we have representations for tables, columns and rows. A class represents a table, its instances are rows, and instance properties are column values. An ORM translates rows in a database to and from objects in an application.</p>
+<table>
+<thead>
+<tr>
+<th>Liquidart</th>
+<th>Database</th>
+<th>Example #1</th>
+<th>Example #2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Class</strong></td>
+<td><strong>Table</strong></td>
+<td>Person</td>
+<td>Bank Account</td>
+</tr>
+<tr>
+<td><strong>Instance</strong></td>
+<td><strong>Row</strong></td>
+<td>A person named Bob</td>
+<td>Sally's Bank Account</td>
+</tr>
+<tr>
+<td><strong>Property</strong></td>
+<td><strong>Column</strong></td>
+<td>Person's Name</td>
+<td>Bank Account Balance</td>
+</tr>
+</tbody>
+</table>
+<p>In Liquidart, each database table-class pairing is called an <em>entity</em>. Collectively, an application's entities are called its <em>data model</em>.</p>
+<h2 id="building-a-data-model">Building a Data Model</h2>
+<p>In our <code>heroes</code> application, we will have one type of entity - a "hero". To create a new entity, we subclass <code>ManagedObject&lt;T&gt;</code>. Create a new directory <code>lib/model/</code> and then add a new file to this directory named <code>hero.dart</code>. Add the following code:</p>
+<pre><code class="language-dart">import 'package:heroes/heroes.dart';
+
+class Hero extends ManagedObject&lt;_Hero&gt; implements _Hero {}
+
+class _Hero {
+  @primaryKey
+  int id;
+
+  @Column(unique: true)
+  String name;
+}
+</code></pre>
+<p>This declares a <code>Hero</code> entity. Entities are always made up of two classes.</p>
+<p>The <code>_Hero</code> class is a direct mapping of a database table. This table's name will have the same name as the class: <code>_Hero</code>. Every property declared in this class will have a corresponding column in this table. Therefore, the <code>_Hero</code> table will have two columns - <code>id</code> and <code>name</code>. The <code>id</code> column is this table's primary key (a unique identifier for each hero). The name of each hero must be unique.</p>
+<p>The other class, <code>Hero</code>, is what we work with in our code - when we fetch heroes from a database, they will be instances of <code>Hero</code>.</p>
+<p>The <code>Hero</code> class is called the <em>instance type</em> of the entity, because that's what we have instances of. <code>_Hero</code> is the <em>table definition</em> of the entity. You won't use the table definition for anything other than describing the database table.</p>
+<p>An instance type must implement its table definition; this gives our <code>Hero</code> all of the properties of <code>_Hero</code>. An instance type must extend <code>ManagedObject&lt;T&gt;</code>, where <code>T</code> is also the table definition. <code>ManagedObject&lt;T&gt;</code> has behavior for automatically transferring objects to the database and back (among other things).</p>
+<div class="admonition tip">
+<p class="admonition-title">Transient Properties</p>
+<p>Properties declared in the instance type aren't stored in the database. This is different than properties in the table definition. For example, a database table might have a <code>firstName</code> and <code>lastName</code>, but it's useful in some places to have a <code>fullName</code> property. Declaring the <code>fullName</code> property in the instance type means we have easy access to the full name, but we still store the first and last name individually.</p>
+</div>
+<h2 id="defining-a-context">Defining a Context</h2>
+<p>Our application needs to know two things to execute database queries:</p>
+<ol>
+<li>What is the data model (our collection of entities)?</li>
+<li>What database are we connecting to?</li>
+</ol>
+<p>Both of these things are set up when an application is first started. In <code>channel.dart</code>, add a new property <code>context</code> and update <code>prepare()</code>:</p>
+<pre><code class="language-dart">class HeroesChannel extends ApplicationChannel {
+  ManagedContext context;
+
+  @override
+  Future prepare() async {
+    logger.onRecord.listen((rec) =&gt; print(&quot;$rec ${rec.error ?? &quot;&quot;} ${rec.stackTrace ?? &quot;&quot;}&quot;));
+
+    final dataModel = ManagedDataModel.fromCurrentMirrorSystem();
+    final persistentStore = PostgreSQLPersistentStore.fromConnectionInfo(
+      &quot;heroes_user&quot;, &quot;password&quot;, &quot;localhost&quot;, 5432, &quot;heroes&quot;);
+
+    context = ManagedContext(dataModel, persistentStore);
+  }
+
+  @override
+  Controller get entryPoint {
+    ...
+</code></pre>
+<p><code>ManagedDataModel.fromCurrentMirrorSystem()</code> will find all of our <code>ManagedObject&lt;T&gt;</code> subclasses and 'compile' them into a data model. A <code>PostgreSQLPersistentStore</code> takes database connection information that it will use to connect and send queries to a database. Together, these objects are packaged in a <code>ManagedContext</code>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Configuring a Database Connection</p>
+<p>This tutorial hardcodes the information needed to connect to a database. In a future chapter, we will move these values to a configuration file so that we can change them during tests and various deployment environments.</p>
+</div>
+<p>The context will coordinate with these two objects to execute queries and translate objects to and from the database. Controllers that make database queries need a reference to the context. So, we'll want <code>HeroesController</code> to have access to the context.</p>
+<p>In <code>heroes_controller.dart</code>, add a property and create a new constructor:</p>
+<pre><code class="language-dart">class HeroesController extends ResourceController {
+  HeroesController(this.context);
+
+  final ManagedContext context;  
+  ...
+</code></pre>
+<p>Now that <code>HeroesController</code> requires a context in its constructor, we need to pass it the context we created in <code>prepare()</code>. Update <code>entryPoint</code> in <code>channel.dart</code>.</p>
+<pre><code class="language-dart">@override
+Controller get entryPoint {
+  final router = Router();
+
+  router
+    .route(&quot;/heroes/[:id]&quot;)
+    .link(() =&gt; HeroesController(context));
+
+  router
+    .route(&quot;/example&quot;)
+    .linkFunction((request) async {
+      return new Response.ok({&quot;key&quot;: &quot;value&quot;});
+  });
+
+  return router;
+}
+</code></pre>
+<p>Now that we've 'injected' this context into our <code>HeroesController</code> constructor, each <code>HeroesController</code> can execute database queries.</p>
+<div class="admonition info">
+<p class="admonition-title">Service Objects and Dependency Injection</p>
+<p>Our context is an example of a <em>service object</em>. A service encapsulates logic and state into a single object that can be reused in multiple controllers. A typical service object accesses another server, like a database or another REST API. Some service objects may simply provide a simplified interface to a complex process, like applying transforms to an image. Services are passed in a controller's constructor; this is called <em>dependency injection</em>. Unlike many frameworks, Liquidart does not require a complex dependency injection framework; this is because you write the code to create instances of your controllers and can pass whatever you like in their constructor.</p>
+</div>
+<h2 id="executing-queries">Executing Queries</h2>
+<p>Our operation methods in <code>HeroesController</code> currently return heroes from an in-memory list. To fetch data from a database instead of this list, we create and execute instances of <code>Query&lt;T&gt;</code> in our <code>ManagedContext</code>.</p>
+<p>Let's start by replacing <code>getAllHeroes</code> in <code>heroes_controller.dart</code>. Make sure to import your <code>model/hero.dart</code> file at the top:</p>
+<pre><code class="language-dart">import 'package:heroes/heroes.dart';
+import 'package:heroes/model/hero.dart';
+
+class HeroesController extends ResourceController {
+  HeroesController(this.context);
+
+  final ManagedContext context;
+
+  @Operation.get()
+  Future&lt;Response&gt; getAllHeroes() async {
+    final heroQuery = Query&lt;Hero&gt;(context);
+    final heroes = await heroQuery.fetch();
+
+    return Response.ok(heroes);
+  }
+
+...
+</code></pre>
+<p>Here, we create an instance of <code>Query&lt;Hero&gt;</code> and then execute its <code>fetch()</code> method. The type argument to <code>Query&lt;T&gt;</code> is an instance type; it lets the query know which table to fetch rows from and the type of objects that are returned by the query. The context argument tells it which database to fetch it from. The <code>fetch()</code> execution method returns a <code>List&lt;Hero&gt;</code>. We write that list to the body of the response.</p>
+<p>Now, let's update <code>getHeroByID</code> to fetch a single hero from the database.</p>
+<pre><code class="language-dart">@Operation.get('id')
+Future&lt;Response&gt; getHeroByID(@Bind.path('id') int id) async {
+  final heroQuery = Query&lt;Hero&gt;(context)
+    ..where((h) =&gt; h.id).equalTo(id);    
+
+  final hero = await heroQuery.fetchOne();
+
+  if (hero == null) {
+    return Response.notFound();
+  }
+  return Response.ok(hero);
+}
+</code></pre>
+<p>This query does two interesting things. First, it uses the <code>where</code> method to filter heroes that have the same <code>id</code> as the path variable. For example, <code>/heroes/1</code> will fetch a hero with an <code>id</code> of <code>1</code>. This works because <code>Query.where</code> adds a SQL WHERE clause to the query. We'd get the following SQL:</p>
+<pre><code>SELECT id, name FROM _question WHERE id = 1;
+</code></pre>
+<p>The where method uses the <em>property selector</em> syntax. This syntax is a closure that takes an argument of the type being queried, and must return a property of that object. This creates an expression object that targets the selected property. By invoking methods like <code>equalTo</code> on this expression object, a boolean expression is added to the query.</p>
+<div class="admonition tip">
+<p class="admonition-title">Property Selectors</p>
+<p>Many query configuration methods use the property selector syntax. Setting up a keyboard shortcut (called a Live Template in IntelliJ) to enter the syntax is beneficial. A downloadable settings configuration for IntelliJ exists <a href="https://aldrinsartfactory.github.io/liquidart/intellij/">here</a> that includes this shortcut.</p>
+</div>
+<p>The <code>fetchOne()</code> execution method will fetch a single object that fulfills all of the expressions applied to the query. If no database row meets the criteria, <code>null</code> is returned. Our controller returns a 404 Not Found response in that scenario.</p>
+<p>We have now written code that fetches heroes from a database instead of from in memory, but we don't have a database - yet.</p>
+<div class="admonition tip">
+<p class="admonition-title">fetchObjectWithID, fetchOne() and Unique Properties</p>
+<p>You can also fetch an object by its primary key with the method <code>ManagedContext.fetchObjectWithID</code>. When fetching with <code>fetchOne</code>, make sure the search criteria is guaranteed to be unique.</p>
+</div>
+<h2 id="setting-up-a-database">Setting Up a Database</h2>
+<p>For development, you'll need to install a PostgreSQL server on your local machine. If you are on macOS, use <a href="https://postgresapp.com/">Postgres.app</a>. This native macOS application manages starting and stopping PostgreSQL servers on your machine. For other platforms, see <a href="https://www.postgresql.org/download/">this page</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">9.6 or Greater</p>
+<p>The minimum version of PostgreSQL needed to work with Liquidart is 9.6.</p>
+</div>
+<p>If you installed Postgres.app, open the application and select the <code>+</code> button on the bottom left corner of the screen to create a new database server. Choose a version (at least 9.6, but the most recent version is best), name the server whatever you like, and leave the rest of the options unchanged before clicking <code>Create Server</code>. Once the server has been created, click <code>Start</code>.</p>
+<p>A list of databases available on this server will be shown as named, database icons. Double-click on any of them to open the <code>psql</code> command-line tool.</p>
+<div class="admonition tip">
+<p class="admonition-title">psql</p>
+<p>For other platforms, <code>psql</code> should be available in your <code>$PATH</code>. You can also add <code>Postgres.app</code>'s <code>psql</code> to your path with the directions <a href="https://postgresapp.com/documentation/cli-tools.html">here</a>.</p>
+</div>
+<p>In <code>psql</code>, create a new database and a user to manage it.</p>
+<pre><code class="language-sql">CREATE DATABASE heroes;
+CREATE USER heroes_user WITH createdb;
+ALTER USER heroes_user WITH password 'password';
+GRANT all ON database heroes TO heroes_user;
+</code></pre>
+<p>Next, we need to create the table where heroes are stored in this database. From your project directory, run the following command:</p>
+<pre><code>liquidart db generate
+</code></pre>
+<p>This command will create a new <em>migration file</em>. A migration file is a Dart script that runs a series of SQL commands to alter a database's schema. It is created in a new directory in your project named <code>migrations/</code>. Open <code>migrations/00000001_initial.migration.dart</code>, it should look like this:</p>
+<pre><code class="language-dart">import 'package:liquidart/liquidart.dart';
+import 'dart:async';
+
+class Migration1 extends Migration {
+  @override
+  Future upgrade() async {
+    database.createTable(SchemaTable(
+      &quot;_Hero&quot;, [
+        SchemaColumn(&quot;id&quot;, ManagedPropertyType.bigInteger,
+            isPrimaryKey: true, autoincrement: true, isIndexed: false, isNullable: false, isUnique: false),
+        SchemaColumn(&quot;name&quot;, ManagedPropertyType.string,
+            isPrimaryKey: false, autoincrement: false, isIndexed: false, isNullable: false, isUnique: true),
+      ],
+    ));
+  }
+
+  @override
+  Future downgrade() async {}
+
+  @override
+  Future seed() async {}
+}
+</code></pre>
+<p>In a moment, we'll execute this migration file. That will create a new table named <code>_Hero</code> with columns for <code>id</code> and <code>name</code>. Before we run it, we should seed the database with some initial heroes. In the <code>seed()</code> method, add the following:</p>
+<pre><code class="language-dart">@override
+Future seed() async {
+  final heroNames = [&quot;Mr. Nice&quot;, &quot;Narco&quot;, &quot;Bombasto&quot;, &quot;Celeritas&quot;, &quot;Magneta&quot;];
+
+  for (final heroName in heroNames) {    
+    await database.store.execute(&quot;INSERT INTO _Hero (name) VALUES (@name)&quot;, substitutionValues: {
+      &quot;name&quot;: heroName
+    });
+  }
+}
+</code></pre>
+<p>Apply this migration file to our locally running <code>heroes</code> database with the following command in the project directory:</p>
+<pre><code>liquidart db upgrade --connect postgres://heroes_user:password@localhost:5432/heroes
+</code></pre>
+<p>Re-run your application with <code>liquidart serve</code>. Then, reload <a href="http://aqueduct-tutorial.stablekernel.io">http://aqueduct-tutorial.stablekernel.io</a>. Your dashboard of heroes and detail page for each will still show up - but this time, they are sourced from a database.</p>
+<div class="admonition warning">
+<p class="admonition-title">ManagedObjects and Migration Scripts</p>
+<p>In our migration's <code>seed()</code> method, we executed SQL queries instead of using the Liquidart ORM. <em>It is very important that you do not use</em> <code>Query&lt;T&gt;</code>, <code>ManagedObject&lt;T&gt;</code> or other elements of the Liquidart ORM in migration files. Migration files represent an ordered series of historical steps that describe your database schema. If you replay those steps (which is what executing a migration file does), you will end up with the same database schema every time. However, a <code>ManagedObject&lt;T&gt;</code> subclass changes over time - the definition of a managed object is not historical, it only represents the current point in time. Since a <code>ManagedObject&lt;T&gt;</code> subclass can change, using one in our migration file would mean that our migration file could change.</p>
+</div>
+<h2 id="query-parameters-and-http-headers">Query Parameters and HTTP Headers</h2>
+<p>In the browser application, the dashboard has a text field for searching heroes. When you enter text into it, it will send the search term to the server by appending a query parameter to <code>GET /heroes</code>. For example, if you entered the text <code>abc</code>, it'd make this request:</p>
+<pre><code>GET /heroes?name=abc
+</code></pre>
+<p><img alt="" src="../../images/run3.png" /></p>
+<p>Our Liquidart application can use this value to return a list of heroes that contains the search string. In <code>heroes_controller.dart</code>, modify <code>getAllHeroes()</code> to bind the 'name' query parameter:</p>
+<pre><code class="language-dart">@Operation.get()
+Future&lt;Response&gt; getAllHeroes({@Bind.query('name') String name}) async {
+  final heroQuery = Query&lt;Hero&gt;(context);
+  if (name != null) {
+    heroQuery.where((h) =&gt; h.name).contains(name, caseSensitive: false);
+  }
+  final heroes = await heroQuery.fetch();
+
+  return Response.ok(heroes);
+}
+</code></pre>
+<p>You can re-run your Liquidart application and use the search bar in the client application.</p>
+<p>The <code>@Bind.query('name')</code> annotation will bind the value of the 'name' query parameter if it is included in the request URL. Otherwise, <code>name</code> will be null.</p>
+<p>Notice that <code>name</code> is an <em>optional parameter</em> (it is surrounded by curly brackets). An optional parameter in an operation method is also optional in the HTTP request. If we removed the curly brackets from this binding, the 'name' query parameter would become required and the request <code>GET /heroes</code> without <code>?name=x</code> would fail with a 400 Bad Request.</p>
+<div class="admonition tip">
+<p class="admonition-title">ResourceController Binding</p>
+</div>
+<p>There is even more to bindings than we've shown (like automatically parsing bound values into types like int and DateTime). For more information, see <a href="https://aldrinsartfactory.github.io/liquidart/http/resource_controller/">ResourceControllers</a>.</p>
+<p>Binding query and header parameters in a operation method is a good way to make your code more intentional and avoid boilerplate parsing code. Liquidart is able to generate better documentation when using bindings.</p>
+<h1 id="next-section-storing-data"><a href="https://aldrinsartfactory.github.io/liquidart/tutorial/storing-data/"><strong>Next Section: Storing Data</strong></a></h1>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        <a href="../getting_started/" class="md-footer__link md-footer__link--prev" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              1. Getting Started
+            </div>
+          </div>
+        </a>
+      
+      
+        <a href="../storing_data/" class="md-footer__link md-footer__link--next" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              3. Storing Data in a Database
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Original documentation of Liquidart (previously Aqueduct) written by the StableKernel Team
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../../assets/javascripts/workers/search.fe42c31b.min.js", "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.4ea5477f.min.js"></script>
+      
+    
+  </body>
+</html>

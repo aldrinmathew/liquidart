@@ -1,0 +1,937 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Official Documentation of the Liquidart Project.">
+      
+      
+      
+        <meta name="author" content="Aldrin Mathew">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.2">
+    
+    
+      
+        <title>1. Getting Started - Liquidart Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6f955dcd.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ef6f36e2.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CFira+Code&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Fira Code"}</style>
+      
+    
+    
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="purple">
+  
+    
+    <script>function __prefix(e){return new URL("../..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+      <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#1-getting-started" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Liquidart Documentation" class="md-header__button md-logo" aria-label="Liquidart Documentation" data-md-component="logo">
+      
+  <img src="../../images/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Liquidart Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              1. Getting Started
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="purple" type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3 3.19.09m3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95 2.06.05m-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="purple" type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5c-.84 0-1.65.15-2.39.42L12 2M3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29L3.34 7m.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14L3.36 17M20.65 7l-1.77 3.79a7.023 7.023 0 0 0-2.38-4.15l4.15.36m-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29L20.64 17M12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44L12 22z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/aldrinsartfactory/liquidart/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Liquidart Documentation" class="md-nav__button md-logo" aria-label="Liquidart Documentation" data-md-component="logo">
+      
+  <img src="../../images/logo.png" alt="logo">
+
+    </a>
+    Liquidart Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/aldrinsartfactory/liquidart/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Welcome
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core_concepts/" class="md-nav__link">
+        Core Concepts
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tour/" class="md-nav__link">
+        Tour
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../best_practices/" class="md-nav__link">
+        Best Practices
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../intellij/" class="md-nav__link">
+        IntelliJ IDEA Templates
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7" type="checkbox" id="__nav_7" checked>
+      
+      <label class="md-nav__link" for="__nav_7">
+        Tutorial
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Tutorial" data-md-level="1">
+        <label class="md-nav__title" for="__nav_7">
+          <span class="md-nav__icon md-icon"></span>
+          Tutorial
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          1. Getting Started
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        1. Getting Started
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    Installation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-a-project" class="md-nav__link">
+    Creating a Project
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#handling-http-requests" class="md-nav__link">
+    Handling HTTP Requests
+  </a>
+  
+    <nav class="md-nav" aria-label="Handling HTTP Requests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#controller-objects-handle-requests" class="md-nav__link">
+    Controller Objects Handle Requests
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#linking-controllers" class="md-nav__link">
+    Linking Controllers
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-routing" class="md-nav__link">
+    Advanced Routing
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resourcecontrollers-and-operation-methods" class="md-nav__link">
+    ResourceControllers and Operation Methods
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#request-binding" class="md-nav__link">
+    Request Binding
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-more-you-know-multi-threading-and-application-state" class="md-nav__link">
+    The More You Know: Multi-threading and Application State
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../executing_queries/" class="md-nav__link">
+        2. Reading from a Database
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../storing_data/" class="md-nav__link">
+        3. Storing Data in a Database
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writing_tests/" class="md-nav__link">
+        4. Configuration and Testing
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    Installation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-a-project" class="md-nav__link">
+    Creating a Project
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#handling-http-requests" class="md-nav__link">
+    Handling HTTP Requests
+  </a>
+  
+    <nav class="md-nav" aria-label="Handling HTTP Requests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#controller-objects-handle-requests" class="md-nav__link">
+    Controller Objects Handle Requests
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#linking-controllers" class="md-nav__link">
+    Linking Controllers
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-routing" class="md-nav__link">
+    Advanced Routing
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resourcecontrollers-and-operation-methods" class="md-nav__link">
+    ResourceControllers and Operation Methods
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#request-binding" class="md-nav__link">
+    Request Binding
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-more-you-know-multi-threading-and-application-state" class="md-nav__link">
+    The More You Know: Multi-threading and Application State
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/aldrinsartfactory/liquidart/edit/master/docs/tutorial/getting_started.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="1-getting-started">1. Getting Started</h1>
+<p>By the end of this tutorial, you will have created an Liquidart application that serves fictional heroes from a PostgreSQL database. You will learn the following:</p>
+<ul>
+<li>Run an Liquidart application</li>
+<li>Route HTTP requests to the appropriate handler in your code</li>
+<li>Store and retrieve database data</li>
+<li>Write automated tests for each endpoint</li>
+<li>Require authorization for HTTP requests</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Getting Help</p>
+<p>If at anytime you get stuck, hop on over to the Liquidart Github Discussions. You can also see a finished version of this application <a href="https://github.com/stablekernel/liquidart_examples/tree/master/heroes">here</a>.</p>
+</div>
+<h2 id="installation">Installation</h2>
+<p>To get started, make sure you have the following software installed:</p>
+<ol>
+<li>Dart (<a href="https://www.dartlang.org/install">Install Instructions</a>)</li>
+<li>IntelliJ IDEA or any other Jetbrains IDE, including the free Community Edition (<a href="https://www.jetbrains.com/idea/download/">Install Instructions</a>)</li>
+<li>The IntelliJ IDEA Dart Plugin (<a href="https://www.dartlang.org/tools/jetbrains-plugin">Install Instructions</a>)</li>
+</ol>
+<p>Install the <code>liquidart</code> command line tool by running the following command in your shell:</p>
+<pre><code>pub global activate liquidart
+</code></pre>
+<div class="admonition warning">
+<p class="admonition-title">PATH Warning</p>
+<p>If you get warning text about your PATH, make sure to read it before moving on.</p>
+</div>
+<h2 id="creating-a-project">Creating a Project</h2>
+<p>Create a new project named <code>heroes</code> by entering the following in your shell:</p>
+<pre><code>liquidart create heroes
+</code></pre>
+<p>This creates a <code>heroes</code> project directory. Open this directory with IntelliJ IDEA by dragging the project folder onto IntellIJ IDEA's icon.</p>
+<p>In IntelliJ's project view, locate the <code>lib</code> directory; this is where your project's code will go. This project has two source files - <code>heroes.dart</code> and <code>channel.dart</code>. Open the file <code>heroes.dart</code>. Click <code>Enable Dart Support</code> in the top right corner of the editor.</p>
+<h2 id="handling-http-requests">Handling HTTP Requests</h2>
+<p>In your browser, navigate to <a href="http://liquidart-tutorial.stablekernel.io/">http://liquidart-tutorial.stablekernel.io</a>. This browser application is a 'Hero Manager' - it allows a user to view, create, delete and update heroes. (It is a slightly modified version of the <a href="https://webdev.dartlang.org/angular/tutorial">AngularDart Tour of Heroes Tutorial</a>.) It will make HTTP requests to <code>http://localhost:8888</code> to fetch and manipulate hero data. The application you will build in this tutorial respond to those requests.</p>
+<div class="admonition warning">
+<p class="admonition-title">Running the Browser Application Locally</p>
+<p>The browser application is served over HTTP so that it can access your Liquidart application when it runs locally on your machine. Your browser may warn you about navigating to an insecure webpage, because it is in fact insecure. You can run this application locally by grabbing the source code from <a href="https://github.com/stablekernel/tour-of-heroes-dart">here</a>.</p>
+</div>
+<p>In this first chapter, you will write code to handle two requests: one to get a list of heroes, and the other to get a single hero by its identifier. Those requests are:</p>
+<ol>
+<li><code>GET /heroes</code> to the list of heroes</li>
+<li><code>GET /heroes/:id</code> to get an individual hero</li>
+</ol>
+<div class="admonition tip">
+<p class="admonition-title">HTTP Operation Shorthand</p>
+<p>The term GET /heroes is called an operation. It is the combination of the HTTP method and the path of the request. Each operation is unique to an application, so your code is segmented into units for each operation. Sections with a colon, like the ':id' segment, are variable: they can be 1, 2, 3, and so on.</p>
+</div>
+<h3 id="controller-objects-handle-requests">Controller Objects Handle Requests</h3>
+<p>Requests are handled by <em>controller objects</em>. A controller object can respond to a request. It can also take other action and let another controller respond. For example, it might check if the request is authorized, or send analytical data to some other service. Controllers are composed together, and each controller in the composition performs its logic in order. This allows for some controllers to be reused, and for better code organization. A composition of controllers is called a <em>channel</em> because requests flow in one direction through the controllers.</p>
+<p>Our application will link two controllers:</p>
+<ul>
+<li>a <code>Router</code> that makes sure the request path is <code>/heroes</code> or <code>/heroes/:id</code></li>
+<li>a <code>HeroesControllers</code> that responds with hero objects</li>
+</ul>
+<p>Your application starts with a channel object called the <em>application channel</em>. You link the controllers in your application to this channel.</p>
+<p><img alt="Entry Point" src="../../images/entrypoint.png" /></p>
+<p>Each application has a subclass of <code>ApplicationChannel</code> that you override methods in to set up your controllers. This type is already declared in <code>lib/channel.dart</code> - open this file and find <code>ApplicationChannel.entryPoint</code>:</p>
+<pre><code class="language-dart">@override
+Controller get entryPoint {
+  final router = Router();
+
+  router
+    .route('/example')
+    .linkFunction((request) async {
+      return Response.ok({'key': 'value'});
+    });
+
+  return router;
+}
+</code></pre>
+<p>When your application gets a request, the <code>entryPoint</code> controller is the first to handle it. In our case, this is a <code>Router</code> - a subclass of <code>Controller</code>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Controller Subclassing</p>
+<p>Every controller you use will be a subclass of Controller. There are some controller subclasses already in Liquidart for common behaviors.</p>
+</div>
+<p>You use the <code>route</code> method on a router to attach a controller to a <em>route</em>. A route is a string syntax that matches the path of a request. In our current implementation, the route will match every request with the path <code>/example</code>. When that request is received, a linked function runs and returns a 200 OK response with an example JSON object body.</p>
+<p>We need to route the path <code>/heroes</code> to a controller of our own, so we can control what happens. Let's create a <code>HeroesController</code>. Create a new file in <code>lib/controller/heroes_controller.dart</code> and add the following code (you will need to create the subdirectory <code>lib/controller/</code>):</p>
+<pre><code class="language-dart">import 'package:liquidart/liquidart.dart';
+import 'package:heroes/heroes.dart';
+
+class HeroesController extends Controller {
+  final _heroes = [
+    {'id': 11, 'name': 'Mr. Nice'},
+    {'id': 12, 'name': 'Narco'},
+    {'id': 13, 'name': 'Bombasto'},
+    {'id': 14, 'name': 'Celeritas'},
+    {'id': 15, 'name': 'Magneta'},    
+  ];
+
+  @override
+  Future&lt;RequestOrResponse&gt; handle(Request request) async {
+    return Response.ok(_heroes);
+  }
+}
+</code></pre>
+<p>Notice that <code>HeroesController</code> is a subclass of <code>Controller</code>; this is what makes it a controller object. It overrides its <code>handle</code> method by returning a <code>Response</code> object. This response object has a 200 OK status code, and it body contains a JSON-encoded list of hero objects. When a controller returns a <code>Response</code> object from its <code>handle</code> method, it is sent to the client.</p>
+<p>Right now, our <code>HeroesController</code> isn't hooked up to the application channel. We need to link it to the router. First, import our new file at the top of <code>channel.dart</code>.</p>
+<pre><code class="language-dart">import 'controller/heroes_controller.dart';
+</code></pre>
+<p>Then link this HeroesController to the Router for the path /heroes:</p>
+<pre><code class="language-dart">@override
+Controller get entryPoint {
+  final router = Router();
+
+  router
+    .route('/heroes')
+    .link(() =&gt; HeroesController());
+
+  router
+    .route('/example')
+    .linkFunction((request) async {
+      return Response.ok({'key': 'value'});
+    });
+
+  return router;
+}
+</code></pre>
+<p>We now have a application that will return a list of heroes. In the project directory, run the following command from the command-line:</p>
+<pre><code>liquidart serve
+</code></pre>
+<p>This will start your application running locally. Reload the browser page <code>http://liquidart-tutorial.stablekernel.io</code>. It will make a request to <code>http://localhost:8888/heroes</code> and your application will serve it. You'll see your heroes in your web browser:</p>
+<p><img alt="First Run" src="../../images/run1.png" /></p>
+<p>You can also see the actual response of your request by entering the following into your shell:</p>
+<pre><code>curl -X GET http://localhost:8888/heroes
+</code></pre>
+<p>You'll get JSON output like this:</p>
+<pre><code class="language-json">[
+  {&quot;id&quot;:11,&quot;name&quot;:&quot;Mr. Nice&quot;},
+  {&quot;id&quot;:12,&quot;name&quot;:&quot;Narco&quot;},
+  {&quot;id&quot;:13,&quot;name&quot;:&quot;Bombasto&quot;},
+  {&quot;id&quot;:14,&quot;name&quot;:&quot;Celeritas&quot;},
+  {&quot;id&quot;:15,&quot;name&quot;:&quot;Magneta&quot;}
+]
+</code></pre>
+<p>You'll also see this request logged in the shell that you started <code>liquidart serve</code> in.</p>
+<h2 id="linking-controllers">Linking Controllers</h2>
+<p>When a controller handles a request, it can either send a response or let one of its linked controllers handle the request. By default, a <code>Router</code> will send a 404 Not Found response for any request. Adding a route to a <code>Router</code> creates an entry point to a new channel that controllers can be linked to. In our application, <code>HeroesController</code> is linked to the route <code>/heroes</code>.</p>
+<p>Controllers come in two different flavors: endpoint and middleware. Endpoint controllers, like <code>HeroesController</code>, always send a response. They implement the behavior that a request is seeking. Middleware controllers, like <code>Router</code>, handles requests before they reach an endpoint controller. A router, for example, handles a request by directing it to the right controller. Controllers like <code>Authorizer</code> verify the authorization of the request. You can create all kinds of controllers to provide any behavior you like.</p>
+<p>A channel can have zero or many middleware controllers, but must end in an endpoint controller. Most controllers can only have one linked controller, but a <code>Router</code> allows for many. For example, a larger application might look like this:</p>
+<pre><code class="language-dart">@override
+Controller get entryPoint {
+  final router = Router();
+
+  router
+    .route('/users')
+    .link(() =&gt; APIKeyValidator())
+    .link(() =&gt; Authorizer.bearer())
+    .link(() =&gt; UsersController());
+
+  router
+    .route('/posts')
+    .link(() =&gt; APIKeyValidator())
+    .link(() =&gt; PostsController());
+
+  return router;
+}
+</code></pre>
+<p>Each of these objects is a subclass of <code>Controller</code>, giving them the ability to be linked together to handle requests. A request goes through controllers in the order they are linked. A request for the path <code>/users</code> will go through an <code>APIKeyValidator</code>, an <code>Authorizer</code> and finally a <code>UsersController</code>. Each of these controllers has an opportunity to respond, preventing the next controller from receiving the request.</p>
+<h2 id="advanced-routing">Advanced Routing</h2>
+<p>Right now, our application handles <code>GET /heroes</code> requests. The browser application uses the this list to populate its hero dashboard. If we click on an individual hero, the browser application will display an individual hero. When navigating to this page, the browser application makes a request to our server for an individual hero. This request contains the unique id of the selected hero in the path, e.g. <code>/heroes/11</code> or <code>/heroes/13</code>.</p>
+<p>Our server doesn't handle this request yet - it only handles requests that have exactly the path <code>/heroes</code>. Since a request for individual heroes will have a path that changes depending on the hero, we need our route to include a <em>path variable</em>.</p>
+<p>A path variable is a segment of route that matches a value for the same segment in the incoming request path. A path variable is a segment prefixed with a colon (:). For example, the route <code>/heroes/:id</code> contains a path variable named id. If the request path is <code>/heroes/1</code>, <code>/heroes/2</code>, and so on, the request will be sent to our <code>HeroesController</code>. The <code>HeroesController</code> will have access to the value of the path variable to determine which hero to return.</p>
+<p>There's one hiccup. The route <code>/heroes/:id</code> no longer matches the path <code>/heroes</code>. It'd be a lot easier to organize our code if both <code>/heroes</code> and <code>/heroes/:id</code> went to our <code>HeroesController</code>; it does heroic stuff. For this reason, we can declare the <code>:id</code> portion of our route to be optional by wrapping it in square brackets. In <code>channel.dart</code>, modify the <code>/heroes</code> route:</p>
+<pre><code class="language-dart">router
+  .route('/heroes/[:id]')
+  .link(() =&gt; HeroesController());
+</code></pre>
+<p>Since the second segment of the path is optional, the path <code>/heroes</code> still matches the route. If the path contains a second segment, the value of that segment is bound to the path variable named <code>id</code>. We can access path variables through the <code>Request</code> object. In <code>heroes_controller.dart</code>, modify <code>handle</code>:</p>
+<pre><code class="language-dart">// In just a moment, we'll replace this code with something even better,
+// but it's important to understand where this information comes from first!
+@override
+Future&lt;RequestOrResponse&gt; handle(Request request) async {
+  if (request.path.variables.containsKey('id')) {
+    final id = int.parse(request.path.variables['id']);
+    final hero = _heroes.firstWhere((hero) =&gt; hero['id'] == id, orElse: () =&gt; null);
+    if (hero == null) {
+      return Response.notFound();
+    }
+
+    return Response.ok(hero);
+  }
+
+  return Response.ok(_heroes);
+}
+</code></pre>
+<p>In your shell currently running the application, hit Ctrl-C to stop the application. Then, run <code>liquidart serve</code> again. In the browser application, click on a hero and you will be taken to a detail page for that hero.</p>
+<p><img alt="Second Run" src="../../images/run2.png" /></p>
+<p>You can verify that your server is responding correctly by executing <code>curl -X GET http://localhost:8888/heroes/11</code> to view the single hero object. You can also trigger a 404 Not Found response by getting a hero that doesn't exist.</p>
+<h2 id="resourcecontrollers-and-operation-methods">ResourceControllers and Operation Methods</h2>
+<p>Our <code>HeroesController</code> is OK right now, but it'll soon run into a problem: what happens when we want to create a new hero? Or update an existing hero's name? Our <code>handle</code> method will start to get unmanageable, quickly.</p>
+<p>That's where <code>ResourceController</code> comes in. A <code>ResourceController</code> allows you to create a distinct method for each operation that we can perform on our heroes. One method will handle getting a list of heroes, another will handle getting a single hero, and so on. Each method has an annotation that identifies the HTTP method and path variables the request must have to trigger it.</p>
+<p>In <code>heroes_controller.dart</code>, replace <code>HeroesController</code> with the following:</p>
+<pre><code class="language-dart">class HeroesController extends ResourceController {
+  final _heroes = [
+    {'id': 11, 'name': 'Mr. Nice'},
+    {'id': 12, 'name': 'Narco'},
+    {'id': 13, 'name': 'Bombasto'},
+    {'id': 14, 'name': 'Celeritas'},
+    {'id': 15, 'name': 'Magneta'},
+  ];
+
+  @Operation.get()
+  Future&lt;Response&gt; getAllHeroes() async {
+    return Response.ok(_heroes);
+  }
+
+  @Operation.get('id')
+  Future&lt;Response&gt; getHeroByID() async {
+    final id = int.parse(request.path.variables['id']);
+    final hero = _heroes.firstWhere((hero) =&gt; hero['id'] == id, orElse: () =&gt; null);
+    if (hero == null) {
+      return Response.notFound();
+    }
+
+    return Response.ok(hero);
+  }
+}
+</code></pre>
+<p>Notice that we didn't have to override <code>handle</code> in <code>ResourceController</code>. A <code>ResourceController</code> implements this method to call one of our operation methods. An operation method - like <code>getAllHeroes</code> and <code>getHeroByID</code> - must have an <code>Operation</code> annotation. The named constructor <code>Operation.get</code> means these methods get called when the request's method is GET. An operation method must also return a <code>Future&lt;Response&gt;</code>.</p>
+<p><code>getHeroByID</code>'s annotation also has an argument - the name of our path variable <code>id</code>. If that path variable exists in the request's path, <code>getHeroByID</code> will be called. If it doesn't exist, <code>getAllHeroes</code> will be called.</p>
+<div class="admonition tip">
+<p class="admonition-title">Naming Operation Methods</p>
+<p>The plain English phrase for an operation - like 'get hero by id' - is a really good name for an operation method and a good name will be useful when you generate OpenAPI documentation from your code.</p>
+</div>
+<p>Reload the application by hitting Ctrl-C in the terminal that ran <code>liquidart serve</code> and then run <code>liquidart serve</code> again. The browser application should still behave the same.</p>
+<div class="admonition tip">
+<p class="admonition-title">Browser Clients</p>
+<p>In addition to <code>curl</code>, you can create a SwaggerUI browser application that executes requests against your locally running application. In your project directory, run <code>liquidart document client</code> and it will generate a file named <code>client.html</code>. Open this file in your browser for a UI that constructs and executes requests that your application supports.</p>
+</div>
+<h2 id="request-binding">Request Binding</h2>
+<p>In our <code>getHeroByID</code> method, we make a dangerous assumption that the path variable 'id' can be parsed into an integer. If 'id' were something else, like a string, <code>int.parse</code> would throw an exception. When exceptions are thrown in operation methods, the controller catches it and sends a 500 Server Error response. 500s are bad, they don't tell the client what's wrong. A 404 Not Found is a better response here, but writing the code to catch that exception and create this response is cumbersome.</p>
+<p>Instead, we can rely on a feature of operation methods called request binding. An operation method can declare parameters and bind them to properties of the request. When our operation method gets called, it will be passed values from the request as arguments. Request bindings automatically parse values into the type of the parameter (and return a better error response if parsing fails). Change the method <code>getHeroByID()</code>:</p>
+<pre><code class="language-dart">@Operation.get('id')
+Future&lt;Response&gt; getHeroByID(@Bind.path('id') int id) async {
+  final hero = _heroes.firstWhere((hero) =&gt; hero['id'] == id, orElse: () =&gt; null);
+
+  if (hero == null) {
+    return Response.notFound();
+  }
+
+  return Response.ok(hero);
+}
+</code></pre>
+<p>The value of the path variable <code>id</code> will be parsed as an integer and be available to this method in the <code>id</code> parameter. The <code>@Bind</code> annotation on an operation method parameter tells Liquidart the value from the request we want bound. Using the named constructor <code>Bind.path</code> binds a path variable, and the name of that variable is indicated in the argument to this constructor.</p>
+<p>You can bind path variables, headers, query parameters and bodies. When binding path variables, we have to specify which path variable with the argument to <code>@Bind.path(pathVariableName)</code>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Bound Parameter Names</p>
+<p>The name of a bound parameter doesn't have to match the name of the path variable. We could have declared it as <code>@Bind.path('id') int heroID</code>. Only the argument to <code>Bind</code>'s constructor must match the actual name of the path variable. This is valuable for other types of bindings, like headers, that may contain characters that aren't valid Dart variable names, e.g. X-API-Key.</p>
+</div>
+<h2 id="the-more-you-know-multi-threading-and-application-state">The More You Know: Multi-threading and Application State</h2>
+<p>In this simple exercise, we used a constant list of heroes as our source of data. For a simple getting-your-feet-wet demo, this is fine. However, in a real application, you'd store this data in a database. That way you could add data to it and not risk losing it when the application was restarted.</p>
+<p>More generally, a web server should never hang on to data that can change. While previously just a best practice, stateless web servers are becoming a requirement with the prevalence of containerization and tools like Kubernetes. Liquidart makes it a bit easier to detect violations of this rule with its multi-threading strategy.</p>
+<p>When you run an Liquidart application, it creates multiple threads. Each of these threads has its own isolated heap in memory; meaning data that exists on one thread can't be accessed from other threads. In Dart, these isolated threads are called isolates.</p>
+<p>An instance of your application channel is created for each isolate. Each HTTP request is given to just one of the isolates to be handled. In a sense, your one application behaves the same as running your application on multiple servers behind a load balancer. (It also makes your application substantially faster.)</p>
+<p>If you are storing any data in your application, you'll find out really quickly. Why? A request that changes data will only change that data in one of your application's isolates. When you make a request to get that data again, its unlikely that you'll see the changes - another isolate with different data will probably handle that request.</p>
+<h1 id="next-chapter-reading-from-a-database"><a href="https://aldrinsartfactory.github.io/liquidart/tutorial/executing-queries/"><strong>Next Chapter: Reading from a Database</strong></a></h1>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        <a href="../../intellij/" class="md-footer__link md-footer__link--prev" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              IntelliJ IDEA Templates
+            </div>
+          </div>
+        </a>
+      
+      
+        <a href="../executing_queries/" class="md-footer__link md-footer__link--next" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              2. Reading from a Database
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Original documentation of Liquidart (previously Aqueduct) written by the StableKernel Team
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../../assets/javascripts/workers/search.fe42c31b.min.js", "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.4ea5477f.min.js"></script>
+      
+    
+  </body>
+</html>
