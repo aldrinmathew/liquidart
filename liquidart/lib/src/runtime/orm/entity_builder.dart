@@ -20,10 +20,10 @@ class EntityBuilder {
     name = _getName();
 
     entity = ManagedEntity(
-        name, type, MirrorSystem.getName(tableDefinitionType.simpleName))
+        name, type, MirrorSystem.getName(tableDefinitionType!.simpleName))
       ..validators = [];
 
-    runtime = ManagedEntityRuntimeImpl(instanceType, entity!);
+    runtime = ManagedEntityRuntimeImpl(instanceType!, entity!);
 
     properties = _getProperties();
     primaryKeyProperty = properties!.firstWhere(
@@ -34,8 +34,8 @@ class EntityBuilder {
     }
   }
 
-  final ClassMirror instanceType;
-  final ClassMirror tableDefinitionType;
+  final ClassMirror? instanceType;
+  final ClassMirror? tableDefinitionType;
   final Table? metadata;
 
   ManagedEntityRuntime? runtime;
@@ -48,10 +48,10 @@ class EntityBuilder {
   Map<String, ManagedAttributeDescription> attributes = {};
   Map<String, ManagedRelationshipDescription> relationships = {};
 
-  String get instanceTypeName => MirrorSystem.getName(instanceType.simpleName);
+  String get instanceTypeName => MirrorSystem.getName(instanceType!.simpleName);
 
   String get tableDefinitionTypeName =>
-      MirrorSystem.getName(tableDefinitionType.simpleName);
+      MirrorSystem.getName(tableDefinitionType!.simpleName);
 
   void compile(List<EntityBuilder> entityBuilders) {
     properties!.forEach((p) {
@@ -64,8 +64,8 @@ class EntityBuilder {
 
   void validate(List<EntityBuilder> entityBuilders) {
     // Check that we have a default constructor
-    if (!classHasDefaultConstructor(instanceType)) {
-      throw ManagedDataModelErrorImpl.noConstructor(instanceType);
+    if (!classHasDefaultConstructor(instanceType!)) {
+      throw ManagedDataModelErrorImpl.noConstructor(instanceType!);
     }
 
     // Check that we only have one primary key
@@ -152,9 +152,9 @@ class EntityBuilder {
         final propertyType = p!.getDeclarationType();
         if (propertyType.isSubtypeOf(reflectType(ManagedSet))) {
           return propertyType.typeArguments.first
-              .isSubtypeOf(foreignKey.parent!.tableDefinitionType);
+              .isSubtypeOf(foreignKey.parent!.tableDefinitionType!);
         }
-        return propertyType.isSubtypeOf(foreignKey.parent!.tableDefinitionType);
+        return propertyType.isSubtypeOf(foreignKey.parent!.tableDefinitionType!);
       };
     }
 
@@ -182,7 +182,7 @@ class EntityBuilder {
       return metadata!.name!;
     }
 
-    var declaredTableNameClass = classHierarchyForClass(tableDefinitionType)
+    var declaredTableNameClass = classHierarchyForClass(tableDefinitionType!)
         .firstWhere((cm) => cm!.staticMembers[#tableName] != null,
             orElse: () => null);
 
@@ -197,7 +197,7 @@ class EntityBuilder {
 
   List<PropertyBuilder> _getProperties() {
     final transientProperties = _getTransientAttributes();
-    final persistentProperties = instanceVariablesFromClass(tableDefinitionType)
+    final persistentProperties = instanceVariablesFromClass(tableDefinitionType!)
         .map((p) => PropertyBuilder(this, p))
         .toList();
 
@@ -207,13 +207,13 @@ class EntityBuilder {
   }
 
   Iterable<PropertyBuilder> _getTransientAttributes() {
-    final attributes = instanceType.declarations.values
+    final attributes = instanceType!.declarations.values
         .where(isTransientPropertyOrAccessor)
         .map((declaration) => PropertyBuilder(this, declaration))
         .toList();
 
-    if (instanceType.superclass!.mixin != instanceType.superclass) {
-      final mixin = instanceType.superclass!.mixin.declarations.values
+    if (instanceType!.superclass!.mixin != instanceType!.superclass) {
+      final mixin = instanceType!.superclass!.mixin.declarations.values
           .where(isTransientPropertyOrAccessor)
           .map((declaration) => PropertyBuilder(this, declaration))
           .toList();
@@ -238,12 +238,15 @@ class EntityBuilder {
   static ClassMirror getTableDefinitionForType(Type instanceType) {
     final ifNotFoundException = ManagedDataModelError(
         "Invalid instance type '$instanceType' '${reflectClass(instanceType).simpleName}' is not subclass of 'ManagedObject'.");
-
-    return classHierarchyForClass(reflectClass(instanceType))
-        .firstWhere(
-            (cm) => !cm!.superclass!.isSubtypeOf(reflectType(ManagedObject)),
-            orElse: () => throw ifNotFoundException)!
-        .typeArguments
-        .first as ClassMirror;
+    List<ClassMirror?> classHierarchyList = classHierarchyForClass(reflectClass(instanceType)).toList();
+    for(int i = 0; i < classHierarchyList.length; i++) {
+      if(classHierarchyList[i] != null) {
+        ClassMirror cm = classHierarchyList[i]!;
+        if(cm.superclass!.isSubtypeOf(reflectType(ManagedObject))) {
+          return cm.typeArguments.first as ClassMirror;
+        }
+      }
+    }
+    throw ifNotFoundException;
   }
 }

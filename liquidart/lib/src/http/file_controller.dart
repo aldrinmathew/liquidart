@@ -5,8 +5,7 @@ import 'package:liquidart/src/openapi/openapi.dart';
 import 'package:path/path.dart' as path;
 import 'http.dart';
 
-typedef _OnFileNotFound = FutureOr<Response> Function(
-    FileController controller, Request req);
+typedef _OnFileNotFound = FutureOr<Response> Function(FileController controller, Request req);
 
 /// Serves files from a directory on the filesystem.
 ///
@@ -40,8 +39,7 @@ class FileController extends Controller {
   ///
   /// Note that the 'Last-Modified' header is always applied to a response served from this instance.
   FileController(String pathOfDirectoryToServe,
-      {FutureOr<Response> onFileNotFound(
-          FileController controller, Request req)?})
+      {FutureOr<Response> onFileNotFound(FileController controller, Request req)?})
       : _servingDirectory = Uri.directory(pathOfDirectoryToServe),
         _onFileNotFound = onFileNotFound!;
 
@@ -137,11 +135,17 @@ class FileController extends Controller {
   ///
   /// Evaluates each policy added by [addCachePolicy] against the [path] and
   /// returns it if exists.
-  CachePolicy cachePolicyForPath(String path) {
-    return _policyPairs
-        .firstWhere((pair) => pair!.shouldApplyToPath(path),
-            orElse: () => null)!
-        .policy;
+  CachePolicy? cachePolicyForPath(String path) {
+    List<_PolicyPair?> policyPairsList = _policyPairs;
+    for (int i = 0; i < policyPairsList.length; i++) {
+      _PolicyPair? pair = policyPairsList[i];
+      if (pair != null) {
+        if(pair.shouldApplyToPath(path)) {
+          return pair.policy;
+        }
+      }
+    }
+    return null;
   }
 
   @override
@@ -174,8 +178,7 @@ class FileController extends Controller {
     }
 
     var lastModifiedDate = file.lastModifiedSync();
-    var ifModifiedSince =
-        request.raw!.headers.value(HttpHeaders.ifModifiedSinceHeader);
+    var ifModifiedSince = request.raw!.headers.value(HttpHeaders.ifModifiedSinceHeader);
     if (ifModifiedSince != null) {
       var date = HttpDate.parse(ifModifiedSince);
       if (!lastModifiedDate.isAfter(date)) {
@@ -211,7 +214,7 @@ class FileController extends Controller {
     };
   }
 
-  CachePolicy _policyForFile(File file) => cachePolicyForPath(file.path);
+  CachePolicy? _policyForFile(File file) => cachePolicyForPath(file.path);
 }
 
 typedef _ShouldApplyToPath = bool Function(String path);

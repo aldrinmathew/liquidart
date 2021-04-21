@@ -97,11 +97,16 @@ class TestModelController extends QueryController<TestModel> {
       statusCode = 400;
     }
 
-    final comparisonMatcher = (query as QueryMixin)
-        .expressions
-        .firstWhere((expr) => expr.keyPath.path.first.name == "id")
-        .expression as ComparisonExpression;
-    if (comparisonMatcher.operator != PredicateOperator.equalTo ||
+    ComparisonExpression? comparisonMatcher;
+    List<QueryExpression<dynamic, dynamic>> expressionsList = (query as QueryMixin).expressions;
+    for(int i = 0; i < expressionsList.length; i++) {
+      QueryExpression<dynamic, dynamic> expr = expressionsList[i];
+      if(expr.keyPath.path.first.name == 'id') {
+        comparisonMatcher = expr.expression as ComparisonExpression;
+      }
+    }
+    
+    if (comparisonMatcher!.operator != PredicateOperator.equalTo ||
         comparisonMatcher.value != id) {
       statusCode = 400;
     }
@@ -127,11 +132,15 @@ class TestModelController extends QueryController<TestModel> {
       statusCode = 400;
     }
 
-    final comparisonMatcher = (query as QueryMixin)
-        .expressions
-        .firstWhere((expr) => expr.keyPath.path.first.name == "id")
-        .expression as ComparisonExpression;
-    if (comparisonMatcher.operator != PredicateOperator.equalTo ||
+    ComparisonExpression? comparisonMatcher;
+    List<QueryExpression<dynamic, dynamic>> expressionsList = (query as QueryMixin).expressions;
+    for(int i = 0; i < expressionsList.length; i++) {
+      QueryExpression<dynamic, dynamic> expr = expressionsList[i];
+      if(expr.keyPath.path.first.name == 'id') {
+        comparisonMatcher = expr.expression as ComparisonExpression;
+      }
+    }
+    if (comparisonMatcher!.operator != PredicateOperator.equalTo ||
         comparisonMatcher.value != id) {
       statusCode = 400;
     }
@@ -184,11 +193,15 @@ class StringController extends QueryController<StringModel> {
 
   @Operation.get("id")
   Future<Response> get(@Bind.path("id") String id) async {
-    final comparisonMatcher = (query as QueryMixin)
-        .expressions
-        .firstWhere((expr) => expr.keyPath.path.first.name == "foo")
-        .expression as StringExpression;
-    return Response.ok(comparisonMatcher.value);
+    StringExpression? comparisonMatcher;
+    List<QueryExpression<dynamic, dynamic>> expressionsList = (query as QueryMixin).expressions;
+    for(int i = 0; i < expressionsList.length; i++) {
+      QueryExpression<dynamic, dynamic> expr = expressionsList[i];
+      if(expr.keyPath.path.first.name == 'foo') {
+        comparisonMatcher = expr.expression as StringExpression;
+      }
+    }
+    return Response.ok(comparisonMatcher!.value);
   }
 }
 

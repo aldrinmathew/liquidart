@@ -119,9 +119,14 @@ class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
 
   ResourceControllerParameter getParameterForVariable(VariableMirror mirror,
       {required bool isRequired}) {
-    final metadata = mirror.metadata
-        .firstWhere((im) => im.reflectee is Bind)
-        .reflectee as Bind;
+    late Bind metadata;
+    List<InstanceMirror> metadataList = mirror.metadata;
+    for(int i = 0; i < metadataList.length; i++) {
+      InstanceMirror im = metadataList[i];
+      if(im.reflectee is Bind) {
+        metadata = im.reflectee as Bind;
+      }
+    }
 
     if (mirror.type is! ClassMirror) {
       throw _makeError(mirror, "Cannot bind dynamic parameters.");

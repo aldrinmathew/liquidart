@@ -46,7 +46,7 @@ class Response implements RequestOrResponse {
   ///
   /// Where [lastModified] is the last modified date of the resource
   /// and [cachePolicy] is the same policy as applied when this resource was first fetched.
-  Response.notModified(DateTime lastModified, CachePolicy cachePolicy) {
+  Response.notModified(DateTime lastModified, CachePolicy? cachePolicy) {
     statusCode = HttpStatus.notModified;
     headers = {HttpHeaders.lastModifiedHeader: HttpDate.format(lastModified)};
     this.cachePolicy = cachePolicy;

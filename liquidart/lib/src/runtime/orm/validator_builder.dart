@@ -34,7 +34,7 @@ class ValidatorBuilder {
             "Invalid '@Validate' on property '${property!.parent!.name}.${property!.name}'. Validations cannot be performed on has-one or has-many relationships.");
       }
 
-      type = property!.relatedProperty!.parent!.instanceType.reflectedType;
+      type = property!.relatedProperty!.parent!.instanceType!.reflectedType;
       prop = property!.relatedProperty!.parent!.primaryKeyProperty;
     }
 

@@ -132,7 +132,7 @@ class PropertyBuilder {
     validators.forEach((v) => v.link(others));
     if (isRelationship) {
       var destinationEntity =
-          others.firstWhere((e) => e == relatedProperty!.parent!.entity);
+          others.firstWhere((e) => e == relatedProperty!.parent!.entity, orElse: () => null);
 
       final dartType =
           ((declaration as VariableMirror).type as ClassMirror).reflectedType;
@@ -243,7 +243,7 @@ class PropertyBuilder {
     }
 
     final possibleEntities = builders.where((e) {
-      return e.tableDefinitionType.isSubtypeOf(expectedInstanceType);
+      return e.tableDefinitionType!.isSubtypeOf(expectedInstanceType);
     }).toList();
 
     if (possibleEntities.length > 1) {
