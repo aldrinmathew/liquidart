@@ -1,3 +1,23 @@
+## 5.0.0-b6
+- Fixed Dart "firstWhere orElse null" issue by replacing it with for loops. Fixed some more similar errors that were not seen previously.
+- Updated Dependencies, Rectifying some null check errors
+- Migration to Dart Null Safety
+- Migrated all packages that liquidart depended on, to Null Safety (including liquiart_test)
+- Had 6000+ Errors uring Migration
+- Took 4 days of work to resolve them all and migrate the framework to Null Safety.
+- I also had to migrate all the packages that liquidart relied on, before migrating liquidart.
+- Huge Changes and Code Refactors.
+
+## 5.0.0-b6
+- Fixed Dart "firstWhere orElse null" issue by replacing it with for loops.
+- Updated Dependencies, Rectifying some null check errors
+- Migration to Dart Null Safety
+- Migrated all packages that liquidart depended on, to Null Safety (including liquiart_test)
+- Had 6000+ Errors uring Migration
+- Took 4 days of work to resolve them all and migrate the framework to Null Safety.
+- I also had to migrate all the packages that liquidart relied on, before migrating liquidart.
+- Huge Changes and Code Refactors.
+
 ## 5.0.0-b5
 - Updated Dependencies, Rectifying some null check errors
 - Migration to Dart Null Safety

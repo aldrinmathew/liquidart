@@ -41,10 +41,15 @@ Operation? getMethodOperationMetadata(DeclarationMirror m) {
   if (!method.isRegularMethod || method.isStatic) {
     return null;
   }
+  Operation? metadata;
   final List<InstanceMirror?> metadataList = method.metadata;
-  final metadata = metadataList
-      .firstWhere((im) => im!.reflectee is Operation, orElse: () => null)!
-      .reflectee as Operation;
-
+  for(int i = 0; i < metadataList.length; i++) {
+    if(metadataList[i]!= null) {
+      InstanceMirror im = metadataList[i]!;
+      if(im.reflectee is Operation) {
+        metadata = im.reflectee as Operation;
+      }
+    }
+  }
   return metadata;
 }
