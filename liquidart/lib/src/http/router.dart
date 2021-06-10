@@ -107,9 +107,9 @@ class Router extends Controller {
     try {
       var requestURISegmentIterator = req.raw.uri.pathSegments.iterator;
 
-      if (req.raw.uri.pathSegments.isEmpty) {
-        requestURISegmentIterator = [""].iterator;
-      }
+      // if (req.raw.uri.pathSegments.isEmpty) {
+      //   requestURISegmentIterator = [""].iterator;
+      // }
 
       for (var i = 0; i < _basePathSegments!.length; i++) {
         requestURISegmentIterator.moveNext();

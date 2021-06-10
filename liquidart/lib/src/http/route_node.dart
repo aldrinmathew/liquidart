@@ -154,7 +154,7 @@ class RouteNode {
   // Valid if has child that is a take all (*) segment.
   RouteNode? takeAllChild;
 
-  RouteNode nodeForPathSegments(
+  RouteNode? nodeForPathSegments(
       Iterator<String> requestSegments, RequestPath path) {
     if (!requestSegments.moveNext()) {
       return this;
@@ -181,7 +181,7 @@ class RouteNode {
 
     // If this is null, then we return null from this method
     // and the router knows we didn't find a match.
-    return takeAllChild!;
+    return takeAllChild;
   }
 
   @override
