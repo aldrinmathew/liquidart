@@ -12,27 +12,27 @@ import 'package:liquidart/src/dev/helpers.dart';
 
 void main() {
   Controller.letUncaughtExceptionsEscape = true;
-  ManagedContext? context;
-  HttpServer? server;
+  late ManagedContext context;
+  late HttpServer server;
 
   setUpAll(() async {
     context = await contextWithModels([TestModel, StringModel]);
 
     server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8888);
     var router = Router();
-    router.route("/users/[:id]").link(() => TestModelController(context!));
-    router.route("/string/:id").link(() => StringController(context!));
+    router.route("/users/[:id]").link(() => TestModelController(context));
+    router.route("/string/:id").link(() => StringController(context));
     router.didAddToChannel();
 
-    server!.listen((req) async {
+    server.listen((req) async {
       // ignore: unawaited_futures
       router.receive(Request(req));
     });
   });
 
   tearDownAll(() async {
-    await context!.close();
-    await server?.close(force: true);
+    await context.close();
+    await server.close(force: true);
   });
 
   test("Request with no path parameters OK", () async {
@@ -65,8 +65,7 @@ void main() {
   });
 
   test("Non-integer, oddly named identifier", () async {
-    var response =
-        await http.get(Uri.parse("http://localhost:8888/string/bar"));
+    var response = await http.get(Uri.parse("http://localhost:8888/string/bar"));
     expect(response.body, '"bar"');
   });
 }
@@ -82,7 +81,7 @@ class TestModelController extends QueryController<TestModel> {
       statusCode = 400;
     }
 
-    if (query!.values!.backing.contents!.isNotEmpty) {
+    if (query!.values?.backing != null && query!.values!.backing.contents.isNotEmpty) {
       statusCode = 400;
     }
 
@@ -97,21 +96,16 @@ class TestModelController extends QueryController<TestModel> {
       statusCode = 400;
     }
 
-    ComparisonExpression? comparisonMatcher;
-    List<QueryExpression<dynamic, dynamic>> expressionsList = (query as QueryMixin).expressions;
-    for(int i = 0; i < expressionsList.length; i++) {
-      QueryExpression<dynamic, dynamic> expr = expressionsList[i];
-      if(expr.keyPath.path.first.name == 'id') {
-        comparisonMatcher = expr.expression as ComparisonExpression;
-      }
-    }
-    
-    if (comparisonMatcher!.operator != PredicateOperator.equalTo ||
+    final comparisonMatcher = (query as QueryMixin)
+        .expressions
+        .firstWhere((expr) => expr.keyPath.path.first!.name == "id")
+        .expression as ComparisonExpression;
+    if (comparisonMatcher.operator != PredicateOperator.equalTo ||
         comparisonMatcher.value != id) {
       statusCode = 400;
     }
 
-    if (query!.values!.backing.contents!.isNotEmpty) {
+    if (query!.values?.backing != null && query!.values!.backing.contents.isNotEmpty) {
       statusCode = 400;
     }
 
@@ -125,22 +119,18 @@ class TestModelController extends QueryController<TestModel> {
     if (query!.values == null) {
       statusCode = 400;
     }
-    if (query!.values!.name != "joe") {
+    if (query!.values?.name != "joe") {
       statusCode = 400;
     }
     if (query == null) {
       statusCode = 400;
     }
 
-    ComparisonExpression? comparisonMatcher;
-    List<QueryExpression<dynamic, dynamic>> expressionsList = (query as QueryMixin).expressions;
-    for(int i = 0; i < expressionsList.length; i++) {
-      QueryExpression<dynamic, dynamic> expr = expressionsList[i];
-      if(expr.keyPath.path.first.name == 'id') {
-        comparisonMatcher = expr.expression as ComparisonExpression;
-      }
-    }
-    if (comparisonMatcher!.operator != PredicateOperator.equalTo ||
+    final comparisonMatcher = (query as QueryMixin)
+        .expressions
+        .firstWhere((expr) => expr.keyPath.path.first!.name == "id")
+        .expression as ComparisonExpression;
+    if (comparisonMatcher.operator != PredicateOperator.equalTo ||
         comparisonMatcher.value != id) {
       statusCode = 400;
     }
@@ -149,7 +139,7 @@ class TestModelController extends QueryController<TestModel> {
       statusCode = 400;
     }
 
-    if (query!.values!.name != "joe") {
+    if (query!.values?.name != "joe") {
       statusCode = 400;
     }
 
@@ -162,7 +152,7 @@ class TestModelController extends QueryController<TestModel> {
     if (query!.values == null) {
       statusCode = 400;
     }
-    if (query!.values!.name != "joe") {
+    if (query!.values?.name != "joe") {
       statusCode = 400;
     }
     if (query == null) {
@@ -193,15 +183,11 @@ class StringController extends QueryController<StringModel> {
 
   @Operation.get("id")
   Future<Response> get(@Bind.path("id") String id) async {
-    StringExpression? comparisonMatcher;
-    List<QueryExpression<dynamic, dynamic>> expressionsList = (query as QueryMixin).expressions;
-    for(int i = 0; i < expressionsList.length; i++) {
-      QueryExpression<dynamic, dynamic> expr = expressionsList[i];
-      if(expr.keyPath.path.first.name == 'foo') {
-        comparisonMatcher = expr.expression as StringExpression;
-      }
-    }
-    return Response.ok(comparisonMatcher!.value);
+    final comparisonMatcher = (query as QueryMixin)
+        .expressions
+        .firstWhere((expr) => expr.keyPath.path.first!.name == "foo")
+        .expression as StringExpression;
+    return Response.ok(comparisonMatcher.value);
   }
 }
 

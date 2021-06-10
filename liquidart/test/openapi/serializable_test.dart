@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 import 'package:liquidart/liquidart.dart';
 
 void main() {
-  APIDocumentContext? ctx;
+  late APIDocumentContext ctx;
   setUp(() {
     ctx = APIDocumentContext(APIDocument()
       ..info = APIInfo("x", "1.0.0")
@@ -16,12 +16,12 @@ void main() {
 
   tearDown(() async {
     // Just in case the test didn't clear these
-    await ctx!.finalize();
+    await ctx.finalize();
   });
 
   test("Serializable contains properties for each declared field", () async {
-    final doc = A().documentSchema(ctx!);
-    await ctx!.finalize();
+    final doc = A().documentSchema(ctx);
+    await ctx.finalize();
 
     expect(doc.properties!.length, 2);
 
@@ -33,7 +33,7 @@ void main() {
   });
 
   test("Nested serializable is documented", () async {
-    final doc = A().documentSchema(ctx!);
+    final doc = A().documentSchema(ctx);
     expect(doc.properties!["b"]!.properties!.length, 1);
     expect(doc.properties!["b"]!.properties!["y"]!.type, APIType.string);
   });
@@ -41,8 +41,8 @@ void main() {
   test(
       "If Serializable cannot be documented, it still allows doc generation but shows error in document",
       () async {
-    final doc = FailsToDocument().documentSchema(ctx!);
-    await ctx!.finalize();
+    final doc = FailsToDocument().documentSchema(ctx);
+    await ctx.finalize();
 
     expect(doc.title, "FailsToDocument");
     expect(doc.description, contains("HttpServer"));
@@ -51,32 +51,22 @@ void main() {
   });
 
   test("Serializable can override static document method", () async {
-    final doc = OverrideDocument().documentSchema(ctx!);
-    await ctx!.finalize();
+    final doc = OverrideDocument().documentSchema(ctx);
+    await ctx.finalize();
 
     expect(doc.properties!["k"], isNotNull);
   });
 
-  test(
-      "Can bind a Serializable implementor to a resource controller method and it auto-documents",
-      () async {
+  test("Can bind a Serializable implementor to a resource controller method and it auto-documents", () async {
     final c = BoundBodyController();
     c.didAddToChannel();
     c.restore(c.recycledState);
 
-    c.documentComponents(ctx!);
-    final op = c.documentOperations(ctx!, "/", APIPath.empty());
-    await ctx!.finalize();
+    c.documentComponents(ctx);
+    final op = c.documentOperations(ctx, "/", APIPath.empty())!;
+    await ctx.finalize();
 
-    expect(
-        op["post"]!
-            .requestBody!
-            .content!["application/json"]!
-            .schema!
-            .referenceURI
-            .pathSegments
-            .last,
-        "BoundBody");
+    expect(op["post"]!.requestBody!.content!["application/json"]!.schema!.referenceURI.pathSegments.last, "BoundBody");
   });
 }
 
@@ -118,7 +108,8 @@ class FailsToDocument extends Serializable {
 
 class OverrideDocument extends Serializable {
   @override
-  APISchemaObject documentSchema(APIDocumentContext context) {
+  APISchemaObject documentSchema(
+      APIDocumentContext context) {
     return APISchemaObject.object({"k": APISchemaObject.string()});
   }
 
@@ -128,6 +119,7 @@ class OverrideDocument extends Serializable {
   @override
   void readFromMap(Map<String, dynamic> requestBody) {}
 }
+
 
 class BoundBody extends Serializable {
   int? x;

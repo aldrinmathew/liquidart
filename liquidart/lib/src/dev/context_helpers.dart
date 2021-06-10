@@ -33,7 +33,7 @@ List<String> commandsForModelInstanceTypes(List<Type> instanceTypes,
 }
 
 Future dropSchemaTables(Schema schema, PersistentStore store) async {
-  final tables = List<SchemaTable>.from(schema.tables!);
+  final tables = List<SchemaTable>.from(schema.tables);
   while (tables.isNotEmpty) {
     try {
       await store.execute("DROP TABLE IF EXISTS ${tables.last.name}");

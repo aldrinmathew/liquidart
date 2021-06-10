@@ -31,7 +31,7 @@ class Response implements RequestOrResponse {
       {dynamic body, Map<String, dynamic>? headers})
       : this(
             HttpStatus.created,
-            _headersWith(headers!, {HttpHeaders.locationHeader: location}),
+            _headersWith(headers, {HttpHeaders.locationHeader: location}),
             body);
 
   /// Represents a 202 response.

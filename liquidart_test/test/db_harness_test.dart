@@ -58,11 +58,11 @@ class HarnessSubclass extends TestHarness<Channel> with TestHarnessORMMixin {
 
   @override
   Future seed() async {
-    await Query.insertObject(context, Model()..name = "bob");
+    await Query.insertObject(context!, Model()..name = "bob");
   }
 
   @override
-  ManagedContext get context => channel.context!;
+  ManagedContext? get context => channel.context;
 }
 
 class _Model {

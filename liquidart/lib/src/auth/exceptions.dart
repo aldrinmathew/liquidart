@@ -33,16 +33,15 @@ class AuthServerException implements Exception {
         return "server_error";
       case AuthRequestError.temporarilyUnavailable:
         return "temporarily_unavailable";
-      default:
-        return null;
     }
+    // return null;
   }
 
-  AuthRequestError? reason;
+  AuthRequestError reason;
   AuthClient? client;
 
   String? get reasonString {
-    return errorString(reason!);
+    return errorString(reason);
   }
 
   @override

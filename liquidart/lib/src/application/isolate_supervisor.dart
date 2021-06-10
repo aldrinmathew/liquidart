@@ -35,7 +35,7 @@ class ApplicationIsolateSupervisor {
   final List<MessageHubMessage> _pendingMessageQueue = [];
 
   bool get _isLaunching => _launchCompleter != null;
-  SendPort? _serverSendPort;
+  late SendPort _serverSendPort;
   Completer? _launchCompleter;
   Completer? _stopCompleter;
 
@@ -67,7 +67,7 @@ class ApplicationIsolateSupervisor {
     _stopCompleter = Completer();
     logger.fine(
         "ApplicationIsolateSupervisor($identifier).stop sending stop to supervised isolate");
-    _serverSendPort!.send(messageKeyStop);
+    _serverSendPort.send(messageKeyStop);
 
     try {
       await _stopCompleter!.future.timeout(const Duration(seconds: 5));
@@ -119,7 +119,7 @@ class ApplicationIsolateSupervisor {
     supervisingApplication.supervisors
         .where((sup) => sup != this)
         .forEach((supervisor) {
-      supervisor._serverSendPort!.send(message);
+      supervisor._serverSendPort.send(message);
     });
   }
 

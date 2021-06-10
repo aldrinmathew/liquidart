@@ -11,7 +11,7 @@ import 'package:test/test.dart';
 
 void main() {
   group("Cooperation", () {
-    PersistentStore? store;
+    late PersistentStore store;
 
     setUp(() {
       store = PostgreSQLPersistentStore(
@@ -19,7 +19,7 @@ void main() {
     });
 
     tearDown(() async {
-      await store!.close();
+      await store.close();
     });
 
     test(
@@ -39,22 +39,24 @@ void main() {
       ]);
 
       var initialBuilder =
-          SchemaBuilder.toSchema(store!, schema, isTemporary: true);
+          SchemaBuilder.toSchema(store, schema, isTemporary: true);
       for (var cmd in initialBuilder.commands) {
-        await store!.execute(cmd);
+        await store.execute(cmd);
       }
 
       var mig = Migration1();
       mig.version = 1;
-      final outSchema = await store!.upgrade(schema, [mig], temporary: true);
+      final outSchema = await (store.upgrade(schema, [mig], temporary: true) as FutureOr<Schema>);
 
       // 'Sync up' that schema to compare it
-      final tableToKeep = schema.tableForName("tableToKeep");
-      tableToKeep!.addColumn(SchemaColumn(
+      final tableToKeep = schema.tableForName("tableToKeep")!;
+      tableToKeep.addColumn(SchemaColumn(
           "addedColumn", ManagedPropertyType.integer,
           defaultValue: "2"));
-      tableToKeep.removeColumn(tableToKeep.columnForName("columnToDelete"));
-      tableToKeep.columnForName("columnToEdit")!.defaultValue = "'foo'";
+      tableToKeep.removeColumn(tableToKeep.columnForName("columnToDelete")!);
+      tableToKeep
+          .columnForName("columnToEdit")!
+          .defaultValue = "'foo'";
 
       schema.removeTable(schema.tableForName("tableToDelete")!);
 
@@ -64,7 +66,7 @@ void main() {
 
       expect(outSchema.differenceFrom(schema).hasDifferences, false);
 
-      var insertResults = await store!.execute(
+      var insertResults = await store.execute(
           "INSERT INTO tableToKeep (columnToEdit) VALUES ('1') RETURNING columnToEdit, addedColumn");
       expect(insertResults, [
         ['1', 2]
@@ -137,20 +139,20 @@ class Migration1 extends Migration { @override Future upgrade() async {} @overri
 class Migration1 extends Migration {
   @override
   Future upgrade() async {
-    database!.createTable(SchemaTable("foo", [
+    database.createTable(SchemaTable("foo", [
       SchemaColumn("foobar", ManagedPropertyType.integer, isIndexed: true)
     ]));
 
     //database.renameTable(currentSchema["tableToRename"], "renamedTable");
-    database!.deleteTable("tableToDelete");
+    database.deleteTable("tableToDelete");
 
-    database!.addColumn(
+    database.addColumn(
         "tableToKeep",
         SchemaColumn("addedColumn", ManagedPropertyType.integer,
             defaultValue: "2"));
-    database!.deleteColumn("tableToKeep", "columnToDelete");
+    database.deleteColumn("tableToKeep", "columnToDelete");
     //database.renameColumn()
-    database!.alterColumn("tableToKeep", "columnToEdit", (col) {
+    database.alterColumn("tableToKeep", "columnToEdit", (col) {
       col.defaultValue = "'foo'";
     });
   }
@@ -166,14 +168,14 @@ class MockMigratable extends CLICommand
     with CLIDatabaseManagingCommand, CLIProject {
   MockMigratable(this.projectDirectory) {
     migrationDirectory =
-        Directory.fromUri(projectDirectory!.uri.resolve("migrations"));
+        Directory.fromUri(projectDirectory.uri.resolve("migrations"));
   }
 
   @override
   Directory? migrationDirectory;
 
   @override
-  Directory? projectDirectory;
+  Directory projectDirectory;
 
   @override
   Future<int> handle() async => 0;

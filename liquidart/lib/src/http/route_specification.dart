@@ -11,7 +11,7 @@ class RouteSpecification {
   RouteSpecification(String patternString) {
     segments = _splitPathSegments(patternString);
     variableNames =
-        segments.where((e) => e.isVariable).map((e) => e.variableName).toList();
+        segments!.where((e) => e.isVariable).map((e) => e.variableName).toList();
   }
 
   static List<RouteSpecification> specificationsForRoutePattern(
@@ -22,16 +22,16 @@ class RouteSpecification {
   }
 
   /// A list of this specification's [RouteSegment]s.
-  List<RouteSegment> segments = [];
+  List<RouteSegment>? segments;
 
   /// A list of all variables in this route.
-  List<String?> variableNames = [];
+  late List<String?> variableNames;
 
   /// A reference back to the [Controller] to be used when this specification is matched.
   Controller? controller;
 
   @override
-  String toString() => segments.join("/");
+  String toString() => segments!.join("/");
 }
 
 List<String> _pathsFromRoutePattern(final String inputPattern) {

@@ -11,7 +11,7 @@ import 'package:liquidart/src/cli/command.dart';
 
 class CLIAuthScopeClient extends CLICommand
     with CLIDatabaseConnectingCommand, CLIDatabaseManagingCommand, CLIProject {
-  ManagedContext? context;
+  late ManagedContext context;
 
   @Option("id", abbr: "i", help: "The client ID to insert.")
   String? get clientID => decode("id");
@@ -45,12 +45,12 @@ class CLIAuthScopeClient extends CLICommand
     var scopingClient = AuthClient.public(clientID!,
         allowedScopes: scopes?.map((s) => AuthScope(s)).toList());
 
-    var query = Query<ManagedAuthClient>(context!)
+    var query = Query<ManagedAuthClient>(context)
       ..where((o) => o.id).equalTo(clientID)
-      ..values!.allowedScope =
+      ..values?.allowedScope =
           scopingClient.allowedScopes?.map((s) => s.toString()).join(" ");
 
-    dynamic? result = await query.updateOne();
+    var result = await query.updateOne();
     if (result == null) {
       displayError("Client ID '$clientID' does not exist.");
       return 1;
@@ -64,7 +64,7 @@ class CLIAuthScopeClient extends CLICommand
 
   @override
   Future cleanup() async {
-    await context?.close();
+    await context.close();
   }
 
   @override

@@ -26,18 +26,16 @@ class QueryException<T> implements HandlerException {
   final T? underlyingException;
 
   /// The type of event that caused this exception.
-  final QueryExceptionEvent? event;
+  final QueryExceptionEvent event;
 
   final List<String>? offendingItems;
 
   @override
   Response get response {
-    return Response(
-        _getStatus(event!), null, _getBody(message!, offendingItems!));
+    return Response(_getStatus(event), null, _getBody(message, offendingItems));
   }
 
-  static Map<String, String> _getBody(
-      String? message, List<String>? offendingItems) {
+  static Map<String, String> _getBody(String? message, List<String>? offendingItems) {
     var body = {
       "error": message ?? "query failed",
     };
@@ -57,9 +55,12 @@ class QueryException<T> implements HandlerException {
         return 503;
       case QueryExceptionEvent.conflict:
         return 409;
+      
       default:
         return 500;
     }
+
+    
   }
 
   @override

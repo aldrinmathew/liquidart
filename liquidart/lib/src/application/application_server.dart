@@ -20,23 +20,22 @@ class ApplicationServer {
   ///
   /// You should not need to invoke this method directly.
   ApplicationServer(this.channelType, this.options, this.identifier) {
-    channel = (RuntimeContext.current[channelType] as ChannelRuntime)
-        .instantiateChannel()
-          ..server = this
-          ..options = options!;
+    channel = (RuntimeContext.current[channelType] as ChannelRuntime).instantiateChannel()
+      ..server = this
+      ..options = options;
   }
 
   /// The configuration this instance used to start its [channel].
-  ApplicationOptions? options;
+  ApplicationOptions options;
 
   /// The underlying [HttpServer].
-  HttpServer? server;
+  late HttpServer server;
 
   /// The instance of [ApplicationChannel] serving requests.
-  ApplicationChannel? channel;
+  late ApplicationChannel channel;
 
   /// The cached entrypoint of [channel].
-  Controller? entryPoint;
+  late Controller entryPoint;
 
   final Type channelType;
 
@@ -64,26 +63,26 @@ class ApplicationServer {
   Future start({bool shareHttpServer = false}) async {
     logger.fine("ApplicationServer($identifier).start entry");
 
-    await channel!.prepare();
+    await channel.prepare();
 
-    entryPoint = channel!.entryPoint;
-    entryPoint!.didAddToChannel();
+    entryPoint = channel.entryPoint;
+    entryPoint.didAddToChannel();
 
     logger.fine("ApplicationServer($identifier).start binding HTTP");
-    final SecurityContext? securityContext = channel!.securityContext;
+    final securityContext = channel.securityContext;
     if (securityContext != null) {
       _requiresHTTPS = true;
 
       server = await HttpServer.bindSecure(
-          options!.address, options!.port, securityContext,
-          requestClientCertificate: options!.isUsingClientCertificate,
-          v6Only: options!.isIpv6Only,
+          options.address, options.port, securityContext,
+          requestClientCertificate: options.isUsingClientCertificate,
+          v6Only: options.isIpv6Only,
           shared: shareHttpServer);
     } else {
       _requiresHTTPS = false;
 
-      server = await HttpServer.bind(options!.address, options!.port,
-          v6Only: options!.isIpv6Only, shared: shareHttpServer);
+      server = await HttpServer.bind(options.address, options.port,
+          v6Only: options.isIpv6Only, shared: shareHttpServer);
     }
 
     logger.fine("ApplicationServer($identifier).start bound HTTP");
@@ -93,9 +92,9 @@ class ApplicationServer {
   /// Closes this HTTP server and channel.
   Future close() async {
     logger.fine("ApplicationServer($identifier).close Closing HTTP listener");
-    await server?.close(force: true);
+    await server.close(force: true);
     logger.fine("ApplicationServer($identifier).close Closing channel");
-    await channel?.close();
+    await channel.close();
 
     // This is actually closed by channel.messageHub.close, but this shuts up the analyzer.
     hubSink?.close();
@@ -106,12 +105,12 @@ class ApplicationServer {
   ///
   /// [ApplicationChannel.willStartReceivingRequests] is invoked after this opening has completed.
   Future didOpen() async {
-    server!.serverHeader = "liquidart/$identifier";
+    server.serverHeader = "liquidart/$identifier";
 
     logger.fine("ApplicationServer($identifier).didOpen start listening");
-    server!.map((baseReq) => Request(baseReq)).listen(entryPoint!.receive);
+    server.map((baseReq) => Request(baseReq)).listen(entryPoint.receive);
 
-    channel!.willStartReceivingRequests();
+    channel.willStartReceivingRequests();
     logger.info("Server liquidart/$identifier started.");
   }
 

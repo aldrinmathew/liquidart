@@ -20,7 +20,7 @@ class ApplicationOptions {
   /// 'any' will be any IPv6 address, otherwise, it will be any IPv4 or IPv6 address.
   ///
   /// This value may be an [InternetAddress] or a [String].
-  dynamic? address;
+  dynamic address;
 
   /// The port to listen for HTTP requests on.
   ///

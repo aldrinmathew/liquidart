@@ -9,8 +9,7 @@ import 'row_instantiator.dart';
 
 class PostgresQueryBuilder extends TableBuilder {
   PostgresQueryBuilder(PostgresQuery query) : super(query) {
-    (query.valueMap ?? query.values.backing.contents!)
-        .forEach(addColumnValueBuilder);
+    (query.valueMap ?? query.values.backing.contents).forEach(addColumnValueBuilder);
 
     columnValueBuilders.forEach((cv) {
       variables[cv.sqlColumnName(withPrefix: valueKeyPrefix)] = cv.value;
@@ -21,25 +20,25 @@ class PostgresQueryBuilder extends TableBuilder {
 
   static const String valueKeyPrefix = "v_";
 
-  final Map<String, dynamic> variables = {};
+  final Map<String?, dynamic> variables = {};
 
   final List<ColumnValueBuilder> columnValueBuilders = [];
 
-  bool get containsJoins => returning.reversed.any((p) => p is TableBuilder);
+  bool get containsJoins => returning!.reversed.any((p) => p is TableBuilder);
 
   String? get sqlWhereClause {
     if (predicate?.format == null) {
       return null;
     }
-    if (predicate!.format!.isEmpty) {
+    if (predicate!.format.isEmpty) {
       return null;
     }
     return predicate!.format;
   }
 
-  void addColumnValueBuilder(String key, dynamic value) {
-    final builder = _createColumnValueBuilder(key, value);
-    columnValueBuilders.add(builder!);
+  void addColumnValueBuilder(String? key, dynamic value) {
+    final builder = _createColumnValueBuilder(key, value)!;
+    columnValueBuilders.add(builder);
     variables[builder.sqlColumnName(withPrefix: valueKeyPrefix)] =
         builder.value;
   }
@@ -49,7 +48,7 @@ class PostgresQueryBuilder extends TableBuilder {
     return instantiator.instancesForRows<T>(rows);
   }
 
-  ColumnValueBuilder? _createColumnValueBuilder(String key, dynamic value) {
+  ColumnValueBuilder? _createColumnValueBuilder(String? key, dynamic value) {
     var property = entity!.properties[key];
     if (property == null) {
       throw ArgumentError("Invalid query. Column '$key' does "
@@ -64,12 +63,12 @@ class PostgresQueryBuilder extends TableBuilder {
       if (value != null) {
         if (value is ManagedObject || value is Map) {
           return ColumnValueBuilder(
-              this, property, value[property.destinationEntity.primaryKey]);
+              this, property, value[property.destinationEntity!.primaryKey]);
         }
 
         throw ArgumentError("Invalid query. Column '$key' in "
             "'${entity!.tableName}' does not exist. '$key' recognized as ORM relationship. "
-            "Provided value must be 'Map' or ${property.destinationEntity.name}.");
+            "Provided value must be 'Map' or ${property.destinationEntity!.name}.");
       }
     }
 
@@ -110,7 +109,7 @@ class PostgresQueryBuilder extends TableBuilder {
     var allSorts = List<ColumnSortBuilder>.from(columnSortBuilders);
 
     var nestedSorts =
-        returning.whereType<TableBuilder>().expand((m) => m.columnSortBuilders);
+        returning!.whereType<TableBuilder>().expand((m) => m.columnSortBuilders);
     allSorts.addAll(nestedSorts);
 
     if (allSorts.isEmpty) {

@@ -9,40 +9,40 @@ import 'package:test/test.dart';
 import 'package:liquidart/src/dev/helpers.dart';
 
 void main() {
-  InMemoryAuthStorage? delegate;
-  AuthServer? authServer;
+  late InMemoryAuthStorage delegate;
+  late AuthServer authServer;
   HttpServer? server;
   String? accessToken;
   String? expiredErrorToken;
 
   setUp(() async {
     delegate = InMemoryAuthStorage();
-    delegate!.createUsers(1);
+    delegate.createUsers(1);
 
-    authServer = AuthServer(delegate!);
+    authServer = AuthServer(delegate);
 
-    accessToken = (await authServer!.authenticate(
-            delegate!.users[1]!.username,
+    accessToken = (await authServer.authenticate(
+            delegate.users[1]!.username,
             InMemoryAuthStorage.defaultPassword,
             "com.stablekernel.app1",
             "kilimanjaro"))
-        .accessToken!;
-    expiredErrorToken = (await authServer!.authenticate(
-            delegate!.users[1]!.username,
+        .accessToken;
+    expiredErrorToken = (await authServer.authenticate(
+            delegate.users[1]!.username,
             InMemoryAuthStorage.defaultPassword,
             "com.stablekernel.app1",
             "kilimanjaro",
             expiration: const Duration(seconds: 0)))
-        .accessToken!;
+        .accessToken;
   });
 
   tearDown(() async {
-    await server!.close();
+    await server?.close();
   });
 
   group("Bearer Token", () {
     test("No bearer token returns 401", () async {
-      var authorizer = Authorizer(authServer!);
+      var authorizer = Authorizer(authServer);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"));
@@ -51,7 +51,7 @@ void main() {
     });
 
     test("Malformed authorization bearer header returns 400", () async {
-      var authorizer = Authorizer(authServer!);
+      var authorizer = Authorizer(authServer);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"),
@@ -63,7 +63,7 @@ void main() {
     test(
         "Malformed, but has credential identifier, authorization bearer header returns 400",
         () async {
-      var authorizer = Authorizer(authServer!);
+      var authorizer = Authorizer(authServer);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"),
@@ -73,7 +73,7 @@ void main() {
     });
 
     test("Invalid bearer token returns 401", () async {
-      var authorizer = Authorizer(authServer!);
+      var authorizer = Authorizer(authServer);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"), headers: {
@@ -83,7 +83,7 @@ void main() {
     });
 
     test("Expired bearer token returns 401", () async {
-      var authorizer = Authorizer.bearer(authServer!);
+      var authorizer = Authorizer.bearer(authServer);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"), headers: {
@@ -93,7 +93,7 @@ void main() {
     });
 
     test("Valid bearer token returns authorization object", () async {
-      var authorizer = Authorizer(authServer!);
+      var authorizer = Authorizer(authServer);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"),
@@ -109,7 +109,7 @@ void main() {
 
   group("Basic Credentials", () {
     test("No basic auth header returns 401", () async {
-      var authorizer = Authorizer.basic(authServer!);
+      var authorizer = Authorizer.basic(authServer);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"));
@@ -118,7 +118,7 @@ void main() {
     });
 
     test("Malformed basic authorization header returns 400", () async {
-      var authorizer = Authorizer.basic(authServer!);
+      var authorizer = Authorizer.basic(authServer);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"),
@@ -128,7 +128,7 @@ void main() {
     });
 
     test("Basic authorization, but empty, header returns 400", () async {
-      var authorizer = Authorizer.basic(authServer!);
+      var authorizer = Authorizer.basic(authServer);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"),
@@ -140,7 +140,7 @@ void main() {
     test(
         "Basic authorization, but bad data after Basic identifier, header returns 400",
         () async {
-      var authorizer = Authorizer.basic(authServer!);
+      var authorizer = Authorizer.basic(authServer);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"),
@@ -150,7 +150,7 @@ void main() {
     });
 
     test("Invalid client id returns 401", () async {
-      var authorizer = Authorizer.basic(authServer!);
+      var authorizer = Authorizer.basic(authServer);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"), headers: {
@@ -162,7 +162,7 @@ void main() {
     });
 
     test("Invalid client secret returns 401", () async {
-      var authorizer = Authorizer.basic(authServer!);
+      var authorizer = Authorizer.basic(authServer);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"), headers: {
@@ -174,7 +174,7 @@ void main() {
     });
 
     test("Valid client ID returns 200 with authorization", () async {
-      var authorizer = Authorizer.basic(authServer!);
+      var authorizer = Authorizer.basic(authServer);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"), headers: {
@@ -190,7 +190,7 @@ void main() {
     });
 
     test("Public client can only be authorized with no password", () async {
-      var authorizer = Authorizer.basic(authServer!);
+      var authorizer = Authorizer.basic(authServer);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"), headers: {
@@ -213,7 +213,7 @@ void main() {
 
     test("Confidential client can never be authorized with no password",
         () async {
-      var authorizer = Authorizer.basic(authServer!);
+      var authorizer = Authorizer.basic(authServer);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"), headers: {
@@ -237,32 +237,32 @@ void main() {
     String? userAndOtherReadOnlyScopedAccessToken;
 
     setUp(() async {
-      userReadOnlyScopedAccessToken = (await authServer!.authenticate(
-              delegate!.users[1]!.username,
+      userReadOnlyScopedAccessToken = (await authServer.authenticate(
+              delegate.users[1]!.username,
               InMemoryAuthStorage.defaultPassword,
               "com.stablekernel.scoped",
               "kilimanjaro",
               requestedScopes: [AuthScope("user.readonly")]))
-          .accessToken!;
+          .accessToken;
 
-      userScopedAccessToken = (await authServer!.authenticate(
-              delegate!.users[1]!.username,
+      userScopedAccessToken = (await authServer.authenticate(
+              delegate.users[1]!.username,
               InMemoryAuthStorage.defaultPassword,
               "com.stablekernel.scoped",
               "kilimanjaro",
               requestedScopes: [AuthScope("user")]))
-          .accessToken!;
+          .accessToken;
 
-      userAndOtherScopedAccessToken = (await authServer!.authenticate(
-              delegate!.users[1]!.username,
+      userAndOtherScopedAccessToken = (await authServer.authenticate(
+              delegate.users[1]!.username,
               InMemoryAuthStorage.defaultPassword,
               "com.stablekernel.scoped",
               "kilimanjaro",
               requestedScopes: [AuthScope("user"), AuthScope("other_scope")]))
-          .accessToken!;
+          .accessToken;
 
-      userAndOtherReadOnlyScopedAccessToken = (await authServer!.authenticate(
-              delegate!.users[1]!.username,
+      userAndOtherReadOnlyScopedAccessToken = (await authServer.authenticate(
+              delegate.users[1]!.username,
               InMemoryAuthStorage.defaultPassword,
               "com.stablekernel.scoped",
               "kilimanjaro",
@@ -270,12 +270,12 @@ void main() {
             AuthScope("user"),
             AuthScope("other_scope.readonly")
           ]))
-          .accessToken!;
+          .accessToken;
     });
 
     test("Single scoped authorizer, valid single scoped token pass authorizer",
         () async {
-      var authorizer = Authorizer.bearer(authServer!, scopes: ["user"]);
+      var authorizer = Authorizer.bearer(authServer, scopes: ["user"]);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"), headers: {
@@ -288,8 +288,7 @@ void main() {
     test(
         "Single scoped authorizer requiring less privileges, valid higher privileged token pass authorizer",
         () async {
-      var authorizer =
-          Authorizer.bearer(authServer!, scopes: ["user.readonly"]);
+      var authorizer = Authorizer.bearer(authServer, scopes: ["user.readonly"]);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"), headers: {
@@ -302,7 +301,7 @@ void main() {
     test(
         "Single scoped authorizer, multiple scoped valid token pass authorizer",
         () async {
-      var authorizer = Authorizer.bearer(authServer!, scopes: ["user"]);
+      var authorizer = Authorizer.bearer(authServer, scopes: ["user"]);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"), headers: {
@@ -315,7 +314,7 @@ void main() {
     test("Multi-scoped authorizer, multi-scoped valid token pass authorizer",
         () async {
       var authorizer =
-          Authorizer.bearer(authServer!, scopes: ["user", "other_scope"]);
+          Authorizer.bearer(authServer, scopes: ["user", "other_scope"]);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"), headers: {
@@ -328,7 +327,7 @@ void main() {
     test(
         "Multi-scoped authorizer, multi-scoped valid token with more privilegs than necessary pass authorizer",
         () async {
-      var authorizer = Authorizer.bearer(authServer!,
+      var authorizer = Authorizer.bearer(authServer,
           scopes: ["user:foo", "other_scope.readonly"]);
       server = await enableAuthorizer(authorizer);
 
@@ -344,7 +343,7 @@ void main() {
     test(
         "Singled scoped authorizer requiring more privileges does not pass authorizer",
         () async {
-      var authorizer = Authorizer.bearer(authServer!, scopes: ["user"]);
+      var authorizer = Authorizer.bearer(authServer, scopes: ["user"]);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"), headers: {
@@ -358,7 +357,7 @@ void main() {
     test(
         "Singled scoped authorized requiring different privileges does not pass authorizer",
         () async {
-      var authorizer = Authorizer.bearer(authServer!, scopes: ["other_scope"]);
+      var authorizer = Authorizer.bearer(authServer, scopes: ["other_scope"]);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"), headers: {
@@ -372,7 +371,7 @@ void main() {
     test("Multi-scoped authorizer, single scoped token do not pass authorizer",
         () async {
       var authorizer =
-          Authorizer.bearer(authServer!, scopes: ["user", "other_scope"]);
+          Authorizer.bearer(authServer, scopes: ["user", "other_scope"]);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"), headers: {
@@ -387,7 +386,7 @@ void main() {
         "Multi-scoped authorizer, multi-scoped token but with different scopes do not pass authorzer",
         () async {
       var authorizer =
-          Authorizer.bearer(authServer!, scopes: ["other", "something_else"]);
+          Authorizer.bearer(authServer, scopes: ["other", "something_else"]);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"), headers: {
@@ -402,7 +401,7 @@ void main() {
         "Multi-scoped authorizer, multi-scoped token but with less privileges on one scope do not pass authorizer",
         () async {
       var authorizer =
-          Authorizer.bearer(authServer!, scopes: ["user", "other_scope"]);
+          Authorizer.bearer(authServer, scopes: ["user", "other_scope"]);
       server = await enableAuthorizer(authorizer);
 
       var res = await http.get(Uri.parse("http://localhost:8000"), headers: {
@@ -463,7 +462,7 @@ void main() {
 
 Future<HttpServer> enableAuthorizer(Authorizer authorizer) async {
   var router = Router();
-  router.route("/").link(() => authorizer).linkFunction(respond);
+  router.route("/").link(() => authorizer)!.linkFunction(respond);
   router.didAddToChannel();
 
   var server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8000);
@@ -475,15 +474,14 @@ Future<HttpServer> enableAuthorizer(Authorizer authorizer) async {
 }
 
 Future<RequestOrResponse> respond(Request req) async {
-  var map = {
+  Map map = {
     "clientID": req.authorization!.clientID,
     "resourceOwnerIdentifier": req.authorization!.ownerID,
     "credentials": req.authorization!.credentials?.toString()
   };
 
   if ((req.authorization!.scopes?.length ?? 0) > 0) {
-    map["scopes"] =
-        req.authorization!.scopes!.map((s) => s.toString()).toList();
+    map["scopes"] = req.authorization!.scopes!.map((s) => s.toString()).toList();
   }
 
   return Response.ok(map);
@@ -497,7 +495,7 @@ class CrashingStorage extends InMemoryAuthStorage {
   }
 
   @override
-  Future<AuthClient> getClient(AuthServer server, String id) async {
+  Future<AuthClient> getClient(AuthServer server, String? id) async {
     throw Response(504, null, "ok");
   }
 }

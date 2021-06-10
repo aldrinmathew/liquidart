@@ -20,11 +20,10 @@ void main() {
     final authHeader = userClient.headers["authorization"];
     expect(authHeader, startsWith("Bearer"));
 
-    final q = Query<ManagedAuthToken>(harness.context)
-      ..where((o) => o.accessToken)
-          .equalTo((authHeader as String).substring(7));
+    final q = Query<ManagedAuthToken>(harness.context!)
+      ..where((o) => o.accessToken).equalTo((authHeader as String).substring(7));
     final token = await q.fetchOne();
-    expect(token!.client!.id, "id");
+    expect(token!.client.id, "id");
   });
 
   test("Can use confidental client to authenticate", () async {
@@ -39,11 +38,10 @@ void main() {
     final authHeader = userClient.headers["authorization"];
     expect(authHeader, startsWith("Bearer"));
 
-    final q = Query<ManagedAuthToken>(harness.context)
-      ..where((o) => o.accessToken)
-          .equalTo((authHeader as String).substring(7));
+    final q = Query<ManagedAuthToken>(harness.context!)
+      ..where((o) => o.accessToken).equalTo((authHeader as String).substring(7));
     final token = await q.fetchOne();
-    expect(token!.client!.id, "confidential-id");
+    expect(token!.client.id, "confidential-id");
   });
 
   test("Can authenticate user with client and access protected route",
@@ -133,7 +131,7 @@ class Channel extends ApplicationChannel {
     router
         .route("/endpoint")
         .link(() => Authorizer.bearer(authServer!, scopes: ["scope"]))
-        .linkFunction((req) async => Response.ok({"key": "value"}));
+        ?.linkFunction((req) async => Response.ok({"key": "value"}));
     return router;
   }
 }
@@ -144,10 +142,11 @@ class HarnessSubclass extends TestHarness<Channel>
   Future seed() async {}
 
   @override
-  AuthServer get authServer => channel.authServer!;
+  AuthServer? get authServer => channel.authServer;
 
   @override
-  ManagedContext get context => channel.context!;
+  ManagedContext? get context => channel.context;
+
 
   @override
   Future onSetUp() async {
@@ -161,7 +160,7 @@ class HarnessSubclass extends TestHarness<Channel>
       ..username = username
       ..salt = salt
       ..hashedPassword = AuthUtility.generatePasswordHash(password, salt);
-    return Query.insertObject(context, user);
+    return Query.insertObject(context!, user);
   }
 }
 

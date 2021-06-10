@@ -9,10 +9,10 @@ import 'package:test/test.dart';
 import 'package:liquidart/src/dev/helpers.dart';
 
 void main() {
-  Application<TestChannel>? application;
+  late Application<TestChannel> application;
   Agent client = Agent.onPort(8888);
 
-  final codeResponse = (Map<String, String> form) {
+  final codeResponse = (Map<String, String?> form) {
     final m = Map<String, String>.from(form);
     m.addAll({"response_type": "code"});
 
@@ -24,7 +24,7 @@ void main() {
     return req.post();
   };
 
-  final tokenResponse = (Map<String, String> form) {
+  final tokenResponse = (Map<String, String?> form) {
     final m = Map<String, String>.from(form);
     m.addAll({"response_type": "token"});
 
@@ -39,16 +39,16 @@ void main() {
   setUpAll(() async {
     application = Application<TestChannel>();
 
-    await application!.startOnCurrentIsolate();
+    await application.startOnCurrentIsolate();
   });
 
   tearDownAll(() async {
-    await application!.stop();
+    await application.stop();
   });
 
   setUp(() async {
-    (application!.channel.authServer!.delegate as InMemoryAuthStorage).reset();
-    (application!.channel.authServer!.delegate as InMemoryAuthStorage)
+    (application.channel!.authServer!.delegate as InMemoryAuthStorage).reset();
+    (application.channel!.authServer!.delegate as InMemoryAuthStorage)
         .createUsers(2);
   });
 
@@ -176,8 +176,7 @@ void main() {
       expect(resp, hasHeaders({"content-type": "text/html; charset=utf-8"}));
     });
 
-    test("Does not allow response_type of token if allowsImplicit is false",
-        () async {
+    test("Does not allow response_type of token if allowsImplicit is false", () async {
       final req = client.request("/auth/redirect")
         ..query = {
           "client_id": "com.stablekernel.redirect",
@@ -229,7 +228,7 @@ void main() {
 
       final redirectURI = Uri.parse(resp.headers["location"]!.first);
       final codeParam = redirectURI.queryParameters["code"];
-      final token = await application!.channel.authServer!
+      final token = await application.channel!.authServer!
           .exchange(codeParam, "com.stablekernel.scoped", "kilimanjaro");
       expect(token.scopes!.length, 1);
       expect(token.scopes!.first.isExactly("user"), true);
@@ -249,7 +248,7 @@ void main() {
 
       final redirectURI = Uri.parse(resp.headers["location"]!.first);
       final codeParam = redirectURI.queryParameters["code"];
-      final token = await application!.channel.authServer!
+      final token = await application.channel!.authServer!
           .exchange(codeParam, "com.stablekernel.scoped", "kilimanjaro");
       expect(token.scopes!.length, 2);
       expect(token.scopes!.any((s) => s.isExactly("user")), true);
@@ -266,8 +265,7 @@ void main() {
         "password": InMemoryAuthStorage.defaultPassword
       });
 
-      expectTokenRedirect(
-          resp, Uri.http("stablekernel.com", "/auth/public-redirect"),
+      expectTokenRedirect(resp, Uri.http("stablekernel.com", "/auth/public-redirect"),
           state: "Wisconsin@&");
     });
 
@@ -280,8 +278,7 @@ void main() {
         "scope": "user"
       });
 
-      expectTokenRedirect(
-          resp, Uri.http("stablekernel.com", "/auth/public-scoped"),
+      expectTokenRedirect(resp, Uri.http("stablekernel.com", "/auth/public-scoped"),
           state: "Wisconsin@&");
 
       final redirectURI = Uri.parse(resp.headers["location"]!.first);
@@ -299,8 +296,7 @@ void main() {
         "scope": "user other_scope"
       });
 
-      expectTokenRedirect(
-          resp, Uri.http("stablekernel.com", "/auth/public-scoped"),
+      expectTokenRedirect(resp, Uri.http("stablekernel.com", "/auth/public-scoped"),
           state: "Wisconsin@&");
 
       final redirectURI = Uri.parse(resp.headers["location"]!.first);
@@ -381,9 +377,7 @@ void main() {
         "state": "a"
       });
       expectTokenErrorRedirect(
-          resp,
-          Uri.http("stablekernel.com", "/auth/public-redirect"),
-          "access_denied",
+          resp, Uri.http("stablekernel.com", "/auth/public-redirect"), "access_denied",
           state: "a");
     });
 
@@ -395,9 +389,7 @@ void main() {
         "state": "a"
       });
       expectTokenErrorRedirect(
-          resp,
-          Uri.http("stablekernel.com", "/auth/public-redirect"),
-          "access_denied",
+          resp, Uri.http("stablekernel.com", "/auth/public-redirect"), "access_denied",
           state: "a");
     });
 
@@ -407,9 +399,7 @@ void main() {
         "password": InMemoryAuthStorage.defaultPassword,
         "state": "a"
       });
-      expectTokenErrorRedirect(
-          resp,
-          Uri.http("stablekernel.com", "/auth/public-redirect"),
+      expectTokenErrorRedirect(resp, Uri.http("stablekernel.com", "/auth/public-redirect"),
           "invalid_request",
           state: "a");
     });
@@ -443,7 +433,7 @@ void main() {
     test("password is incorrect yields 302 with error", () async {
       final resp = await codeResponse({
         "client_id": "com.stablekernel.redirect",
-        "username": user1["username"]!,
+        "username": user1["username"],
         "password": "nonsense",
         "state": "a"
       });
@@ -455,7 +445,7 @@ void main() {
     test("password is empty returns 302 with error", () async {
       final resp = await codeResponse({
         "client_id": "com.stablekernel.redirect",
-        "username": user1["username"]!,
+        "username": user1["username"],
         "password": "",
         "state": "a"
       });
@@ -467,7 +457,7 @@ void main() {
     test("password is missing returns 302 with error", () async {
       final resp = await codeResponse({
         "client_id": "com.stablekernel.redirect",
-        "username": user1["username"]!,
+        "username": user1["username"],
         "state": "a"
       });
       expectErrorRedirect(resp, Uri.http("stablekernel.com", "/auth/redirect"),
@@ -505,40 +495,34 @@ void main() {
     test("password is incorrect yields 302 with error", () async {
       final resp = await tokenResponse({
         "client_id": "com.stablekernel.public.redirect",
-        "username": user1["username"]!,
+        "username": user1["username"],
         "password": "nonsense",
         "state": "a"
       });
       expectTokenErrorRedirect(
-          resp,
-          Uri.http("stablekernel.com", "/auth/public-redirect"),
-          "access_denied",
+          resp, Uri.http("stablekernel.com", "/auth/public-redirect"), "access_denied",
           state: "a");
     });
 
     test("password is empty returns 302 with error", () async {
       final resp = await tokenResponse({
         "client_id": "com.stablekernel.public.redirect",
-        "username": user1["username"]!,
+        "username": user1["username"],
         "password": "",
         "state": "a"
       });
       expectTokenErrorRedirect(
-          resp,
-          Uri.http("stablekernel.com", "/auth/public-redirect"),
-          "access_denied",
+          resp, Uri.http("stablekernel.com", "/auth/public-redirect"), "access_denied",
           state: "a");
     });
 
     test("password is missing returns 302 with error", () async {
       final resp = await tokenResponse({
         "client_id": "com.stablekernel.public.redirect",
-        "username": user1["username"]!,
+        "username": user1["username"],
         "state": "a"
       });
-      expectTokenErrorRedirect(
-          resp,
-          Uri.http("stablekernel.com", "/auth/public-redirect"),
+      expectTokenErrorRedirect(resp, Uri.http("stablekernel.com", "/auth/public-redirect"),
           "invalid_request",
           state: "a");
     });
@@ -610,8 +594,8 @@ void main() {
   group("client_id failures", () {
     test("Omit client_id returns 400", () async {
       final resp = await tokenResponse({
-        "username": user1["username"]!,
-        "password": user1["password"]!,
+        "username": user1["username"],
+        "password": user1["password"],
         "state": "a"
       });
       expect(resp, hasStatus(400));
@@ -620,8 +604,8 @@ void main() {
     test("client_id does not exist for app returns 400", () async {
       final resp = await tokenResponse({
         "client_id": "abc",
-        "username": user1["username"]!,
-        "password": user1["password"]!,
+        "username": user1["username"],
+        "password": user1["password"],
         "state": "a"
       });
       expect(resp, hasStatus(400));
@@ -630,8 +614,8 @@ void main() {
     test("client_id that does not have redirectURI returns 400", () async {
       final resp = await tokenResponse({
         "client_id": "com.stablekernel.app1",
-        "username": user1["username"]!,
-        "password": user1["password"]!,
+        "username": user1["username"],
+        "password": user1["password"],
         "state": "a"
       });
       expect(resp, hasStatus(400));
@@ -661,8 +645,8 @@ void main() {
     test("client_id is empty returns 400", () async {
       final resp = await tokenResponse({
         "client_id": "",
-        "username": user1["username"]!,
-        "password": user1["password"]!,
+        "username": user1["username"],
+        "password": user1["password"],
         "state": "a"
       });
       expect(resp, hasStatus(400));
@@ -670,30 +654,24 @@ void main() {
   });
 
   group("Code Invalid requests and state", () {
-    test("public client with response type code redirects with error",
-        () async {
+    test("public client with response type code redirects with error", () async {
       final resp = await codeResponse({
         "client_id": "com.stablekernel.public.redirect",
-        "username": user1["username"]!,
-        "password": user1["password"]!,
+        "username": user1["username"],
+        "password": user1["password"],
         "state": "a"
       });
-      expectErrorRedirect(
-          resp,
-          Uri.http("stablekernel.com", "/auth/public-redirect"),
-          "unauthorized_client",
-          state: "a");
+      expectErrorRedirect(resp, Uri.http("stablekernel.com", "/auth/public-redirect"), "unauthorized_client", state: "a");
     });
 
     test("Omit state is error", () async {
       final resp = await codeResponse({
         "client_id": "com.stablekernel.redirect",
-        "username": user1["username"]!,
+        "username": user1["username"],
         "password": InMemoryAuthStorage.defaultPassword
       });
 
-      expectErrorRedirect(resp, Uri.http("stablekernel.com", "/auth/redirect"),
-          "invalid_request");
+      expectErrorRedirect(resp, Uri.http("stablekernel.com", "/auth/redirect"), "invalid_request");
     });
 
     test("Failed username + state still returns state in error", () async {
@@ -711,7 +689,7 @@ void main() {
     test("Failed password + state still returns state in error", () async {
       final resp = await codeResponse({
         "client_id": "com.stablekernel.redirect",
-        "username": user1["username"]!,
+        "username": user1["username"],
         "password": "nonsense",
         "state": "xyz"
       });
@@ -722,8 +700,7 @@ void main() {
   });
 
   group("Token Invalid requests and state", () {
-    test("Does not allow response_type of token if allowsImplicit is false",
-        () async {
+    test("Does not allow response_type of token if allowsImplicit is false", () async {
       final encodedUsername = Uri.encodeQueryComponent(user1["username"]!);
       final encodedPassword = Uri.encodeQueryComponent(user1["password"]!);
 
@@ -740,14 +717,11 @@ void main() {
     test("Omit state is error", () async {
       final resp = await tokenResponse({
         "client_id": "com.stablekernel.public.redirect",
-        "username": user1["username"]!,
+        "username": user1["username"],
         "password": InMemoryAuthStorage.defaultPassword
       });
 
-      expectTokenErrorRedirect(
-          resp,
-          Uri.http("stablekernel.com", "/auth/public-redirect"),
-          "invalid_request");
+      expectTokenErrorRedirect(resp, Uri.http("stablekernel.com", "/auth/public-redirect"), "invalid_request");
     });
 
     test("Failed username + state still returns state in error", () async {
@@ -758,23 +732,19 @@ void main() {
         "state": "xyz"
       });
       expectTokenErrorRedirect(
-          resp,
-          Uri.http("stablekernel.com", "/auth/public-redirect"),
-          "access_denied",
+          resp, Uri.http("stablekernel.com", "/auth/public-redirect"), "access_denied",
           state: "xyz");
     });
 
     test("Failed password + state still returns state in error", () async {
       final resp = await tokenResponse({
         "client_id": "com.stablekernel.public.redirect",
-        "username": user1["username"]!,
+        "username": user1["username"],
         "password": "nonsense",
         "state": "xyz"
       });
       expectTokenErrorRedirect(
-          resp,
-          Uri.http("stablekernel.com", "/auth/public-redirect"),
-          "access_denied",
+          resp, Uri.http("stablekernel.com", "/auth/public-redirect"), "access_denied",
           state: "xyz");
     });
   });
@@ -808,6 +778,8 @@ void main() {
           state: "Wisconsin@&");
     });
   });
+
+
 }
 
 class TestChannel extends ApplicationChannel
@@ -824,23 +796,22 @@ class TestChannel extends ApplicationChannel
   @override
   Controller get entryPoint {
     final router = Router();
-    router.route("/auth/code").link(() => AuthRedirectController(authServer,
-        delegate: this, allowsImplicit: false));
+    router
+        .route("/auth/code")
+        .link(() => AuthRedirectController(authServer, delegate: this, allowsImplicit: false));
 
     router
         .route("/auth/redirect")
         .link(() => AuthRedirectController(authServer, delegate: this));
 
-    router
-        .route("/bad-delegate")
-        .link(() => AuthRedirectController(authServer, delegate: badDelegate));
+    router.route("/bad-delegate").link(() => AuthRedirectController(authServer, delegate: badDelegate));
     router.route("/nopage").link(() => AuthRedirectController(authServer));
     return router;
   }
 
   @override
   Future<String> render(AuthRedirectController forController, Uri requestUri,
-      String responseType, String clientID, String state, String scope) async {
+      String? responseType, String? clientID, String? state, String? scope) async {
     return json.encode({
       "response_type": responseType,
       "path": requestUri.path,
@@ -854,7 +825,7 @@ class TestChannel extends ApplicationChannel
 class BadAuthRedirectDelegate implements AuthRedirectControllerDelegate {
   @override
   Future<String?> render(AuthRedirectController forController, Uri requestUri,
-      String responseType, String clientID, String state, String scope) async {
+      String? responseType, String? clientID, String? state, String? scope) async {
     return null;
   }
 }
@@ -862,8 +833,8 @@ class BadAuthRedirectDelegate implements AuthRedirectControllerDelegate {
 void expectRedirect(TestResponse resp, Uri requestURI, {String? state}) {
   expect(resp, hasStatus(HttpStatus.movedTemporarily));
 
-  final location = resp.headers.value(HttpHeaders.locationHeader);
-  final uri = Uri.parse(location!);
+  final location = resp.headers.value(HttpHeaders.locationHeader)!;
+  final uri = Uri.parse(location);
 
   expect(uri.queryParameters["code"], hasLength(greaterThan(0)));
   expect(uri.queryParameters["state"], state);
@@ -880,8 +851,8 @@ void expectRedirect(TestResponse resp, Uri requestURI, {String? state}) {
 void expectTokenRedirect(TestResponse resp, Uri requestURI, {String? state}) {
   expect(resp, hasStatus(HttpStatus.movedTemporarily));
 
-  final location = resp.headers.value(HttpHeaders.locationHeader);
-  final uri = Uri.parse(location!);
+  final location = resp.headers.value(HttpHeaders.locationHeader)!;
+  final uri = Uri.parse(location);
 
   final fragmentParams = parametersFromFragment(uri.fragment);
 
@@ -898,8 +869,8 @@ void expectErrorRedirect(TestResponse resp, Uri requestURI, String errorReason,
     {String? state}) {
   expect(resp, hasStatus(HttpStatus.movedTemporarily));
 
-  final location = resp.headers.value(HttpHeaders.locationHeader);
-  final uri = Uri.parse(location!);
+  final location = resp.headers.value(HttpHeaders.locationHeader)!;
+  final uri = Uri.parse(location);
   expect(uri.authority, requestURI.authority);
   expect(uri.path, requestURI.path);
   expect(uri.queryParameters["error"], errorReason);
@@ -911,13 +882,12 @@ void expectErrorRedirect(TestResponse resp, Uri requestURI, String errorReason,
   }
 }
 
-void expectTokenErrorRedirect(
-    TestResponse resp, Uri requestURI, String errorReason,
+void expectTokenErrorRedirect(TestResponse resp, Uri requestURI, String errorReason,
     {String? state}) {
   expect(resp, hasStatus(HttpStatus.movedTemporarily));
 
-  final location = resp.headers.value(HttpHeaders.locationHeader);
-  final uri = Uri.parse(location!);
+  final location = resp.headers.value(HttpHeaders.locationHeader)!;
+  final uri = Uri.parse(location);
 
   final fragmentParams = parametersFromFragment(uri.fragment);
 
@@ -927,10 +897,8 @@ void expectTokenErrorRedirect(
   expect(uri.path, equals(requestURI.path));
 }
 
-Map<String, String> parametersFromFragment(String? fragment) {
-  if (fragment == null) {
-    return {};
-  } else if (fragment.isEmpty) {
+Map<String, String> parametersFromFragment(String fragment) {
+  if (fragment.isEmpty) {
     return {};
   }
 

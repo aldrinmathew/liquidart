@@ -34,15 +34,15 @@ class SchemaColumn {
 
     if (desc is ManagedRelationshipDescription) {
       isPrimaryKey = false;
-      relatedTableName = desc.destinationEntity.tableName;
-      relatedColumnName = desc.destinationEntity.primaryKey;
+      relatedTableName = desc.destinationEntity!.tableName;
+      relatedColumnName = desc.destinationEntity!.primaryKey;
       _deleteRule = deleteRuleStringForDeleteRule(desc.deleteRule);
     } else if (desc is ManagedAttributeDescription) {
       defaultValue = desc.defaultValue;
       isPrimaryKey = desc.isPrimaryKey;
     }
 
-    _type = typeStringForType(desc.type.kind!);
+    _type = typeStringForType(desc.type!.kind);
     isNullable = desc.isNullable;
     autoincrement = desc.autoincrement;
     isUnique = desc.isUnique;
@@ -68,17 +68,17 @@ class SchemaColumn {
   ///
   /// Where [map] is typically created by [asMap].
   SchemaColumn.fromMap(Map<String, dynamic> map) {
-    name = map["name"] as String;
-    _type = map["type"] as String;
-    isIndexed = map["indexed"] as bool;
-    isNullable = map["nullable"] as bool;
-    autoincrement = map["autoincrement"] as bool;
-    isUnique = map["unique"] as bool;
-    defaultValue = map["defaultValue"] as String;
-    isPrimaryKey = map["primaryKey"] as bool;
-    relatedTableName = map["relatedTableName"] as String;
-    relatedColumnName = map["relatedColumnName"] as String;
-    _deleteRule = map["deleteRule"] as String;
+    name = map["name"] as String?;
+    _type = map["type"] as String?;
+    isIndexed = map["indexed"] as bool?;
+    isNullable = map["nullable"] as bool?;
+    autoincrement = map["autoincrement"] as bool?;
+    isUnique = map["unique"] as bool?;
+    defaultValue = map["defaultValue"] as String?;
+    isPrimaryKey = map["primaryKey"] as bool?;
+    relatedTableName = map["relatedTableName"] as String?;
+    relatedColumnName = map["relatedColumnName"] as String?;
+    _deleteRule = map["deleteRule"] as String?;
   }
 
   /// Creates an empty instance of this type.
@@ -93,32 +93,32 @@ class SchemaColumn {
   SchemaTable? table;
 
   /// The [String] representation of this column's type.
-  String get typeString => _type!;
+  String? get typeString => _type;
 
   /// The type of this column in a [ManagedDataModel].
-  ManagedPropertyType? get type => typeFromTypeString(_type!);
+  ManagedPropertyType? get type => typeFromTypeString(_type);
 
   set type(ManagedPropertyType? t) {
-    _type = typeStringForType(t!);
+    _type = typeStringForType(t);
   }
 
   /// Whether or not this column is indexed.
-  bool isIndexed = false;
+  bool? isIndexed = false;
 
   /// Whether or not this column is nullable.
-  bool isNullable = false;
+  bool? isNullable = false;
 
   /// Whether or not this column is autoincremented.
-  bool autoincrement = false;
+  bool? autoincrement = false;
 
   /// Whether or not this column is unique.
-  bool isUnique = false;
+  bool? isUnique = false;
 
   /// The default value for this column when inserted into a database.
   String? defaultValue;
 
   /// Whether or not this column is the primary key of its [table].
-  bool isPrimaryKey = false;
+  bool? isPrimaryKey = false;
 
   /// The related table name if this column is a foreign key column.
   ///
@@ -137,10 +137,10 @@ class SchemaColumn {
   /// The delete rule for this column if it is a foreign key column.
   ///
   /// Undefined if not a foreign key column.
-  DeleteRule? get deleteRule => deleteRuleForDeleteRuleString(_deleteRule!);
+  DeleteRule? get deleteRule => deleteRuleForDeleteRuleString(_deleteRule);
 
   set deleteRule(DeleteRule? t) {
-    _deleteRule = deleteRuleStringForDeleteRule(t!);
+    _deleteRule = deleteRuleStringForDeleteRule(t);
   }
 
   /// Whether or not this column is a foreign key column.
@@ -157,8 +157,8 @@ class SchemaColumn {
   }
 
   /// Returns string representation of [ManagedPropertyType].
-  static String? typeStringForType(ManagedPropertyType type) {
-    switch (type) {
+  static String? typeStringForType(ManagedPropertyType? type) {
+    switch (type!) {
       case ManagedPropertyType.integer:
         return "integer";
       case ManagedPropertyType.doublePrecision:
@@ -177,13 +177,11 @@ class SchemaColumn {
         return null;
       case ManagedPropertyType.document:
         return "document";
-      default:
-        return null;
     }
   }
 
   /// Returns inverse of [typeStringForType].
-  static ManagedPropertyType? typeFromTypeString(String type) {
+  static ManagedPropertyType? typeFromTypeString(String? type) {
     switch (type) {
       case "integer":
         return ManagedPropertyType.integer;
@@ -199,14 +197,13 @@ class SchemaColumn {
         return ManagedPropertyType.string;
       case "document":
         return ManagedPropertyType.document;
-      default:
-        return null;
     }
+    return null;
   }
 
   /// Returns string representation of [DeleteRule].
-  static String? deleteRuleStringForDeleteRule(DeleteRule rule) {
-    switch (rule) {
+  static String? deleteRuleStringForDeleteRule(DeleteRule? rule) {
+    switch (rule!) {
       case DeleteRule.cascade:
         return "cascade";
       case DeleteRule.nullify:
@@ -215,13 +212,11 @@ class SchemaColumn {
         return "restrict";
       case DeleteRule.setDefault:
         return "default";
-      default:
-        return null;
     }
   }
 
   /// Returns inverse of [deleteRuleStringForDeleteRule].
-  static DeleteRule? deleteRuleForDeleteRuleString(String rule) {
+  static DeleteRule? deleteRuleForDeleteRuleString(String? rule) {
     switch (rule) {
       case "cascade":
         return DeleteRule.cascade;
@@ -231,9 +226,8 @@ class SchemaColumn {
         return DeleteRule.restrict;
       case "default":
         return DeleteRule.setDefault;
-      default:
-        return null;
     }
+    return null;
   }
 
   /// Returns portable representation of this instance.
@@ -269,8 +263,7 @@ class SchemaColumnDifference {
             "Cannot change primary key of '${expectedColumn!.table!.name}'");
       }
 
-      if (actualColumn!.relatedColumnName !=
-          expectedColumn!.relatedColumnName) {
+      if (actualColumn!.relatedColumnName != expectedColumn!.relatedColumnName) {
         throw SchemaException(
             "Cannot change Relationship inverse of '${expectedColumn!.table!.name}.${expectedColumn!.name}'");
       }
@@ -290,8 +283,8 @@ class SchemaColumnDifference {
             "Cannot change autoincrement behavior of '${expectedColumn!.table!.name}.${expectedColumn!.name}'");
       }
 
-      if (expectedColumn!.name!.toLowerCase() !=
-          actualColumn!.name!.toLowerCase()) {
+      if (expectedColumn!.name?.toLowerCase() !=
+          actualColumn!.name?.toLowerCase()) {
         _differingProperties.add(_PropertyDifference(
             "name", expectedColumn!.name, actualColumn!.name));
       }
@@ -303,12 +296,12 @@ class SchemaColumnDifference {
 
       if (expectedColumn!.isUnique != actualColumn!.isUnique) {
         _differingProperties.add(_PropertyDifference(
-            "isUnique", expectedColumn!.isUnique, actualColumn!.isUnique));
+          "isUnique", expectedColumn!.isUnique, actualColumn!.isUnique));
       }
 
       if (expectedColumn!.isNullable != actualColumn!.isNullable) {
-        _differingProperties.add(_PropertyDifference("isNullable",
-            expectedColumn!.isNullable, actualColumn!.isNullable));
+        _differingProperties.add(_PropertyDifference(
+            "isNullable", expectedColumn!.isNullable, actualColumn!.isNullable));
       }
 
       if (expectedColumn!.defaultValue != actualColumn!.defaultValue) {
@@ -317,8 +310,8 @@ class SchemaColumnDifference {
       }
 
       if (expectedColumn!.deleteRule != actualColumn!.deleteRule) {
-        _differingProperties.add(_PropertyDifference("deleteRule",
-            expectedColumn!.deleteRule, actualColumn!.deleteRule));
+        _differingProperties.add(_PropertyDifference(
+            "deleteRule", expectedColumn!.deleteRule, actualColumn!.deleteRule));
       }
     }
   }
@@ -354,8 +347,7 @@ class SchemaColumnDifference {
     }
 
     return _differingProperties.map((property) {
-      return property.getErrorMessage(
-          expectedColumn!.table!.name!, expectedColumn!.name!);
+      return property.getErrorMessage(expectedColumn!.table!.name, expectedColumn!.name);
     }).toList();
   }
 
@@ -369,8 +361,8 @@ class _PropertyDifference {
   final dynamic expectedValue;
   final dynamic actualValue;
 
-  String getErrorMessage(String actualTableName, String expectedColumnName) {
+  String getErrorMessage(String? actualTableName, String? expectedColumnName) {
     return "Column '${expectedColumnName}' in table '${actualTableName}' expected "
-        "'$expectedValue' for '$name', but migration files yield '$actualValue'";
+      "'$expectedValue' for '$name', but migration files yield '$actualValue'";
   }
 }

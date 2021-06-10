@@ -35,7 +35,7 @@ class PartialMapMatcher extends Matcher {
       return false;
     }
 
-    final Map<String, dynamic> inputMap = item;
+    final inputMap = item;
     final mismatches = <String>[];
     matchState["PartialMatcher.mismatches"] = mismatches;
     var foundMismatch = false;
@@ -87,10 +87,10 @@ class PartialMapMatcher extends Matcher {
       mismatchDescription
           .add("the following keys differ from partial matcher: \n");
       mismatches.forEach((s) {
-        final matcher = _matcherMap[s];
+        final matcher = _matcherMap[s]!;
         final value = item[s];
         mismatchDescription.add("  - '$s' ");
-        matcher!.describeMismatch(
+        matcher.describeMismatch(
             value, mismatchDescription, matchState, verbose);
         mismatchDescription.add("\n");
       });

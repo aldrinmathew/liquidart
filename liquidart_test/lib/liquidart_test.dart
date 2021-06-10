@@ -1,4 +1,4 @@
-/// Testing utilities for Liquidart applications
+/// Testing utilities for liquidart applications
 ///
 /// This library should be imported in test scripts. It should not be imported in application code.
 ///

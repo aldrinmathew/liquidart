@@ -21,7 +21,7 @@ import 'route_specification.dart';
 class Router extends Controller {
   /// Creates a new [Router].
   Router({String? basePath, Future notFoundHandler(Request request)?})
-      : _unmatchedController = notFoundHandler!,
+      : _unmatchedController = notFoundHandler,
         _basePathSegments =
             basePath?.split("/").where((str) => str.isNotEmpty).toList() ?? [] {
     policy!.allowCredentials = false;
@@ -105,9 +105,9 @@ class Router extends Controller {
   Future receive(Request req) async {
     Controller next;
     try {
-      var requestURISegmentIterator = req.raw!.uri.pathSegments.iterator;
+      var requestURISegmentIterator = req.raw.uri.pathSegments.iterator;
 
-      if (req.raw!.uri.pathSegments.isEmpty) {
+      if (req.raw.uri.pathSegments.isEmpty) {
         requestURISegmentIterator = [""].iterator;
       }
 
@@ -119,13 +119,13 @@ class Router extends Controller {
         }
       }
 
-      final node =
-          _root.node!.nodeForPathSegments(requestURISegmentIterator, req.path!);
-      if (node.specification == null) {
+      final node = // TODO
+          _root.node?.nodeForPathSegments(requestURISegmentIterator, req.path);
+      if (node?.specification == null) {
         await _handleUnhandledRequest(req);
         return null;
       }
-      req.path!.setSpecification(node.specification!,
+      req.path.setSpecification(node!.specification!,
           segmentOffset: _basePathSegments!.length);
 
       next = node.controller;
@@ -197,7 +197,7 @@ class _RouteController extends Controller {
   @override
   Map<String, APIPath> documentPaths(APIDocumentContext components) {
     return specifications.fold(<String, APIPath>{}, (pathMap, spec) {
-      final elements = spec.segments.map((rs) {
+      final elements = spec.segments?.map((rs) {
         if (rs.isLiteralMatcher) {
           return rs.literal;
         } else if (rs.isVariable) {
@@ -214,7 +214,7 @@ class _RouteController extends Controller {
             .map((pathVar) => APIParameter.path(pathVar))
             .toList();
 
-      if (spec.segments.any((seg) => seg.isRemainingMatcher)) {
+      if (spec.segments!.any((seg) => seg.isRemainingMatcher)) {
         path.parameters!.add(APIParameter.path("path")
           ..description =
               "This path variable may contain slashes '/' and may be empty.");

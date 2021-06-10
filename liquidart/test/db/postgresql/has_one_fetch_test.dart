@@ -18,14 +18,14 @@ import 'package:liquidart/src/dev/helpers.dart';
 void main() {
   group("Happy path", () {
     ManagedContext? context;
-    List<Parent> truth = [];
+    late List<Parent> truth;
     setUpAll(() async {
       context = await contextWithModels([Child, Parent, Toy, Vaccine]);
-      truth = await populate(context!);
+      truth = await populate(context);
     });
 
     tearDownAll(() async {
-      await context!.close();
+      await context?.close();
     });
 
     test("Fetch has-one relationship that is null returns null for property",
@@ -35,10 +35,10 @@ void main() {
         ..where((o) => o.name).equalTo("D");
 
       var verifier = (Parent? p) {
-        expect(p!.name, "D");
-        expect(p.pid, isNotNull);
-        expect(p.backing.contents!["child"], isNull);
-        expect(p.backing.contents!.containsKey("child"), true);
+        expect(p?.name, "D");
+        expect(p?.pid, isNotNull);
+        expect(p?.backing.contents["child"], isNull);
+        expect(p?.backing.contents.containsKey("child"), true);
       };
       verifier(await q.fetchOne());
       verifier((await q.fetch()).first);
@@ -49,15 +49,15 @@ void main() {
         () async {
       var q = Query<Parent>(context!)..where((o) => o.name).equalTo("D");
 
-      q.join<Child>(object: (p) => p.child!)
-        ..join(object: (c) => c.toy!)
-        ..join(set: (c) => c.vaccinations!);
+      q.join(object: (p) => p.child!)
+        ..join<Toy>(object: (c) => c.toy!)
+        ..join(set: (c) => c.vaccinations);
 
       var verifier = (Parent? p) {
-        expect(p!.name, "D");
-        expect(p.pid, isNotNull);
-        expect(p.backing.contents!["child"], isNull);
-        expect(p.backing.contents!.containsKey("child"), true);
+        expect(p?.name, "D");
+        expect(p?.pid, isNotNull);
+        expect(p?.backing.contents["child"], isNull);
+        expect(p?.backing.contents.containsKey("child"), true);
       };
       verifier(await q.fetchOne());
       verifier((await q.fetch()).first);
@@ -71,12 +71,12 @@ void main() {
         ..where((o) => o.name).equalTo("C");
 
       var verifier = (Parent? p) {
-        expect(p!.name, "C");
-        expect(p.pid, isNotNull);
-        expect(p.child!.cid, isNotNull);
-        expect(p.child!.name, "C3");
-        expect(p.child!.backing.contents!.containsKey("toy"), false);
-        expect(p.child!.backing.contents!.containsKey("vaccinations"), false);
+        expect(p?.name, "C");
+        expect(p?.pid, isNotNull);
+        expect(p?.child!.cid, isNotNull);
+        expect(p?.child!.name, "C3");
+        expect(p?.child!.backing.contents.containsKey("toy"), false);
+        expect(p?.child!.backing.contents.containsKey("vaccinations"), false);
       };
       verifier(await q.fetchOne());
       verifier((await q.fetch()).first);
@@ -89,18 +89,18 @@ void main() {
 
       q.join(object: (p) => p.child!)
         ..join(object: (c) => c.toy!)
-        ..join(set: (c) => c.vaccinations!);
+        ..join(set: (c) => c.vaccinations);
 
       var verifier = (Parent? p) {
-        expect(p!.name, "B");
-        expect(p.pid, isNotNull);
-        expect(p.child!.cid, isNotNull);
-        expect(p.child!.name, "C2");
-        expect(p.child!.backing.contents!.containsKey("toy"), true);
-        expect(p.child!.toy, isNull);
-        expect(p.child!.vaccinations!.length, 1);
-        expect(p.child!.vaccinations!.first.vid, isNotNull);
-        expect(p.child!.vaccinations!.first.kind, "V3");
+        expect(p?.name, "B");
+        expect(p?.pid, isNotNull);
+        expect(p?.child!.cid, isNotNull);
+        expect(p?.child!.name, "C2");
+        expect(p?.child!.backing.contents.containsKey("toy"), true);
+        expect(p?.child!.toy, isNull);
+        expect(p?.child!.vaccinations!.length, 1);
+        expect(p?.child!.vaccinations!.first.vid, isNotNull);
+        expect(p?.child!.vaccinations!.first.kind, "V3");
       };
 
       verifier(await q.fetchOne());
@@ -114,16 +114,16 @@ void main() {
 
       q.join(object: (p) => p.child!)
         ..join(object: (c) => c.toy!)
-        ..join(set: (c) => c.vaccinations!);
+        ..join(set: (c) => c.vaccinations);
 
       var verifier = (Parent? p) {
-        expect(p!.name, "C");
-        expect(p.pid, isNotNull);
-        expect(p.child!.cid, isNotNull);
-        expect(p.child!.name, "C3");
-        expect(p.child!.backing.contents!.containsKey("toy"), true);
-        expect(p.child!.toy, isNull);
-        expect(p.child!.vaccinations, []);
+        expect(p?.name, "C");
+        expect(p?.pid, isNotNull);
+        expect(p?.child!.cid, isNotNull);
+        expect(p?.child!.name, "C3");
+        expect(p?.child!.backing.contents.containsKey("toy"), true);
+        expect(p?.child!.toy, isNull);
+        expect(p?.child!.vaccinations, []);
       };
 
       verifier(await q.fetchOne());
@@ -144,7 +144,7 @@ void main() {
 
       expect(results.last.pid, isNotNull);
       expect(results.last.name, "D");
-      expect(results.last.backing.contents!.containsKey("child"), true);
+      expect(results.last.backing.contents.containsKey("child"), true);
       expect(results.last.child, isNull);
     });
 
@@ -152,7 +152,7 @@ void main() {
       var q = Query<Parent>(context!);
       q.join(object: (p) => p.child!)
         ..join(object: (c) => c.toy!)
-        ..join(set: (c) => c.vaccinations!);
+        ..join(set: (c) => c.vaccinations);
 
       var all = await q.fetch();
 
@@ -161,14 +161,14 @@ void main() {
         originalIterator.moveNext();
         expect(p.pid, originalIterator.current.pid);
         expect(p.name, originalIterator.current.name);
-        expect(p.child!.cid, originalIterator.current.child!.cid);
-        expect(p.child!.name, originalIterator.current.child!.name);
-        expect(p.child!.toy!.tid, originalIterator.current.child!.toy!.tid);
-        expect(p.child!.toy!.name, originalIterator.current.child!.toy!.name);
+        expect(p.child!.cid, originalIterator.current.child?.cid);
+        expect(p.child!.name, originalIterator.current.child?.name);
+        expect(p.child!.toy?.tid, originalIterator.current.child?.toy?.tid);
+        expect(p.child!.toy?.name, originalIterator.current.child?.toy?.name);
 
-        var vacIter = originalIterator.current.child!.vaccinations!.iterator;
-        // ?? <Vaccine>[].iterator
-        p.child!.vaccinations!.forEach((v) {
+        var vacIter = originalIterator.current.child?.vaccinations?.iterator ??
+            <Vaccine>[].iterator;
+        p.child?.vaccinations?.forEach((v) {
           vacIter.moveNext();
           expect(v.vid, vacIter.current.vid);
           expect(v.kind, vacIter.current.kind);
@@ -184,11 +184,11 @@ void main() {
 
     setUpAll(() async {
       context = await contextWithModels([Child, Parent, Toy, Vaccine]);
-      await populate(context!);
+      await populate(context);
     });
 
     tearDownAll(() {
-      context!.close();
+      context?.close();
     });
 
     test("Predicate impacts top-level objects when fetching object graph",
@@ -196,7 +196,7 @@ void main() {
       var q = Query<Parent>(context!)..where((o) => o.name).equalTo("A");
       q.join(object: (p) => p.child!)
         ..join(object: (c) => c.toy!)
-        ..join(set: (c) => c.vaccinations!)
+        ..join(set: (c) => c.vaccinations)
             .sortBy((v) => v.vid, QuerySortOrder.ascending);
 
       var results = await q.fetch();
@@ -217,7 +217,7 @@ void main() {
       q.join(object: (p) => p.child!)
         ..where((o) => o.name).equalTo("C1")
         ..join(object: (c) => c.toy!)
-        ..join(set: (c) => c.vaccinations!)
+        ..join(set: (c) => c.vaccinations)
             .sortBy((v) => v.vid, QuerySortOrder.ascending);
 
       var results = await q.fetch();
@@ -233,7 +233,7 @@ void main() {
 
       for (var other in results.sublist(1)) {
         expect(other.child, isNull);
-        expect(other.backing.contents!.containsKey("child"), true);
+        expect(other.backing.contents.containsKey("child"), true);
       }
     });
 
@@ -243,7 +243,7 @@ void main() {
       var childJoin = q.join(object: (p) => p.child!)
         ..join(object: (c) => c.toy!);
       childJoin
-          .join(set: (c) => c.vaccinations!)
+          .join(set: (c) => c.vaccinations)
           .where((o) => o.kind)
           .equalTo("V1");
 
@@ -271,7 +271,7 @@ void main() {
       var childJoin = q.join(object: (p) => p.child!)
         ..join(object: (c) => c.toy!);
       childJoin
-          .join(set: (c) => c.vaccinations!)
+          .join(set: (c) => c.vaccinations)
           .where((o) => o.kind)
           .equalTo("V1");
       var results = await q.fetch();
@@ -285,8 +285,8 @@ void main() {
         ..where((o) => o.child!.name).equalTo("C1")
         ..where((o) => o.child!.cid).equalTo(1);
       final res1 = await q.fetchOne();
-      expect(res1!.pid, 1);
-      expect(res1.backing.contents!.containsKey("child"), false);
+      expect(res1?.pid, 1);
+      expect(res1?.backing.contents.containsKey("child"), false);
 
       var q2 = Query<Parent>(context!)
         ..where((o) => o.child!.name).equalTo("C1")
@@ -301,11 +301,11 @@ void main() {
 
     setUpAll(() async {
       context = await contextWithModels([Child, Parent, Toy, Vaccine]);
-      await populate(context!);
+      await populate(context);
     });
 
     tearDownAll(() async {
-      await context!.close();
+      await context?.close();
     });
 
     test("Can fetch graph when omitting foreign or primary keys from query",
@@ -315,19 +315,19 @@ void main() {
       var childQuery = q.join(object: (p) => p.child!)
         ..returningProperties((c) => [c.name]);
       childQuery
-          .join(set: (c) => c.vaccinations!)
+          .join(set: (c) => c.vaccinations)
           .returningProperties((v) => [v.kind]);
 
       var parents = await q.fetch();
       for (var p in parents) {
         expect(p.name, isNotNull);
         expect(p.pid, isNotNull);
-        expect(p.backing.contents!.length, 3);
+        expect(p.backing.contents.length, 3);
 
         if (p.child != null) {
           expect(p.child!.name, isNotNull);
           expect(p.child!.cid, isNotNull);
-          expect(p.child!.backing.contents!.length, 3);
+          expect(p.child!.backing.contents.length, 3);
 
           for (var v in p.child!.vaccinations!) {
             expect(v.kind, isNotNull);
@@ -344,21 +344,21 @@ void main() {
         ..returningProperties((c) => [c.cid]);
 
       childQuery
-          .join(set: (c) => c.vaccinations!)
+          .join(set: (c) => c.vaccinations)
           .returningProperties((v) => [v.vid]);
 
       var parents = await q.fetch();
       for (var p in parents) {
         expect(p.pid, isNotNull);
-        expect(p.backing.contents!.length, 2);
+        expect(p.backing.contents.length, 2);
 
         if (p.child != null) {
           expect(p.child!.cid, isNotNull);
-          expect(p.child!.backing.contents!.length, 2);
+          expect(p.child!.backing.contents.length, 2);
 
           for (var v in p.child!.vaccinations!) {
             expect(v.vid, isNotNull);
-            expect(v.backing.contents!.length, 1);
+            expect(v.backing.contents.length, 1);
           }
         }
       }
@@ -370,11 +370,11 @@ void main() {
 
     setUpAll(() async {
       context = await contextWithModels([Child, Parent, Toy, Vaccine]);
-      await populate(context!);
+      await populate(context);
     });
 
     tearDownAll(() {
-      context!.close();
+      context?.close();
     });
 
     test("Objects returned in join are not the same instance", () async {
@@ -383,7 +383,7 @@ void main() {
         ..join(object: (p) => p.child!);
 
       var o = await q.fetchOne();
-      expect(identical(o!.child!.parent, o), false);
+      expect(identical(o?.child?.parent, o), false);
     });
   });
 
@@ -392,17 +392,17 @@ void main() {
 
     setUpAll(() async {
       context = await contextWithModels([Child, Parent, Toy, Vaccine]);
-      await populate(context!);
+      await populate(context);
     });
 
     tearDownAll(() {
-      context!.close();
+      context?.close();
     });
 
     test("Trying to fetch hasOne relationship through resultProperties fails",
         () async {
       try {
-        Query<Parent>(context!).returningProperties((p) => [p.pid, p.child]);
+        Query<Parent>(context!).returningProperties((p) => [p.pid, p.child!]);
         expect(true, false);
       } on ArgumentError catch (e) {
         expect(
@@ -491,7 +491,7 @@ class _Vaccine {
   Child? child;
 }
 
-Future<List<Parent>> populate(ManagedContext context) async {
+Future<List<Parent>> populate(ManagedContext? context) async {
   /*
                 A            B      C
                 C1           C2     C3
@@ -521,20 +521,20 @@ Future<List<Parent>> populate(ManagedContext context) async {
   ];
 
   for (var p in parents) {
-    var q = Query<Parent>(context)..values!.name = p.name;
+    var q = Query<Parent>(context!)..values?.name = p.name;
     var insertedParent = await q.insert();
     modelGraph.add(insertedParent);
 
     if (p.child != null) {
       var childQ = Query<Child>(context)
-        ..values!.name = p.child!.name
-        ..values!.parent = insertedParent;
+        ..values?.name = p.child!.name
+        ..values?.parent = insertedParent;
       insertedParent.child = await childQ.insert();
 
       if (p.child!.toy != null) {
         var toyQ = Query<Toy>(context)
-          ..values!.name = p.child!.toy!.name
-          ..values!.child = insertedParent.child;
+          ..values?.name = p.child!.toy!.name
+          ..values?.child = insertedParent.child;
         insertedParent.child!.toy = await toyQ.insert();
       }
 
@@ -542,8 +542,8 @@ Future<List<Parent>> populate(ManagedContext context) async {
         insertedParent.child!.vaccinations = ManagedSet<Vaccine>.from(
             await Future.wait(p.child!.vaccinations!.map((v) {
           var vQ = Query<Vaccine>(context)
-            ..values!.kind = v.kind
-            ..values!.child = insertedParent.child;
+            ..values?.kind = v.kind
+            ..values?.child = insertedParent.child;
           return vQ.insert();
         })));
       }

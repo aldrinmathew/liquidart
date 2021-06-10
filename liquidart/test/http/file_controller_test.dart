@@ -26,7 +26,7 @@ void main() {
   var subdir = Directory.fromUri(fileDirectory.uri.resolve("subdir/"));
   var subdirFile = File.fromUri(subdir.uri.resolve("index.html"));
 
-  HttpServer? server;
+  late HttpServer server;
 
   setUpAll(() async {
     fileDirectory.createSync();
@@ -72,7 +72,7 @@ void main() {
     router.didAddToChannel();
 
     server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8888);
-    server!.map((r) => Request(r)).listen((req) {
+    server.map((r) => Request(r)).listen((req) {
       router.receive(req);
     });
   });
@@ -80,7 +80,7 @@ void main() {
   tearDownAll(() {
     fileDirectory.deleteSync(recursive: true);
     client.close(force: true);
-    server!.close(force: true);
+    server.close(force: true);
   });
 
   test("Can serve json file", () async {
@@ -202,8 +202,7 @@ void main() {
   });
 
   test("Can add extension", () async {
-    var response =
-        await http.get(Uri.parse("http://localhost:8888/silly/file.silly"));
+    var response = await http.get(Uri.parse("http://localhost:8888/silly/file.silly"));
     expect(response.statusCode, 200);
     expect(response.headers["content-type"], "text/html; charset=utf-8");
     expect(response.headers["content-encoding"], "gzip");
@@ -226,12 +225,12 @@ void main() {
     expect(response.statusCode, 200);
     expect(response.body, htmlContents);
 
-    expect(serverHasNoMoreConnections(server!), completes);
+    expect(serverHasNoMoreConnections(server), completes);
   });
 
   test("Provide onFileNotFound provides another response", () async {
-    var response = await http
-        .get(Uri.parse("http://localhost:8888/redirect/jkasdjlkasjdksadj"));
+    var response =
+        await http.get(Uri.parse("http://localhost:8888/redirect/jkasdjlkasjdksadj"));
     expect(response.statusCode, 200);
     expect(json.decode(response.body), {"k": "v"});
   });
@@ -315,8 +314,7 @@ void main() {
 
 Future<http.Response> getFile(String path,
     {Map<String, String>? headers}) async {
-  return http.get(Uri.parse("http://localhost:8888/files$path"),
-      headers: headers);
+  return http.get(Uri.parse("http://localhost:8888/files$path"), headers: headers);
 }
 
 Future<http.Response> getCacheableFile(String path,

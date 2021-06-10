@@ -6,10 +6,10 @@ import 'package:test/test.dart';
 
 void main() {
   group("SSL", () {
-    Application? app;
+    late Application app;
 
     tearDown(() async {
-      await app!.stop();
+      await app.stop();
     });
 
     test("Start with HTTPS", () async {
@@ -23,7 +23,7 @@ void main() {
             .resolve("liquidart.key.pem")
             .toFilePath(windows: Platform.isWindows);
 
-      await app!.start(numberOfInstances: 1);
+      await app.start(numberOfInstances: 1);
 
       var completer = Completer<List<int>>();
       var socket = await SecureSocket.connect("localhost", 8888,
@@ -41,7 +41,7 @@ void main() {
 }
 
 Uri getCIDirectoryUri() {
-  final env = Platform.environment['LIQUIDART_CI_DIR_LOCATION'];
+  final env = Platform.environment['liquidart_CI_DIR_LOCATION'];
   return env != null
       ? Uri.parse(env)
       : Directory.current.uri.resolve("../").resolve("ci/");

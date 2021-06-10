@@ -25,7 +25,7 @@ class CLIDatabaseUpgrade extends CLICommand
     }
 
     try {
-      final currentVersion = await persistentStore.schemaVersion;
+      final currentVersion = await persistentStore!.schemaVersion;
       final appliedMigrations = migrations
           .where((mig) => mig.versionNumber <= currentVersion)
           .toList();
@@ -54,7 +54,7 @@ class CLIDatabaseUpgrade extends CLICommand
     } on QueryException catch (e) {
       if (e.event == QueryExceptionEvent.transport) {
         final databaseUrl =
-            "${connectedDatabase!.username}:${connectedDatabase!.password}@${connectedDatabase!.host}:${connectedDatabase!.port}/${connectedDatabase!.databaseName}";
+            "${connectedDatabase.username}:${connectedDatabase.password}@${connectedDatabase.host}:${connectedDatabase.port}/${connectedDatabase.databaseName}";
         throw CLIException(
             "There was an error connecting to the database '$databaseUrl'. Reason: ${e.message}.");
       }
@@ -86,7 +86,7 @@ class CLIDatabaseUpgrade extends CLICommand
         logHandler: displayProgress);
 
     if (schemaMap.containsKey("error") == true) {
-      throw CLIException(schemaMap["error"] as String);
+      throw CLIException(schemaMap["error"] as String?);
     }
 
     return Schema.fromMap(schemaMap);
@@ -95,8 +95,8 @@ class CLIDatabaseUpgrade extends CLICommand
   DBInfo? get _storeConnectionInfo {
     var s = persistentStore;
     if (s is PostgreSQLPersistentStore) {
-      return DBInfo("postgres", s.username!, s.password!, s.host!, s.port!,
-          s.databaseName!, s.timeZone!);
+      return DBInfo("postgres", s.username, s.password, s.host, s.port,
+          s.databaseName, s.timeZone);
     }
 
     return null;

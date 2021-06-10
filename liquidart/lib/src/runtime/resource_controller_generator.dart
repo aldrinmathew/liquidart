@@ -16,13 +16,13 @@ String getInvokerSource(BuildContext context,
   buf.writeln("  return (rc as $subclassName).${op.dartMethodName}(");
 
   var counter = 0;
-  op.positionalParameters!.forEach((p) {
-    buf.writeln("    args.positionalArguments[$counter] as ${p!.type},");
+  op.positionalParameters.forEach((p) {
+    buf.writeln("    args.positionalArguments[$counter] as ${p.type},");
     counter++;
   });
 
-  op.namedParameters!.forEach((p) {
-    var defaultValue = sourcifyValue(p!.defaultValue);
+  op.namedParameters.forEach((p) {
+    var defaultValue = sourcifyValue(p.defaultValue);
 
     buf.writeln(
         "    ${p.symbolName}: args.namedArguments['${p.symbolName}'] as ${p.type} ?? $defaultValue,");
@@ -39,7 +39,7 @@ String getApplyRequestPropertiesSource(
   StringBuffer buf = StringBuffer();
   final subclassName = MirrorSystem.getName(runtime.type.simpleName);
 
-  runtime.ivarParameters.forEach((f) {
+  runtime.ivarParameters!.forEach((f) {
     buf.writeln("(untypedController as $subclassName).${f.symbolName} "
         "= args.instanceVariables['${f.symbolName}'] as ${f.type};");
   });
@@ -49,11 +49,11 @@ String getApplyRequestPropertiesSource(
 
 String getResourceControllerImplSource(
     BuildContext context, ResourceControllerRuntimeImpl runtime) {
-  final ivarSources = runtime.ivarParameters
+  final ivarSources = runtime.ivarParameters!
       .map((i) => getParameterSource(context, runtime, i))
       .join(",\n");
   final operationSources = runtime.operations
-      .map((o) => getOperationSource(context, runtime, o!))
+      .map((o) => getOperationSource(context, runtime, o))
       .join(",\n");
 
   return """
@@ -78,7 +78,7 @@ String getDecoderSource(
   switch (parameter.location) {
     case BindingType.path:
       {
-        return getElementDecoderSource(parameter.type!);
+        return getElementDecoderSource(parameter.type);
       }
     case BindingType.header:
       {
@@ -92,9 +92,8 @@ String getDecoderSource(
       {
         return getBodyDecoderSource(parameter);
       }
-    default:
-      throw StateError("unknown parameter");
   }
+  // throw StateError("unknown parameter");
 }
 
 String sourcifyFilter(List<String>? filter) {
@@ -106,11 +105,11 @@ String sourcifyFilter(List<String>? filter) {
 }
 
 String getBodyDecoderSource(ResourceControllerParameter p) {
-  final ignore = sourcifyFilter(p.ignoreFilter!);
-  final reject = sourcifyFilter(p.rejectFilter!);
-  final require = sourcifyFilter(p.requireFilter!);
-  final accept = sourcifyFilter(p.acceptFilter!);
-  if (isSerializable(p.type!)) {
+  final ignore = sourcifyFilter(p.ignoreFilter);
+  final reject = sourcifyFilter(p.rejectFilter);
+  final require = sourcifyFilter(p.requireFilter);
+  final accept = sourcifyFilter(p.acceptFilter);
+  if (isSerializable(p.type)) {
     return """(v) {
     return ${p.type}()
       ..read((v as RequestBody).as(), 
@@ -120,7 +119,7 @@ String getBodyDecoderSource(ResourceControllerParameter p) {
            require: $require);
     }
     """;
-  } else if (isListSerializable(p.type!)) {
+  } else if (isListSerializable(p.type)) {
     return """ (b) {
       final body = b as RequestBody;
       final bodyList = body.as<List<Map<String, dynamic>>>();
@@ -129,7 +128,7 @@ String getBodyDecoderSource(ResourceControllerParameter p) {
       }
 
       final iterable = bodyList.map((object) {
-        return ${reflectType(p.type!).typeArguments.first.reflectedType}()
+        return ${reflectType(p.type).typeArguments.first.reflectedType}()
           ..read(object,
             accept: $accept,
             ignore: $ignore,
@@ -165,9 +164,9 @@ String getElementDecoderSource(Type type) {
 }
 
 String getListDecoderSource(ResourceControllerParameter p) {
-  if (reflectType(p.type!).isSubtypeOf(reflectType(List))) {
+  if (reflectType(p.type).isSubtypeOf(reflectType(List))) {
     final mapper = getElementDecoderSource(
-        reflectType(p.type!).typeArguments.first.reflectedType);
+      reflectType(p.type).typeArguments.first.reflectedType);
     return """(v) {
   return ${p.type}.from((v as List).map($mapper));  
 }  """;
@@ -178,7 +177,7 @@ String getListDecoderSource(ResourceControllerParameter p) {
   if (listOfValues.length > 1) {
     throw ArgumentError("multiple values not expected");
   }
-  return ${getElementDecoderSource(p.type!)}(listOfValues.first);
+  return ${getElementDecoderSource(p.type)}(listOfValues.first);
 }  
   """;
 }
@@ -206,16 +205,14 @@ String getOperationSource(
     BuildContext context,
     ResourceControllerRuntimeImpl runtime,
     ResourceControllerOperation operation) {
-  final scopeElements = operation.scopes!
-      .map((s) => "AuthScope(${sourcifyValue(s.toString())})")
+  final scopeElements = operation.scopes?.map((s) => "AuthScope(${sourcifyValue(s.toString())})").join(",");
+  final namedParameters = operation.namedParameters
+      .map((p) => getParameterSource(context, runtime, p))
       .join(",");
-  final namedParameters = operation.namedParameters!
-      .map((p) => getParameterSource(context, runtime, p!))
+  final positionalParameters = operation.positionalParameters
+      .map((p) => getParameterSource(context, runtime, p))
       .join(",");
-  final positionalParameters = operation.positionalParameters!
-      .map((p) => getParameterSource(context, runtime, p!))
-      .join(",");
-  final pathVars = operation.pathVariables!.map((s) => "'$s'").join(",");
+  final pathVars = operation.pathVariables.map((s) => "'$s'").join(",");
 
   return """
 ResourceControllerOperation(

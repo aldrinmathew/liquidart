@@ -9,10 +9,10 @@ class MigrationSource {
   }
 
   MigrationSource.fromMap(Map<String, dynamic> map) {
-    originalName = map["originalName"] as String;
-    source = map["source"] as String;
-    name = map["name"] as String;
-    uri = map["uri"] as Uri;
+    originalName = map["originalName"] as String?;
+    source = map["source"] as String?;
+    name = map["name"] as String?;
+    uri = map["uri"] as Uri?;
   }
 
   factory MigrationSource.fromFile(Uri uri) {
@@ -20,11 +20,11 @@ class MigrationSource {
     final migrationTypes = analyzer.getSubclassesFromFile("Migration", uri);
     if (migrationTypes.length != 1) {
       throw StateError(
-          "Invalid migration file. Must contain exactly one 'Migration' subclass. File: '$uri'.");
+        "Invalid migration file. Must contain exactly one 'Migration' subclass. File: '$uri'.");
     }
 
-    final klass = migrationTypes.first;
-    final source = klass!.toSource();
+    final klass = migrationTypes.first!;
+    final source = klass.toSource();
     final offset = klass.name.offset - klass.offset;
     return MigrationSource(source, uri, offset, offset + klass.name.length);
   }

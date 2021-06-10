@@ -10,7 +10,7 @@ import 'package:cli_agent/cli_agent.dart';
 class CLIClient {
   CLIClient(this.agent);
 
-  final CommandLineAgent? agent;
+  final CommandLineAgent agent;
 
   ProjectAgent get projectAgent {
     if (agent is ProjectAgent) {
@@ -19,7 +19,6 @@ class CLIClient {
 
     throw StateError("is not a project terminal");
   }
-
   List<String>? defaultArgs;
 
   String get output {
@@ -41,16 +40,15 @@ class CLIClient {
   }
 
   Directory get defaultMigrationDirectory {
-    return Directory.fromUri(
-        agent!.workingDirectory.uri.resolve("migrations/"));
+    return Directory.fromUri(agent.workingDirectory.uri.resolve("migrations/"));
   }
 
   Directory get libraryDirectory {
-    return Directory.fromUri(agent!.workingDirectory.uri.resolve("lib/"));
+    return Directory.fromUri(agent.workingDirectory.uri.resolve("lib/"));
   }
 
   void delete() {
-    agent!.workingDirectory.deleteSync(recursive: true);
+    agent.workingDirectory.deleteSync(recursive: true);
   }
 
   CLIClient replicate(Uri uri) {
@@ -63,8 +61,7 @@ class CLIClient {
     if (dstDirectory.existsSync()) {
       dstDirectory.deleteSync(recursive: true);
     }
-    CommandLineAgent.copyDirectory(
-        src: agent!.workingDirectory.uri, dst: dstUri);
+    CommandLineAgent.copyDirectory(src: agent.workingDirectory.uri, dst: dstUri);
     return CLIClient(ProjectAgent.existing(dstUri));
   }
 
@@ -76,13 +73,16 @@ class CLIClient {
       {String name = "application_test",
       String? template,
       bool offline = true}) async {
+        final args = <String>[];
     if (template == null) {
       final client = CLIClient(ProjectAgent(name, dependencies: {
-        "liquidart": {"path": "../.."}
+        "liquidart" : {
+          "path": "../.."
+        }
       }, devDependencies: {
         "test": "^1.0.0"
       }));
-
+      
       client.projectAgent.addLibraryFile("channel", """
 import 'dart:async';
 
@@ -103,19 +103,19 @@ class TestChannel extends ApplicationChannel {
   }
 }
   """);
-
+      
       return client;
+    }else{
+      
+      args.addAll(["-t", template]);
+    
     }
-
+    
     try {
       ProjectAgent.projectsDirectory.createSync();
     } catch (_) {}
 
-    final args = <String>[];
-    dynamic templateCheck = template;
-    if (templateCheck != null) {
-      args.addAll(["-t", template]);
-    }
+    
 
     if (offline) {
       args.add("--offline");
@@ -126,14 +126,14 @@ class TestChannel extends ApplicationChannel {
     await run("create", args);
     print("$output");
 
-    return CLIClient(ProjectAgent.existing(
-        ProjectAgent.projectsDirectory.uri.resolve("$name/")));
+    return CLIClient(ProjectAgent.existing(ProjectAgent.projectsDirectory.uri.resolve("$name/")));
   }
 
   Future<int> executeMigrations(
       {String connectString =
           "postgres://dart:dart@localhost:5432/dart_test"}) async {
-    final res = await run("db", ["upgrade", "--connect", connectString]);
+    final res =
+        await run("db", ["upgrade", "--connect", connectString]);
     if (res != 0) {
       print("executeMigrations failed: $output");
     }
@@ -171,7 +171,7 @@ class TestChannel extends ApplicationChannel {
 
     print("Running 'liquidart ${args.join(" ")}'");
     final saved = Directory.current;
-    Directory.current = agent!.workingDirectory;
+    Directory.current = agent.workingDirectory;
 
     var cmd = Runner()..outputSink = _output;
     var results = cmd.options.parse(args);
@@ -186,14 +186,14 @@ class TestChannel extends ApplicationChannel {
     return exitCode;
   }
 
-  CLITask start(String command, List<String>? inputArgs) {
-    final args = inputArgs ?? [];
+  CLITask start(String command, List<String> inputArgs) {
+    final args = inputArgs;
     args.insert(0, command);
     args.addAll(defaultArgs ?? []);
 
     print("Starting 'liquidart ${args.join(" ")}'");
     final saved = Directory.current;
-    Directory.current = agent!.workingDirectory;
+    Directory.current = agent.workingDirectory;
 
     var cmd = Runner()..outputSink = _output;
     var results = cmd.options.parse(args);
@@ -204,7 +204,7 @@ class TestChannel extends ApplicationChannel {
       if (cmd.runningProcess != null) {
         t.cancel();
         Directory.current = saved;
-        task.process = cmd.runningProcess!;
+        task.process = cmd.runningProcess;
         task._processStarted.complete(true);
       } else {
         elapsed += 100;

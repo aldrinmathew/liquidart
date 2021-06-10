@@ -142,7 +142,7 @@ void main() {
 }
 
 class TestSerializable extends Serializable {
-  Map<String, dynamic> contents = {};
+  Map<String, dynamic>? contents;
 
   @override
   void readFromMap(Map<String, dynamic> object) {

@@ -11,7 +11,7 @@ between a builder command (e.g. createTable) and the generate SQL/Dart command.
  */
 
 void main() {
-  PostgreSQLPersistentStore? store;
+  late PostgreSQLPersistentStore store;
 
   setUp(() async {
     store = PostgreSQLPersistentStore(
@@ -19,13 +19,13 @@ void main() {
   });
 
   tearDown(() async {
-    await store!.close();
+    await store.close();
   });
 
   group("Tables", () {
     test("Add table to schema", () async {
       final cmds = await applyDifference(
-          store!,
+          store,
           Schema.empty(),
           Schema([
             SchemaTable("foo", [
@@ -36,14 +36,14 @@ void main() {
 
       expect(cmds.length, 1);
 
-      final defs = await TableDefinition.get(store!, ["foo"]);
+      final defs = await TableDefinition.get(store, ["foo"]);
       expect(defs["foo"]!.columns.length, 1);
       defs["foo"]!.expectColumn("id", "integer", primaryKey: true);
     });
 
     test("Add multiple, unrelated tables", () async {
       final cmds = await applyDifference(
-          store!,
+          store,
           Schema.empty(),
           Schema([
             SchemaTable("foo", [
@@ -58,7 +58,7 @@ void main() {
 
       expect(cmds.length, 2);
 
-      final defs = await TableDefinition.get(store!, ["foo", "bar"]);
+      final defs = await TableDefinition.get(store, ["foo", "bar"]);
 
       expect(defs["foo"]!.columns.length, 1);
       defs["foo"]!.expectColumn("id", "integer", primaryKey: true);
@@ -81,8 +81,8 @@ void main() {
         Schema.empty()
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      var defs = await TableDefinition.get(store!, ["foo", "bar"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      var defs = await TableDefinition.get(store, ["foo", "bar"]);
 
       expect(defs["foo"]!.columns.length, 1);
       defs["foo"]!.expectColumn("id", "integer", primaryKey: true);
@@ -90,8 +90,8 @@ void main() {
       expect(defs["bar"]!.columns.length, 1);
       defs["bar"]!.expectColumn("id", "integer", primaryKey: true);
 
-      await applyDifference(store!, schemas[1], schemas[2]);
-      defs = await TableDefinition.get(store!, ["foo", "bar"]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      defs = await TableDefinition.get(store, ["foo", "bar"]);
       expect(defs.length, 0);
     });
 
@@ -116,12 +116,12 @@ void main() {
         ])
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      var defs = await TableDefinition.get(store!, ["u"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      var defs = await TableDefinition.get(store, ["u"]);
       expect(defs["u"]!.uniqueSet, isNull);
 
-      await applyDifference(store!, schemas[1], schemas[2]);
-      defs = await TableDefinition.get(store!, ["u"]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      defs = await TableDefinition.get(store, ["u"]);
       expect(defs["u"]!.uniqueSet, ["a", "b"]);
     });
 
@@ -147,12 +147,12 @@ void main() {
         ])
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      var defs = await TableDefinition.get(store!, ["u"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      var defs = await TableDefinition.get(store, ["u"]);
       expect(defs["u"]!.uniqueSet, ["a", "b"]);
 
-      await applyDifference(store!, schemas[1], schemas[2]);
-      defs = await TableDefinition.get(store!, ["u"]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      defs = await TableDefinition.get(store, ["u"]);
       expect(defs["u"]!.uniqueSet, isNull);
     });
 
@@ -182,12 +182,12 @@ void main() {
         ])
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      var defs = await TableDefinition.get(store!, ["u"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      var defs = await TableDefinition.get(store, ["u"]);
       expect(defs["u"]!.uniqueSet, ["a", "b"]);
 
-      await applyDifference(store!, schemas[1], schemas[2]);
-      defs = await TableDefinition.get(store!, ["u"]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      defs = await TableDefinition.get(store, ["u"]);
       expect(defs["u"]!.uniqueSet, ["b", "c"]);
     });
 
@@ -211,9 +211,9 @@ void main() {
         ])
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      final defs = await TableDefinition.get(store!, ["t", "u"]);
-      expect(defs["u"]!.uniqueSet..sort(), ["ref_id", "x"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      final defs = await TableDefinition.get(store, ["t", "u"]);
+      expect(defs["u"]!.uniqueSet?..sort(), ["ref_id", "x"]);
       defs["u"]!.expectColumn("ref_id", "integer",
           nullable: true,
           relatedTableName: "t",
@@ -251,10 +251,10 @@ void main() {
         ])
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      await applyDifference(store!, schemas[1], schemas[2]);
-      final defs = await TableDefinition.get(store!, ["t", "u"]);
-      expect(defs["u"]!.uniqueSet..sort(), ["ref_id", "x"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      final defs = await TableDefinition.get(store, ["t", "u"]);
+      expect(defs["u"]!.uniqueSet?..sort(), ["ref_id", "x"]);
       defs["u"]!.expectColumn("ref_id", "integer",
           nullable: true,
           relatedTableName: "t",
@@ -298,10 +298,10 @@ void main() {
         ])
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      await applyDifference(store!, schemas[1], schemas[2]);
-      final defs = await TableDefinition.get(store!, ["t", "u"]);
-      expect(defs["u"]!.uniqueSet..sort(), ["ref_id", "x", "y"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      final defs = await TableDefinition.get(store, ["t", "u"]);
+      expect(defs["u"]!.uniqueSet?..sort(), ["ref_id", "x", "y"]);
       defs["u"]!.expectColumn("ref_id", "integer",
           nullable: true,
           relatedTableName: "t",
@@ -327,12 +327,12 @@ void main() {
         ])
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      var defs = await TableDefinition.get(store!, ["foo"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      var defs = await TableDefinition.get(store, ["foo"]);
       defs["foo"]!.expectColumn("id", "integer", primaryKey: true);
 
-      await applyDifference(store!, schemas[1], schemas[2]);
-      defs = await TableDefinition.get(store!, ["foo"]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      defs = await TableDefinition.get(store, ["foo"]);
       defs["foo"]!.expectColumn("id", "integer", primaryKey: true);
       defs["foo"]!.expectColumn("x", "text");
     });
@@ -358,12 +358,12 @@ void main() {
         ])
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      var defs = await TableDefinition.get(store!, ["foo"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      var defs = await TableDefinition.get(store, ["foo"]);
       defs["foo"]!.expectColumn("id", "integer", primaryKey: true);
 
-      await applyDifference(store!, schemas[1], schemas[2]);
-      defs = await TableDefinition.get(store!, ["foo"]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      defs = await TableDefinition.get(store, ["foo"]);
       defs["foo"]!.expectColumn("id", "integer", primaryKey: true);
       defs["foo"]!.expectColumn("x", "text");
       defs["foo"]!.expectColumn("y", "timestamp without time zone",
@@ -390,9 +390,9 @@ void main() {
         ])
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      await applyDifference(store!, schemas[1], schemas[2]);
-      final defs = await TableDefinition.get(store!, ["foo"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      final defs = await TableDefinition.get(store, ["foo"]);
       defs["foo"]!.expectColumn("id", "integer", primaryKey: true);
       defs["foo"]!.expectColumn("x", "bigint", autoincrementing: true);
     });
@@ -413,9 +413,9 @@ void main() {
         ]),
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      await applyDifference(store!, schemas[1], schemas[2]);
-      final defs = await TableDefinition.get(store!, ["foo"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      final defs = await TableDefinition.get(store, ["foo"]);
       expect(defs["foo"]!.columns.length, 1);
       defs["foo"]!.expectColumn("id", "integer", primaryKey: true);
     });
@@ -437,9 +437,9 @@ void main() {
         ]),
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      await applyDifference(store!, schemas[1], schemas[2]);
-      final defs = await TableDefinition.get(store!, ["foo"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      final defs = await TableDefinition.get(store, ["foo"]);
       expect(defs["foo"]!.columns.length, 1);
       defs["foo"]!.expectColumn("id", "integer", primaryKey: true);
     });
@@ -469,13 +469,13 @@ void main() {
         ]),
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      await applyDifference(store!, schemas[1], schemas[2]);
-      var defs = await TableDefinition.get(store!, ["foo"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      var defs = await TableDefinition.get(store, ["foo"]);
       defs["foo"]!.expectColumn("x", "bigint", indexed: true);
 
-      await applyDifference(store!, schemas[2], schemas[3]);
-      defs = await TableDefinition.get(store!, ["foo"]);
+      await applyDifference(store, schemas[2], schemas[3]);
+      defs = await TableDefinition.get(store, ["foo"]);
       defs["foo"]!.expectColumn("x", "bigint", indexed: false);
     });
 
@@ -505,13 +505,13 @@ void main() {
         ]),
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      await applyDifference(store!, schemas[1], schemas[2]);
-      var defs = await TableDefinition.get(store!, ["foo"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      var defs = await TableDefinition.get(store, ["foo"]);
       defs["foo"]!.expectColumn("x", "bigint", defaultValue: "1");
 
-      await applyDifference(store!, schemas[2], schemas[3]);
-      defs = await TableDefinition.get(store!, ["foo"]);
+      await applyDifference(store, schemas[2], schemas[3]);
+      defs = await TableDefinition.get(store, ["foo"]);
       defs["foo"]!.expectColumn("x", "bigint", defaultValue: null);
     });
 
@@ -538,13 +538,13 @@ void main() {
         ]),
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      await applyDifference(store!, schemas[1], schemas[2]);
-      var defs = await TableDefinition.get(store!, ["foo"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      var defs = await TableDefinition.get(store, ["foo"]);
       defs["foo"]!.expectColumn("x", "bigint", unique: true);
 
-      await applyDifference(store!, schemas[2], schemas[3]);
-      defs = await TableDefinition.get(store!, ["foo"]);
+      await applyDifference(store, schemas[2], schemas[3]);
+      defs = await TableDefinition.get(store, ["foo"]);
       defs["foo"]!.expectColumn("x", "bigint", unique: false);
     });
 
@@ -573,13 +573,13 @@ void main() {
         ]),
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      await applyDifference(store!, schemas[1], schemas[2]);
-      var defs = await TableDefinition.get(store!, ["foo"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      var defs = await TableDefinition.get(store, ["foo"]);
       defs["foo"]!.expectColumn("x", "bigint", nullable: true);
 
-      await applyDifference(store!, schemas[2], schemas[3]);
-      defs = await TableDefinition.get(store!, ["foo"]);
+      await applyDifference(store, schemas[2], schemas[3]);
+      defs = await TableDefinition.get(store, ["foo"]);
       defs["foo"]!.expectColumn("x", "bigint", nullable: false);
     });
   });
@@ -600,8 +600,8 @@ void main() {
         ])
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      var defs = await TableDefinition.get(store!, ["t", "u"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      var defs = await TableDefinition.get(store, ["t", "u"]);
       defs["u"]!.expectColumn("ref_id", "integer",
           nullable: true,
           relatedTableName: "t",
@@ -625,8 +625,8 @@ void main() {
         ])
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      var defs = await TableDefinition.get(store!, ["t", "u"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      var defs = await TableDefinition.get(store, ["t", "u"]);
       defs["u"]!.expectColumn("ref_id", "integer",
           nullable: true,
           relatedTableName: "t",
@@ -651,8 +651,8 @@ void main() {
         ])
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      var defs = await TableDefinition.get(store!, ["t", "u"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      var defs = await TableDefinition.get(store, ["t", "u"]);
       defs["u"]!.expectColumn("ref_id", "integer",
           nullable: true,
           relatedTableName: "t",
@@ -677,8 +677,8 @@ void main() {
         ])
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      var defs = await TableDefinition.get(store!, ["t", "u"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      var defs = await TableDefinition.get(store, ["t", "u"]);
       defs["t"]!.expectColumn("ref_id", "integer",
           nullable: true,
           relatedTableName: "t",
@@ -708,8 +708,8 @@ void main() {
         ])
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      var defs = await TableDefinition.get(store!, ["t", "u", "v"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      var defs = await TableDefinition.get(store, ["t", "u", "v"]);
       defs["t"]!.expectColumn("ref_id", "integer",
           nullable: true,
           relatedTableName: "u",
@@ -747,10 +747,10 @@ void main() {
         ])
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      await applyDifference(store!, schemas[1], schemas[2]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      await applyDifference(store, schemas[1], schemas[2]);
 
-      var defs = await TableDefinition.get(store!, ["t", "u"]);
+      var defs = await TableDefinition.get(store, ["t", "u"]);
       defs["u"]!.expectColumn("ref_id", "integer",
           nullable: true,
           relatedTableName: "t",
@@ -780,9 +780,9 @@ void main() {
         ])
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      await applyDifference(store!, schemas[1], schemas[2]);
-      var defs = await TableDefinition.get(store!, ["t", "u"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      var defs = await TableDefinition.get(store, ["t", "u"]);
       defs["u"]!.expectColumn("ref_id", "integer",
           nullable: true,
           relatedTableName: "t",
@@ -813,9 +813,9 @@ void main() {
         ])
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      await applyDifference(store!, schemas[1], schemas[2]);
-      var defs = await TableDefinition.get(store!, ["t", "u"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      var defs = await TableDefinition.get(store, ["t", "u"]);
       defs["u"]!.expectColumn("ref_id", "integer",
           nullable: true,
           relatedTableName: "t",
@@ -846,9 +846,9 @@ void main() {
         ])
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      await applyDifference(store!, schemas[1], schemas[2]);
-      var defs = await TableDefinition.get(store!, ["t", "u"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      var defs = await TableDefinition.get(store, ["t", "u"]);
       defs["u"]!.expectColumn("ref_id", "integer",
           nullable: true,
           relatedTableName: "t",
@@ -880,9 +880,9 @@ void main() {
         ]),
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      await applyDifference(store!, schemas[1], schemas[2]);
-      var defs = await TableDefinition.get(store!, ["t", "u"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      var defs = await TableDefinition.get(store, ["t", "u"]);
       expect(defs["u"]!.columns.length, 1);
       expect(defs["u"]!.columns.first.name, "id");
     });
@@ -911,11 +911,11 @@ void main() {
         ]),
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      await store!.execute("INSERT INTO t (id) VALUES (1)");
-      await store!.execute("INSERT INTO u (id, ref_id) VALUES (1,1)");
-      await applyDifference(store!, schemas[1], schemas[2]);
-      var defs = await TableDefinition.get(store!, ["t", "u"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      await store.execute("INSERT INTO t (id) VALUES (1)");
+      await store.execute("INSERT INTO u (id, ref_id) VALUES (1,1)");
+      await applyDifference(store, schemas[1], schemas[2]);
+      var defs = await TableDefinition.get(store, ["t", "u"]);
       expect(defs["u"]!.columns.length, 1);
       expect(defs["u"]!.columns.first.name, "id");
     });
@@ -946,32 +946,32 @@ void main() {
               DeleteRule.setDefault,
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      var defs = await TableDefinition.get(store!, ["t", "u"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      var defs = await TableDefinition.get(store, ["t", "u"]);
       defs["u"]!.expectColumn("ref_id", "integer",
           nullable: true,
           relatedTableName: "t",
           relatedColumnName: "id",
           deleteRule: "SET NULL");
 
-      await applyDifference(store!, schemas[1], schemas[2]);
-      defs = await TableDefinition.get(store!, ["t", "u"]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      defs = await TableDefinition.get(store, ["t", "u"]);
       defs["u"]!.expectColumn("ref_id", "integer",
           nullable: true,
           relatedTableName: "t",
           relatedColumnName: "id",
           deleteRule: "CASCADE");
 
-      await applyDifference(store!, schemas[2], schemas[3]);
-      defs = await TableDefinition.get(store!, ["t", "u"]);
+      await applyDifference(store, schemas[2], schemas[3]);
+      defs = await TableDefinition.get(store, ["t", "u"]);
       defs["u"]!.expectColumn("ref_id", "integer",
           nullable: true,
           relatedTableName: "t",
           relatedColumnName: "id",
           deleteRule: "RESTRICT");
 
-      await applyDifference(store!, schemas[3], schemas[4]);
-      defs = await TableDefinition.get(store!, ["t", "u"]);
+      await applyDifference(store, schemas[3], schemas[4]);
+      defs = await TableDefinition.get(store, ["t", "u"]);
       defs["u"]!.expectColumn("ref_id", "integer",
           nullable: true,
           relatedTableName: "t",
@@ -1007,16 +1007,16 @@ void main() {
         ])
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      var defs = await TableDefinition.get(store!, ["t", "u"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      var defs = await TableDefinition.get(store, ["t", "u"]);
       defs["u"]!.expectColumn("ref_id", "integer",
           nullable: true,
           relatedTableName: "t",
           relatedColumnName: "id",
           deleteRule: "SET NULL");
 
-      await applyDifference(store!, schemas[1], schemas[2]);
-      defs = await TableDefinition.get(store!, ["t", "u"]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      defs = await TableDefinition.get(store, ["t", "u"]);
       defs["u"]!.expectColumn("ref_id", "integer",
           nullable: false,
           relatedTableName: "t",
@@ -1047,16 +1047,16 @@ void main() {
         ])
       ];
 
-      await applyDifference(store!, schemas[0], schemas[1]);
-      var defs = await TableDefinition.get(store!, ["t", "u"]);
+      await applyDifference(store, schemas[0], schemas[1]);
+      var defs = await TableDefinition.get(store, ["t", "u"]);
       defs["u"]!.expectColumn("ref_id", "integer",
           nullable: true,
           relatedTableName: "t",
           relatedColumnName: "id",
           deleteRule: "SET NULL");
 
-      await applyDifference(store!, schemas[1], schemas[2]);
-      defs = await TableDefinition.get(store!, ["t", "u", "v"]);
+      await applyDifference(store, schemas[1], schemas[2]);
+      defs = await TableDefinition.get(store, ["t", "u", "v"]);
       expect(defs.length, 1);
       expect(defs.containsKey("v"), true);
     });
@@ -1087,8 +1087,8 @@ class TableDefinition {
 
     final m = <String, TableDefinition>{};
     tables.forEach((t) {
-      if (t.isValid!) {
-        m[t.name!] = t;
+      if (t.isValid) {
+        m[t.name] = t;
       }
     });
 
@@ -1133,11 +1133,11 @@ class TableDefinition {
     expect(col.deleteRule, deleteRule, reason: "$name delete rule");
   }
 
-  final String? name;
-  List<ColumnDefinition> columns = [];
-  bool? isValid;
+  final String name;
+  late List<ColumnDefinition> columns;
+  late bool isValid;
 
-  List<String> uniqueSet = [];
+  List<String>? uniqueSet;
 
   Future<void> resolve(PostgreSQLPersistentStore store) async {
     final exists = await store.execute(
@@ -1145,7 +1145,7 @@ class TableDefinition {
         as List<List<dynamic>>;
     isValid = exists.length == 1;
 
-    if (!isValid!) {
+    if (!isValid) {
       return;
     }
 
@@ -1219,11 +1219,10 @@ class ColumnDefinition {
     dataType = row[2] as String;
     isNullable = row[3] == "YES";
 
-    String? def = row[1] as String?;
-    dynamic defCheck = def;
-    if (def!.startsWith("nextval")) {
+    final def = row[1] as String;
+    if (def.startsWith("nextval")) {
       isAutoincrementing = true;
-    } else if (defCheck != null) {
+    } else {
       defaultValue = def;
     }
   }

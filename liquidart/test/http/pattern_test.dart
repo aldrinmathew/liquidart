@@ -209,7 +209,7 @@ void expectRouterException(void f(), {String? exceptionMessage}) {
   }
 }
 
-List<List<RouteSegment>> _segmentsForRoute(String route) {
+List<List<RouteSegment>?> _segmentsForRoute(String route) {
   return RouteSpecification.specificationsForRoutePattern(route)
       .map((spec) => spec.segments)
       .map((segs) => segs)

@@ -17,7 +17,7 @@ void main() {
   });
 
   tearDown(() async {
-    await server!.close(force: true);
+    await server?.close(force: true);
     server = null;
   });
 
@@ -155,8 +155,7 @@ void main() {
 
       final response = await http.post(Uri.parse("http://localhost:4040"),
           headers: {"Content-Type": "application/octet-stream"},
-          // ignore: return_of_invalid_type_from_catch_error
-          body: [1, 2, 3]).catchError((err) => null);
+          body: [1, 2, 3]);
 
       expect(response.statusCode, 200);
       expect(response.bodyBytes, [1, 2, 3]);
@@ -233,15 +232,13 @@ Future<http.Response> postJSON(dynamic body) {
   if (body == null) {
     return http.post(Uri.parse("http://localhost:4040"), headers: {
       "Content-Type": "application/json"
-      // ignore: return_of_invalid_type_from_catch_error
-    }).catchError((err) => null);
+    });
   }
   return http
       .post(Uri.parse("http://localhost:4040"),
           headers: {"Content-Type": "application/json"},
           body: json.encode(body))
-      // ignore: return_of_invalid_type_from_catch_error
-      .catchError((err) => null);
+      ;
 }
 
 class TestModel extends ManagedObject<_TestModel> implements _TestModel {}
@@ -254,7 +251,7 @@ class _TestModel {
 }
 
 class TestSerializable extends Serializable {
-  Map<String, dynamic> contents = {};
+  Map<String, dynamic>? contents;
 
   @override
   void readFromMap(Map<String, dynamic> object) {
@@ -262,7 +259,7 @@ class TestSerializable extends Serializable {
   }
 
   @override
-  Map<String, dynamic> asMap() {
+  Map<String, dynamic>? asMap() {
     return contents;
   }
 }

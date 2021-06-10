@@ -7,7 +7,7 @@ void main() {
   ManagedContext? context;
 
   tearDown(() async {
-    await context!.close();
+    await context?.close();
     context = null;
   });
 
@@ -199,10 +199,9 @@ class _TestModel {
 
   ManagedSet<RefModel>? ref;
 
-  // ignore: unused_element
-  static String tableName() {
-    return "simple";
-  }
+  // static String tableName() {
+  //   return "simple";
+  // }
 
   @override
   String toString() {

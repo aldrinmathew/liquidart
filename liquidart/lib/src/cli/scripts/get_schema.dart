@@ -21,7 +21,7 @@ class GetSchemaExecutable extends Executable<Map<String, dynamic>> {
     }
   }
 
-  static List<String> importsForPackage(String packageName) => [
+  static List<String> importsForPackage(String? packageName) => [
         "package:liquidart/liquidart.dart",
         "package:$packageName/$packageName.dart",
         "package:replica/replica.dart"
@@ -35,7 +35,7 @@ Future<Schema> getProjectSchema(CLIProject project) async {
       logHandler: project.displayProgress);
 
   if (response.containsKey("error")) {
-    throw CLIException(response["error"] as String);
+    throw CLIException(response["error"] as String?);
   }
 
   return Schema.fromMap(response);

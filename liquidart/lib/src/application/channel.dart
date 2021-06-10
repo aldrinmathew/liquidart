@@ -59,7 +59,7 @@ abstract class ApplicationChannel implements APIComponentDocumenter {
   Logger get logger => Logger("liquidart");
 
   /// The [ApplicationServer] that sends HTTP requests to this object.
-  ApplicationServer get server => _server!;
+  ApplicationServer get server => _server;
 
   set server(ApplicationServer server) {
     _server = server;
@@ -81,8 +81,8 @@ abstract class ApplicationChannel implements APIComponentDocumenter {
   /// reference a private key and certificate file, this value is derived from that information. You may override
   /// this method to provide an alternative means to creating a [SecurityContext].
   SecurityContext? get securityContext {
-    if (options!.certificateFilePath == null ||
-        options!.privateKeyFilePath == null) {
+    if (options?.certificateFilePath == null ||
+        options?.privateKeyFilePath == null) {
       return null;
     }
 
@@ -114,7 +114,7 @@ abstract class ApplicationChannel implements APIComponentDocumenter {
   ///         }
   Controller get entryPoint;
 
-  ApplicationServer? _server;
+  late ApplicationServer _server;
 
   /// You override this method to perform initialization tasks.
   ///
@@ -169,11 +169,11 @@ abstract class ApplicationChannel implements APIComponentDocumenter {
     final context = APIDocumentContext(doc);
     documentComponents(context);
 
-    doc.paths = root.documentPaths(context);
+    doc.paths = root.documentPaths(context)!;
 
     doc.info = APIInfo(
-        projectSpec["name"] as String, projectSpec["version"] as String,
-        description: projectSpec["description"] as String);
+        projectSpec["name"] as String?, projectSpec["version"] as String?,
+        description: projectSpec["description"] as String?);
 
     await context.finalize();
 
@@ -235,8 +235,8 @@ class ApplicationMessageHub extends Stream<dynamic> implements Sink<dynamic> {
           {Function? onError, void onDone()?, bool? cancelOnError = false}) =>
       _inboundController.stream.listen(onData,
           onError: onError ??
-              (err, StackTrace st) =>
-                  _logger.severe("ApplicationMessageHub error", err, st),
+              ((err, StackTrace st) =>
+                  _logger.severe("ApplicationMessageHub error", err, st)),
           onDone: onDone,
           cancelOnError: cancelOnError);
 
@@ -268,7 +268,7 @@ class ApplicationMessageHub extends Stream<dynamic> implements Sink<dynamic> {
 
 abstract class ChannelRuntime {
   Iterable<APIComponentDocumenter?> getDocumentableChannelComponents(
-      ApplicationChannel channel);
+    ApplicationChannel channel);
 
   Type get channelType;
 
@@ -280,3 +280,4 @@ abstract class ChannelRuntime {
 
   Future? runGlobalInitialization(ApplicationOptions config);
 }
+

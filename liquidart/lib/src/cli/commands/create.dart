@@ -55,18 +55,16 @@ class CLITemplateCreator extends CLICommand with CLILiquidartGlobal {
     }
 
     displayProgress("Template source is: ${templateSourceDirectory.path}");
-    displayProgress(
-        "See more templates with 'liquidart create list-templates'");
-    copyProjectFiles(destDirectory, templateSourceDirectory, projectName!);
+    displayProgress("See more templates with 'liquidart create list-templates'");
+    copyProjectFiles(destDirectory, templateSourceDirectory, projectName);
 
     createProjectSpecificFiles(destDirectory.path);
-    if (liquidartPackageRef.sourceType == "path") {
-      final liquidartLocation = liquidartPackageRef.resolve()!.location;
+    if (liquidartPackageRef!.sourceType == "path") {
+      final liquidartLocation = liquidartPackageRef!.resolve()!.location;
 
       addDependencyOverridesToPackage(destDirectory.path, {
         "liquidart": liquidartLocation.uri,
-        "liquidart_test":
-            liquidartLocation.parent.uri.resolve("liquidart_test/")
+        "liquidart_test": liquidartLocation.parent.uri.resolve("liquidart_test/")
       });
     }
 
@@ -124,18 +122,18 @@ class CLITemplateCreator extends CLICommand with CLILiquidartGlobal {
     return true;
   }
 
-  void interpretContentFile(String projectName, Directory destinationDirectory,
+  void interpretContentFile(String? projectName, Directory destinationDirectory,
       FileSystemEntity sourceFileEntity) {
     if (shouldIncludeItem(sourceFileEntity)) {
       if (sourceFileEntity is Directory) {
         copyDirectory(projectName, destinationDirectory, sourceFileEntity);
       } else if (sourceFileEntity is File) {
-        copyFile(projectName, destinationDirectory, sourceFileEntity);
+        copyFile(projectName!, destinationDirectory, sourceFileEntity);
       }
     }
   }
 
-  void copyDirectory(String projectName, Directory destinationParentDirectory,
+  void copyDirectory(String? projectName, Directory destinationParentDirectory,
       Directory sourceDirectory) {
     var sourceDirectoryName = sourceDirectory
         .uri.pathSegments[sourceDirectory.uri.pathSegments.length - 2];
@@ -206,7 +204,7 @@ class CLITemplateCreator extends CLICommand with CLILiquidartGlobal {
   }
 
   void copyProjectFiles(Directory destinationDirectory,
-      Directory sourceDirectory, String projectName) {
+      Directory sourceDirectory, String? projectName) {
     displayInfo(
         "Copying template files to new project directory (${destinationDirectory.path})...");
     try {
@@ -338,15 +336,15 @@ class CLITemplateList extends CLICommand with CLILiquidartGlobal {
 class CLILiquidartGlobal {
   PubCache pub = PubCache();
 
-  PackageRef get liquidartPackageRef {
+  PackageRef? get liquidartPackageRef {
     return pub
         .getGlobalApplications()
         .firstWhere((app) => app.name == "liquidart")
-        .getDefiningPackageRef()!;
+        .getDefiningPackageRef();
   }
 
   Uri get templateDirectory {
-    return liquidartPackageRef.resolve()!.location.uri.resolve("templates/");
+    return liquidartPackageRef!.resolve()!.location.uri.resolve("templates/");
   }
 
   Uri getTemplateLocation(String templateName) {

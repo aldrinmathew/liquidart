@@ -20,8 +20,7 @@ class _SameNameOne {
   @primaryKey
   int? id;
 
-  // ignore: unused_element
-  static String tableName() => "fo";
+  // static String tableName() => "fo";
 }
 
 class SameNameTwo extends ManagedObject<_SameNameTwo> {}
@@ -30,6 +29,5 @@ class _SameNameTwo {
   @primaryKey
   int? id;
 
-  // ignore: unused_element
-  static String tableName() => "fo";
+  // static String tableName() => "fo";
 }

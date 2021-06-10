@@ -10,9 +10,8 @@ part of liquidart_test.client;
 class TestRequest {
   TestRequest._(this._client);
 
-  // ignore: prefer_final_fields
-  HttpClient? _client;
-  Uri? _baseUrl;
+  HttpClient _client;
+  late Uri _baseUrl;
 
   /// The base URL of the request.
   ///
@@ -20,11 +19,11 @@ class TestRequest {
   /// when this request is executed.
   ///
   /// This property is set to [Agent.baseURL] of the creating agent.
-  set baseURL(String? baseURL) {
-    _baseUrl = Uri.parse(baseURL!);
+  set baseURL(String baseURL) {
+    _baseUrl = Uri.parse(baseURL);
   }
 
-  String? get baseURL => _baseUrl.toString();
+  String get baseURL => _baseUrl.toString();
 
   /// The path of the request; will be appended to [baseURL].
   String? path;
@@ -41,7 +40,7 @@ class TestRequest {
   /// Prior to execution, [body] will be encoded according to its [contentType] codec in [CodecRegistry].
   ///
   /// To disable encoded, set [encodeBody] to false: [body] must be a [List<int>] when encoding is disabled.
-  dynamic? body;
+  dynamic body;
 
   /// Whether or not [body] should be encoded according to [contentType].
   ///
@@ -52,7 +51,7 @@ class TestRequest {
   /// Query parameters to add to the request.
   ///
   /// Key-value pairs in this property will be appended to the request URI after being properly URL encoded.
-  Map<String, dynamic> query = {};
+  Map<String, dynamic>? query = {};
 
   /// HTTP headers to add to the request.
   ///
@@ -70,15 +69,15 @@ class TestRequest {
       throw StateError("TestRequest must have non-null path and baseURL.");
     }
 
-    var actualPath = path;
-    while (actualPath!.startsWith("/")) {
+    var actualPath = path!;
+    while (actualPath.startsWith("/")) {
       actualPath = actualPath.substring(1);
     }
 
-    var url = _baseUrl!.resolve(actualPath).toString();
-    if (query.isNotEmpty) {
-      final pairs = query.keys.map((key) {
-        final val = query[key];
+    var url = _baseUrl.resolve(actualPath).toString();
+    if ((query?.length ?? 0) > 0) {
+      final pairs = query!.keys.map((key) {
+        final val = query![key];
         if (val == null || val == true) {
           return "$key";
         } else {
@@ -167,16 +166,16 @@ class TestRequest {
           "Cannot set 'body' when using HTTP '${method.toUpperCase()}'.");
     }
 
-    final request = await _client!.openUrl(method.toUpperCase(), uri);
+    final request = await _client.openUrl(method.toUpperCase(), uri);
 
     headers.forEach((headerKey, headerValue) {
       request.headers.add(headerKey, headerValue as Object);
     });
 
     if (body != null) {
-      final bytes = _bodyBytes;
+      final bytes = _bodyBytes!;
       request.headers.contentType = contentType;
-      request.headers.contentLength = bytes!.length;
+      request.headers.contentLength = bytes.length;
       request.add(bytes);
     }
 
@@ -195,7 +194,7 @@ class TestRequest {
     }
 
     if (!encodeBody) {
-      return body as List<int>;
+      return body as List<int>?;
     }
 
     final codec =

@@ -8,7 +8,7 @@ import 'package:test/test.dart';
 import 'package:liquidart/src/dev/helpers.dart';
 
 void main() {
-  APIDocument? doc;
+  late APIDocument doc;
   ManagedDataModel? dataModel;
 
   setUpAll(() async {
@@ -18,7 +18,7 @@ void main() {
       ..info = APIInfo("x", "1.0.0")
       ..paths = {}
       ..components = APIComponents();
-    final ctx = APIDocumentContext(doc!);
+    final ctx = APIDocumentContext(doc);
 
     final router = Router()
       ..route("/path").link(() => BindManagedObjectController())
@@ -26,7 +26,7 @@ void main() {
       ..route("/subclass/[:id]").link(() => MOCSubclass(dbCtx));
     router.didAddToChannel();
     router.documentComponents(ctx);
-    doc!.paths = router.documentPaths(ctx);
+    doc.paths = router.documentPaths(ctx);
 
     dbCtx.documentComponents(ctx);
     await ctx.finalize();
@@ -34,28 +34,27 @@ void main() {
 
   group("Entity descriptions", () {
     test("Contains all entities in data model", () {
-      expect(doc!.components!.schemas.length, 3);
+      expect(doc.components!.schemas.length, 3);
     });
 
     test("Schema object contains all persistent attributes with correct types",
         () {
-      final entity = doc!.components!.schemas["Model1"];
-      expect(entity!.properties!["string"]!.type, APIType.string);
-      expect(entity.properties!["dateTime"]!.type, APIType.string);
-      expect(entity.properties!["dateTime"]!.format, "date-time");
-      expect(entity.properties!["id"]!.type, APIType.integer);
-      expect(entity.properties!["boolean"]!.type, APIType.boolean);
+        final entity = doc.components!.schemas["Model1"]!;
+        expect(entity.properties!["string"]!.type, APIType.string);
+        expect(entity.properties!["dateTime"]!.type, APIType.string);
+        expect(entity.properties!["dateTime"]!.format, "date-time");
+        expect(entity.properties!["id"]!.type, APIType.integer);
+        expect(entity.properties!["boolean"]!.type, APIType.boolean);
 
-      expect(entity.properties!["id"]!.isReadOnly, false);
-      expect(entity.properties!["id"]!.description,
-          contains("This is the primary identifier"));
-      expect(entity.properties!["string"]!.description,
-          contains("No two objects may have the same value for this field"));
-    });
+        expect(entity.properties!["id"]!.isReadOnly, false);
+        expect(entity.properties!["id"]!.description, contains("This is the primary identifier"));
+        expect(entity.properties!["string"]!.description, contains("No two objects may have the same value for this field"));
+      });
+
 
     test("Schema object contains all transient attributes", () {
-      final entity = doc!.components!.schemas["Model1"];
-      expect(entity!.properties!["getter"]!.type, APIType.string);
+      final entity = doc.components!.schemas["Model1"]!;
+      expect(entity.properties!["getter"]!.type, APIType.string);
       expect(entity.properties!["getter"]!.isWriteOnly, false);
       expect(entity.properties!["getter"]!.isReadOnly, true);
 
@@ -70,59 +69,58 @@ void main() {
     });
 
     test("Schema contains to-many relationships", () {
-      final entity = doc!.components!.schemas["Model1"];
-      expect(entity!.properties!["model2s"]!.type, APIType.array);
+      final entity = doc.components!.schemas["Model1"]!;
+      expect(entity.properties!["model2s"]!.type, APIType.array);
       expect(entity.properties!["model2s"]!.isReadOnly, true);
       expect(entity.properties!["model2s"]!.items!.referenceURI.path,
-          "/components/schemas/Model2");
+        "/components/schemas/Model2");
     });
 
     test("Schema contains to-one relationships", () {
-      final entity = doc!.components!.schemas["Model1"];
-      expect(entity!.properties!["model3"]!.isReadOnly, true);
+      final entity = doc.components!.schemas["Model1"]!;
+      expect(entity.properties!["model3"]!.isReadOnly, true);
       expect(entity.properties!["model3"]!.referenceURI.path,
-          "/components/schemas/Model3");
+        "/components/schemas/Model3");
     });
 
     test("Entity with uniquePropertySet is included in description", () {
-      final entity = doc!.components!.schemas["Model1"];
-      expect(entity!.description, contains("string"));
+      final entity = doc.components!.schemas["Model1"]!;
+      expect(entity.description, contains("string"));
       expect(entity.description, contains("dateTime"));
     });
 
     test("Schema contains belongs-to relationships as the primary key", () {
-      final model2 = doc!.components!.schemas["Model2"];
-      expect(model2!.properties!["model1"]!.type, APIType.object);
+      final model2 = doc.components!.schemas["Model2"]!;
+      expect(model2.properties!["model1"]!.type, APIType.object);
       expect(model2.properties!["model1"]!.isReadOnly, false);
       expect(model2.properties!["model1"]!.properties!.length, 1);
-      expect(model2.properties!["model1"]!.properties!["id"]!.type,
-          APIType.integer);
+      expect(model2.properties!["model1"]!.properties!["id"]!.type, APIType.integer);
 
-      final model3 = doc!.components!.schemas["Model3"];
-      expect(model3!.properties!["model1"]!.type, APIType.object);
-      expect(model3.properties!["model1"]!.isReadOnly, false);
+      final model3 = doc.components!.schemas["Model3"]!;
+      expect(model3.properties!["model1"]!.type, APIType.object);
+      expect(model2.properties!["model1"]!.isReadOnly, false);
       expect(model3.properties!["model1"]!.properties!.length, 1);
-      expect(model3.properties!["model1"]!.properties!["id"]!.type,
-          APIType.integer);
+      expect(model3.properties!["model1"]!.properties!["id"]!.type, APIType.integer);
     });
 
     test(
-        "If property is not in default set, it should not be included in schema",
+      "If property is not in default set, it should not be included in schema",
         () {
-      const model = Model3;
-      const propName = "notIncluded";
+        const model = Model3;
+        const propName = "notIncluded";
 
-      // just make sure we're right that Model3.notIncluded is actually a property...
-      expect(dataModel!.entityForType(model).attributes[propName], isNotNull);
+        // just make sure we're right that Model3.notIncluded is actually a property...
+        expect(dataModel!.entityForType(model)!.attributes[propName], isNotNull);
 
-      final model3 = doc!.components!.schemas[model.toString()];
-      // ... since we're checking that it doesn't exist in the spec
-      expect(model3!.properties![propName], isNull);
-    });
+        final model3 = doc.components!
+          .schemas[model.toString()]!;
+        // ... since we're checking that it doesn't exist in the spec
+        expect(model3.properties![propName], isNull);
+      });
 
     test("Entity default value is available in schema", () {
-      final schema = doc!.components!.schemas["Model1"];
-      expect(schema!.properties!["boolean"]!.defaultValue, "true");
+      final schema = doc.components!.schemas["Model1"]!;
+      expect(schema.properties!["boolean"]!.defaultValue, "true");
     });
   });
 
@@ -130,7 +128,7 @@ void main() {
     APISchemaObject? schema;
 
     setUpAll(() {
-      schema = doc!.components!.schemas["Model3"]!;
+      schema = doc.components!.schemas["Model3"];
     });
 
     test("Custom validator documents schema object", () {
@@ -149,13 +147,13 @@ void main() {
     });
 
     test(
-        "Schema object contains maximumExclusive if min exclusive value in validator",
+      "Schema object contains maximumExclusive if min exclusive value in validator",
         () {
-      expect(schema!.properties!["lessThanEqualTo"]!.maximum, 1);
-      expect(schema!.properties!["lessThanEqualTo"]!.exclusiveMaximum, false);
-      expect(schema!.properties!["lessThanEqualTo"]!.minimum, isNull);
-      expect(schema!.properties!["lessThanEqualTo"]!.exclusiveMinimum, isNull);
-    });
+        expect(schema!.properties!["lessThanEqualTo"]!.maximum, 1);
+        expect(schema!.properties!["lessThanEqualTo"]!.exclusiveMaximum, false);
+        expect(schema!.properties!["lessThanEqualTo"]!.minimum, isNull);
+        expect(schema!.properties!["lessThanEqualTo"]!.exclusiveMinimum, isNull);
+      });
 
     test("Schema object contains minimum if max value in validator", () {
       expect(schema!.properties!["greaterThan"]!.maximum, isNull);
@@ -165,15 +163,13 @@ void main() {
     });
 
     test(
-        "Schema object contains minimumExclusive if max exclusive value in validator",
+      "Schema object contains minimumExclusive if max exclusive value in validator",
         () {
-      expect(schema!.properties!["greaterThanEqualTo"]!.maximum, isNull);
-      expect(
-          schema!.properties!["greaterThanEqualTo"]!.exclusiveMaximum, isNull);
-      expect(schema!.properties!["greaterThanEqualTo"]!.minimum, 1);
-      expect(
-          schema!.properties!["greaterThanEqualTo"]!.exclusiveMinimum, false);
-    });
+        expect(schema!.properties!["greaterThanEqualTo"]!.maximum, isNull);
+        expect(schema!.properties!["greaterThanEqualTo"]!.exclusiveMaximum, isNull);
+        expect(schema!.properties!["greaterThanEqualTo"]!.minimum, 1);
+        expect(schema!.properties!["greaterThanEqualTo"]!.exclusiveMinimum, false);
+      });
 
     test("Schema object contains range if range validator", () {
       expect(schema!.properties!["range"]!.maximum, 5);
@@ -184,9 +180,9 @@ void main() {
 
     test("Schema object has equal max/min length if equals length validator",
         () {
-      expect(schema!.properties!["lengthEqualTo"]!.maxLength, 20);
-      expect(schema!.properties!["lengthEqualTo"]!.minLength, 20);
-    });
+        expect(schema!.properties!["lengthEqualTo"]!.maxLength, 20);
+        expect(schema!.properties!["lengthEqualTo"]!.minLength, 20);
+      });
 
     test("Schema object has diff max/min length if range length validator", () {
       expect(schema!.properties!["lengthRange"]!.maxLength, 19);
@@ -210,11 +206,9 @@ void main() {
   });
 
   group("Controller integration", () {
-    test(
-        "If ResourceController binds ManagedObject, schema component definition comes from context",
-        () {
-      final schema = doc!.components!.schemas["Model1"];
-      expect(schema!.properties!["string"]!.type, APIType.string);
+    test("If ResourceController binds ManagedObject, schema component definition comes from context", () {
+      final schema = doc.components!.schemas["Model1"]!;
+      expect(schema.properties!["string"]!.type, APIType.string);
       expect(schema.properties!["dateTime"], isNotNull);
       expect(schema.properties!["getter"], isNotNull);
       expect(schema.properties!["setter"], isNotNull);
@@ -224,29 +218,20 @@ void main() {
     });
 
     test("Can emit document for ManagedObjectController", () {
-      expect(doc!.paths["/model"]!.operations!.length, 2);
-      expect(
-          doc!.paths["/model"]!.operations!["get"]!.responses!["200"]!
-              .content!["application/json"]!.schema!.type,
-          APIType.array);
-      expect(
-          doc!.paths["/model"]!.operations!["get"]!.responses!["200"]!
-              .content!["application/json"]!.schema!.items!.referenceURI.path,
-          "/components/schemas/Model1");
-      expect(
-          doc!.paths["/model"]!.operations!["post"]!.requestBody!
-              .content!["application/json"]!.schema!.referenceURI.path,
-          "/components/schemas/Model1");
+      expect(doc.paths["/model"]!.operations!.length, 2);
+      expect(doc.paths["/model"]!.operations!["get"]!.responses!["200"]!.content!["application/json"]!.schema!.type, APIType.array);
+      expect(doc.paths["/model"]!.operations!["get"]!.responses!["200"]!.content!["application/json"]!.schema!.items!.referenceURI.path, "/components/schemas/Model1");
+      expect(doc.paths["/model"]!.operations!["post"]!.requestBody!.content!["application/json"]!.schema!.referenceURI.path, "/components/schemas/Model1");
 
-      expect(doc!.paths["/model/{id}"]!.operations!.length, 3);
+      expect(doc.paths["/model/{id}"]!.operations!.length, 3);
 
-      expect(doc!.paths["/subclass"]!.operations!.length, 2);
-      expect(doc!.paths["/subclass/{id}"]!.operations!.length, 3);
+      expect(doc.paths["/subclass"]!.operations!.length, 2);
+      expect(doc.paths["/subclass/{id}"]!.operations!.length, 3);
     });
   });
 
   test("Can encode into JSON", () {
-    expect(json.encode(doc!.asMap()), isNotNull);
+    expect(json.encode(doc.asMap()), isNotNull);
   });
 }
 
@@ -359,7 +344,7 @@ class CustomValidate extends Validate {
 
   @override
   void constrainSchemaObject(
-      APIDocumentContext context, APISchemaObject object) {
+    APIDocumentContext context, APISchemaObject object) {
     object.maxProperties = 2;
   }
 }
@@ -375,4 +360,6 @@ class MOCSubclass extends ManagedObjectController<Model1> {
   MOCSubclass(ManagedContext ctx) : super(ctx);
 }
 
-enum MOEnum { case1, case2 }
+enum MOEnum {
+  case1, case2
+}

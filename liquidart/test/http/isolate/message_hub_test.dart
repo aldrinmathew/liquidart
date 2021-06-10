@@ -2,23 +2,24 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:http/http.dart' as http;
 import 'package:liquidart/liquidart.dart';
 import 'package:test/test.dart';
 
 void main() {
   group("Happy path", () {
-    Application? app;
+    late Application app;
 
     tearDown(() async {
-      await app!.stop();
+      await app.stop();
     });
 
     test(
         "A message sent to the hub is received by other channels, but not by sender",
         () async {
       app = Application<HubChannel>()..options.port = 8000;
-      await app!.start(numberOfInstances: 3);
+      await app.start(numberOfInstances: 3);
 
       var resp = await postMessage("msg1");
       var postingIsolateID = isolateIdentifierFromResponse(resp);
@@ -47,7 +48,7 @@ void main() {
       app = Application<HubChannel>()
         ..options.port = 8000
         ..options.context = {"sendIn": "prepare"};
-      await app!.start(numberOfInstances: 3);
+      await app.start(numberOfInstances: 3);
 
       expect(
           waitForMessages({
@@ -69,17 +70,17 @@ void main() {
   });
 
   group("Multiple listeners", () {
-    Application? app;
+    late Application app;
 
     tearDown(() async {
-      await app!.stop();
+      await app.stop();
     });
 
     test("Message hub stream can have multiple listeners", () async {
       app = Application<HubChannel>()
         ..options.port = 8000
         ..options.context = {"multipleListeners": true};
-      await app!.start(numberOfInstances: 3);
+      await app.start(numberOfInstances: 3);
 
       var resp = await postMessage("msg1");
       var postingIsolateID = isolateIdentifierFromResponse(resp);
@@ -108,15 +109,15 @@ void main() {
   });
 
   group("Failure cases", () {
-    Application? app;
+    late Application app;
 
     tearDown(() async {
-      await app!.stop();
+      await app.stop();
     });
 
     test("Send invalid x-isolate data returns error in error stream", () async {
       app = Application<HubChannel>()..options.port = 8000;
-      await app!.start(numberOfInstances: 3);
+      await app.start(numberOfInstances: 3);
 
       var resp = await postMessage("garbage");
       var errors = await getErrorsFromIsolates();
@@ -150,21 +151,21 @@ Future<http.Response> postMessage(String message) async {
       body: message);
 }
 
-Future waitForMessages(Map<int, List<Map<String, dynamic>?>> expectedMessages,
+Future waitForMessages(Map<int, List<Map<String, dynamic>>> expectedMessages,
     {int? butNeverReceiveIn}) async {
   final response = await http.get(Uri.parse("http://localhost:8000/messages"));
   final respondingIsolateID = isolateIdentifierFromResponse(response);
-  final messages = json.decode(response.body) as List<dynamic>;
+  final messages = json.decode(response.body) as List<dynamic>?;
 
   if (expectedMessages.containsKey(respondingIsolateID)) {
     final remainingMessagesExpectedForIsolateID =
         expectedMessages[respondingIsolateID];
-    for (var message in messages) {
+    for (var message in messages!) {
       final firstMatchedMessage =
-          remainingMessagesExpectedForIsolateID!.firstWhere((msg) {
-        return msg!["isolateID"] == message["isolateID"] &&
+          remainingMessagesExpectedForIsolateID!.firstWhereOrNull((msg) {
+        return msg["isolateID"] == message["isolateID"] &&
             msg["message"] == message["message"];
-      }, orElse: () => null);
+      });
 
       if (firstMatchedMessage != null) {
         remainingMessagesExpectedForIsolateID.remove(firstMatchedMessage);
@@ -176,7 +177,7 @@ Future waitForMessages(Map<int, List<Map<String, dynamic>?>> expectedMessages,
   }
 
   if (butNeverReceiveIn != null &&
-      messages.isNotEmpty &&
+      messages!.isNotEmpty &&
       respondingIsolateID == butNeverReceiveIn) {
     throw Exception("Received unexpected message from butNeverReceivedIn");
   }
@@ -264,7 +265,7 @@ class HubChannel extends ApplicationChannel {
     });
 
     router.route("/send").linkFunction((req) async {
-      String msg = await req.body!.decode();
+      String msg = await req.body.decode();
       if (msg == "garbage") {
         messageHub.add((x) => x);
       } else {

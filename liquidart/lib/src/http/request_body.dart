@@ -68,9 +68,9 @@ class RequestBody extends BodyDecoder {
         _bufferingController!.add(chunk);
       }, onDone: () {
         _bufferingController!.close();
-      }, onError: (e, StackTrace st) {
+      }, onError: (Object e, StackTrace st) {
         if (!_bufferingController!.isClosed) {
-          _bufferingController!.addError(e as Object, st);
+          _bufferingController!.addError(e, st);
           _bufferingController!.close();
         }
       }, cancelOnError: true);
@@ -80,7 +80,7 @@ class RequestBody extends BodyDecoder {
   }
 
   @override
-  ContentType? get contentType => _request.headers.contentType!;
+  ContentType? get contentType => _request.headers.contentType;
 
   @override
   bool get isEmpty => !_hasContent;

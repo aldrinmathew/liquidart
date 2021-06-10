@@ -26,7 +26,7 @@ abstract class AuthCodeControllerDelegate {
   ///
   /// If not null, [scope] should also be included as an additional form parameter.
   Future<String> render(AuthCodeController forController, Uri requestUri,
-      String responseType, String clientID, String state, String scope);
+      String? responseType, String? clientID, String? state, String? scope);
 }
 
 /// [Controller] for issuing OAuth 2.0 authorization codes.
@@ -56,7 +56,7 @@ class AuthCodeController extends ResourceController {
   }
 
   /// A reference to the [AuthServer] used to grant authorization codes.
-  final AuthServer? authServer;
+  final AuthServer authServer;
 
   /// A randomly generated value the client can use to verify the origin of the redirect.
   ///
@@ -97,11 +97,11 @@ class AuthCodeController extends ResourceController {
       return Response(405, {}, null);
     }
 
-    final String? renderedPage = await delegate!.render(
-        this, request!.raw!.uri, responseType!, clientID!, state!, scope!);
-    if (renderedPage == null) {
-      return Response.notFound();
-    }
+    final renderedPage = await delegate!.render(
+        this, request!.raw.uri, responseType, clientID, state, scope);
+    // if (renderedPage == null) {
+    //   return Response.notFound();
+    // }
 
     return Response.ok(renderedPage)..contentType = ContentType.html;
   }
@@ -125,7 +125,7 @@ class AuthCodeController extends ResourceController {
 
       /// A space-delimited list of access scopes being requested.
       @Bind.query("scope") String? scope}) async {
-    final client = await authServer!.getClient(clientID!);
+    final client = await authServer.getClient(clientID);
 
     if (state == null) {
       return _redirectResponse(null, null,
@@ -133,7 +133,7 @@ class AuthCodeController extends ResourceController {
     }
 
     if (responseType != "code") {
-      if (client.redirectURI == null) {
+      if (client?.redirectURI == null) {
         return Response.badRequest();
       }
 
@@ -144,10 +144,10 @@ class AuthCodeController extends ResourceController {
     try {
       final scopes = scope?.split(" ").map((s) => AuthScope(s)).toList();
 
-      final authCode = await authServer!.authenticateForCode(
-          username!, password!, clientID!,
-          requestedScopes: scopes!);
-      return _redirectResponse(client.redirectURI, state, code: authCode.code);
+      final authCode = await authServer.authenticateForCode(
+          username, password, clientID,
+          requestedScopes: scopes);
+      return _redirectResponse(client!.redirectURI, state, code: authCode.code);
     } on FormatException {
       return _redirectResponse(null, state,
           error: AuthServerException(AuthRequestError.invalidScope, client));
@@ -157,10 +157,10 @@ class AuthCodeController extends ResourceController {
   }
 
   @override
-  APIRequestBody documentOperationRequestBody(
-      APIDocumentContext context, Operation operation) {
+  APIRequestBody? documentOperationRequestBody(
+      APIDocumentContext context, Operation? operation) {
     final body = super.documentOperationRequestBody(context, operation);
-    if (operation.method == "POST") {
+    if (operation!.method == "POST") {
       body!.content!["application/x-www-form-urlencoded"]!.schema!
           .properties!["password"]!.format = "password";
       body.content!["application/x-www-form-urlencoded"]!.schema!.required = [
@@ -171,13 +171,13 @@ class AuthCodeController extends ResourceController {
         "password"
       ];
     }
-    return body!;
+    return body;
   }
 
   @override
   List<APIParameter?> documentOperationParameters(
-      APIDocumentContext context, Operation operation) {
-    final params = super.documentOperationParameters(context, operation);
+      APIDocumentContext context, Operation? operation) {
+    final params = super.documentOperationParameters(context, operation)!;
     params.where((p) => p!.name != "scope").forEach((p) {
       p!.isRequired = true;
     });
@@ -186,8 +186,8 @@ class AuthCodeController extends ResourceController {
 
   @override
   Map<String, APIResponse> documentOperationResponses(
-      APIDocumentContext context, Operation operation) {
-    if (operation.method == "GET") {
+      APIDocumentContext context, Operation? operation) {
+    if (operation!.method == "GET") {
       return {
         "200": APIResponse.schema(
             "Serves a login form.", APISchemaObject.string(),
@@ -213,10 +213,10 @@ class AuthCodeController extends ResourceController {
   }
 
   @override
-  Map<String, APIOperation> documentOperations(
+  Map<String, APIOperation>? documentOperations(
       APIDocumentContext context, String route, APIPath path) {
     final ops = super.documentOperations(context, route, path);
-    authServer!.documentedAuthorizationCodeFlow.authorizationURL =
+    authServer.documentedAuthorizationCodeFlow.authorizationURL =
         Uri(path: route.substring(1));
     return ops;
   }
@@ -224,14 +224,14 @@ class AuthCodeController extends ResourceController {
   static Response _redirectResponse(
       final String? inputUri, String? clientStateOrNull,
       {String? code, AuthServerException? error}) {
-    final uriString = inputUri ?? error!.client!.redirectURI;
+    final uriString = inputUri ?? error!.client?.redirectURI;
     if (uriString == null) {
       return Response.badRequest(body: {"error": error!.reasonString});
     }
 
     final redirectURI = Uri.parse(uriString);
     final queryParameters =
-        Map<String, String>.from(redirectURI.queryParameters);
+        Map<String, String?>.from(redirectURI.queryParameters);
 
     if (code != null) {
       queryParameters["code"] = code;
@@ -240,7 +240,7 @@ class AuthCodeController extends ResourceController {
       queryParameters["state"] = clientStateOrNull;
     }
     if (error != null) {
-      queryParameters["error"] = error.reasonString!;
+      queryParameters["error"] = error.reasonString;
     }
 
     final responseURI = Uri(

@@ -51,18 +51,18 @@ abstract class BodyDecoder {
           "Invalid body decoding. Must decode data prior to calling 'decodedType'.");
     }
 
-    return (_decodedData as Object).runtimeType;
+    return (_decodedData as Object?).runtimeType;
   }
 
   /// The raw bytes of this request body.
   ///
   /// This value is valid if [retainOriginalBytes] was set to true prior to [decode] being invoked.
-  List<int> get originalBytes {
+  List<int>? get originalBytes {
     if (retainOriginalBytes == false) {
       throw StateError(
           "'originalBytes' were not retained. Set 'retainOriginalBytes' to true prior to decoding.");
     }
-    return _bytes!;
+    return _bytes;
   }
 
   final Stream<List<int>> _originalByteStream;

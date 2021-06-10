@@ -103,8 +103,7 @@ class TimeoutChannel extends ApplicationChannel {
 
   @override
   Future prepare() async {
-    final timeoutLength =
-        options!.context["timeout${server.identifier}"] as int?;
+    final timeoutLength = options!.context["timeout${server.identifier}"] as int?;
     if (timeoutLength == null) {
       return;
     }

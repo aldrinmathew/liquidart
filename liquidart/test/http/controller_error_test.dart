@@ -11,13 +11,13 @@ void main() {
   HttpServer? server;
 
   tearDown(() async {
-    await server!.close();
+    await server?.close();
   });
 
   test("Response thrown during normal handling is sent as response", () async {
     server = await enableController(ClosureController((req) {
       throw Response.ok(null);
-    }));
+    } ));
 
     final r = await http.get(Uri.parse("http://localhost:4040"));
     expect(r.statusCode, 200);
@@ -55,7 +55,7 @@ void main() {
     server = await enableController(ClosureController((req) {
       // nonsense body to trigger exception when encoding
       throw Response.ok(PassthruController());
-    }));
+    } ));
 
     final r = await http.get(Uri.parse("http://localhost:4040"));
     expect(r.statusCode, 500);

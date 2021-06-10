@@ -8,7 +8,7 @@ import 'package:liquidart/src/dev/helpers.dart';
 void main() {
   ManagedContext? context;
   tearDown(() async {
-    await context!.close();
+    await context?.close();
     context = null;
   });
 
@@ -38,13 +38,13 @@ void main() {
     context = await contextWithModels([TestModel]);
 
     final q = Query<TestModel>(context!)
-      ..values!.id = 1
-      ..values!.n = "a"
-      ..values!.t = DateTime.now()
-      ..values!.l = 1
-      ..values!.b = true
-      ..values!.d = 1.0
-      ..values!.doc = Document({"k": "v"});
+      ..values?.id = 1
+      ..values?.n = "a"
+      ..values?.t = DateTime.now()
+      ..values?.l = 1
+      ..values?.b = true
+      ..values?.d = 1.0
+      ..values?.doc = Document({"k": "v"});
 
     var builder = PostgresQueryBuilder(q as PostgresQuery);
     var insertString = builder.sqlValuesToInsert;

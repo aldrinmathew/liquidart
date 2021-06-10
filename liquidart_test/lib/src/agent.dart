@@ -36,7 +36,7 @@ part 'response.dart';
 ///         }
 class Agent {
   /// Configures a new agent that sends requests to [app].
-  Agent(Application app)
+  Agent(Application? app)
       : _application = app,
         _host = null,
         _port = null,
@@ -62,7 +62,7 @@ class Agent {
         _port = original._port,
         contentType = original.contentType,
         _application = original._application {
-    headers.addAll(original.headers);
+    headers.addAll(original.headers );
   }
 
   final String? _scheme;
@@ -96,7 +96,7 @@ class Agent {
       if (!_application!.isRunning) {
         throw StateError("Application under test is not running.");
       }
-      return "${_application!.server!.requiresHTTPS ? "https" : "http"}://localhost:${_application!.channel.server.server!.port}";
+      return "${_application!.server!.requiresHTTPS ? "https" : "http"}://localhost:${_application!.channel!.server.server.port}";
     }
 
     return "$_scheme://$_host:$_port";
@@ -151,7 +151,7 @@ class Agent {
   ///
   /// Calls [execute] with "GET" method.
   Future<TestResponse> get(String path,
-      {Map<String, dynamic> headers = const {}, Map<String, dynamic> query = const {}}) {
+      {Map<String, dynamic>? headers, Map<String, dynamic>? query}) {
     return execute("GET", path, headers: headers, query: query);
   }
 
@@ -160,8 +160,8 @@ class Agent {
   /// Calls [execute] with "POST" method.
   Future<TestResponse> post(String path,
       {dynamic body,
-      Map<String, dynamic> headers = const {},
-      Map<String, dynamic> query = const {}}) {
+      Map<String, dynamic>? headers,
+      Map<String, dynamic>? query}) {
     return execute("POST", path, body: body, headers: headers, query: query);
   }
 
@@ -170,8 +170,8 @@ class Agent {
   /// Calls [execute] with "DELETE" method.
   Future<TestResponse> delete(String path,
       {dynamic body,
-      Map<String, dynamic> headers = const {},
-      Map<String, dynamic> query = const {}}) {
+      Map<String, dynamic>? headers,
+      Map<String, dynamic>? query}) {
     return execute("DELETE", path, body: body, headers: headers, query: query);
   }
 
@@ -180,8 +180,8 @@ class Agent {
   /// Calls [execute] with "PUT" method.
   Future<TestResponse> put(String path,
       {dynamic body,
-      Map<String, dynamic> headers = const {},
-      Map<String, dynamic> query = const {}}) {
+      Map<String, dynamic>? headers,
+      Map<String, dynamic>? query}) {
     return execute("PUT", path, body: body, headers: headers, query: query);
   }
 
@@ -201,7 +201,7 @@ class Agent {
   Future<TestResponse> execute(String method, String path,
       {dynamic body,
       Map<String, dynamic>? headers,
-      Map<String, dynamic> query = const {}}) {
+      Map<String, dynamic>? query}) {
     final req = request(path)
       ..body = body
       ..query = query;

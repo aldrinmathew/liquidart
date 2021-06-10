@@ -11,23 +11,23 @@ void main() {
   });
 
   tearDown(() async {
-    await context!.close();
+    await context?.close();
     context = null;
   });
 
   group("Basic queries", () {
     test("Can insert document object", () async {
       final q = Query<Obj>(context!)
-        ..values!.id = 1
-        ..values!.document = Document({"k": "v"});
+        ..values?.id = 1
+        ..values?.document = Document({"k": "v"});
       final o = await q.insert();
       expect(o.document!.data, {"k": "v"});
     });
 
     test("Can insert document array", () async {
       final q = Query<Obj>(context!)
-        ..values!.id = 1
-        ..values!.document = Document([
+        ..values?.id = 1
+        ..values?.document = Document([
           {"k": "v"},
           1
         ]);
@@ -40,8 +40,8 @@ void main() {
 
     test("Can fetch document object", () async {
       final q = Query<Obj>(context!)
-        ..values!.id = 1
-        ..values!.document = Document({"k": "v"});
+        ..values?.id = 1
+        ..values?.document = Document({"k": "v"});
       await q.insert();
 
       final o = await Query<Obj>(context!).fetch();
@@ -50,8 +50,8 @@ void main() {
 
     test("Can fetch array object", () async {
       final q = Query<Obj>(context!)
-        ..values!.id = 1
-        ..values!.document = Document([
+        ..values?.id = 1
+        ..values?.document = Document([
           {"k": "v"},
           1
         ]);
@@ -66,13 +66,13 @@ void main() {
 
     test("Can update value of document property", () async {
       final q = Query<Obj>(context!)
-        ..values!.id = 1
-        ..values!.document = Document({"k": "v"});
+        ..values?.id = 1
+        ..values?.document = Document({"k": "v"});
       final o = await q.insert();
 
       final u = Query<Obj>(context!)
         ..where((o) => o.id).equalTo(o.id)
-        ..values!.document = Document(["a"]);
+        ..values?.document = Document(["a"]);
       final updated = await u.updateOne();
       expect(updated!.document!.data, ["a"]);
     });
@@ -102,10 +102,10 @@ void main() {
       ];
 
       var counter = 1;
-      await Future.forEach(testData, (data) async {
+      await Future.forEach(testData, (dynamic data) async {
         final q = Query<Obj>(context!)
-          ..values!.id = counter
-          ..values!.document = Document(data);
+          ..values?.id = counter
+          ..values?.document = Document(data);
         await q.insert();
         counter++;
       });

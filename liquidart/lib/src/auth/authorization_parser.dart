@@ -7,7 +7,7 @@ abstract class AuthorizationParser<T> {
 }
 
 /// Parses a Bearer token from an Authorization header.
-class AuthorizationBearerParser extends AuthorizationParser<String> {
+class AuthorizationBearerParser extends AuthorizationParser<String?> {
   const AuthorizationBearerParser();
 
   /// Parses a Bearer token from [authorizationHeader]. If the header is malformed or doesn't exist,
@@ -17,11 +17,11 @@ class AuthorizationBearerParser extends AuthorizationParser<String> {
   ///
   /// If [authorizationHeader] is malformed or null, throws an [AuthorizationParserException].
   @override
-  String parse(String? authorizationHeader) {
-    if (authorizationHeader == null) {
-      throw AuthorizationParserException(
-          AuthorizationParserExceptionReason.missing);
-    }
+  String? parse(String authorizationHeader) {
+    // if (authorizationHeader == null) {
+    //   throw AuthorizationParserException(
+    //       AuthorizationParserExceptionReason.missing);
+    // }
 
     final matcher = RegExp("Bearer (.+)");
     final match = matcher.firstMatch(authorizationHeader);
@@ -29,7 +29,7 @@ class AuthorizationBearerParser extends AuthorizationParser<String> {
       throw AuthorizationParserException(
           AuthorizationParserExceptionReason.malformed);
     }
-    return match[1]!;
+    return match[1];
   }
 }
 
@@ -72,11 +72,11 @@ class AuthorizationBasicParser
           AuthorizationParserExceptionReason.malformed);
     }
 
-    final base64String = match[1];
+    final base64String = match[1]!;
     String decodedCredentials;
     try {
       decodedCredentials =
-          String.fromCharCodes(const Base64Decoder().convert(base64String!));
+          String.fromCharCodes(const Base64Decoder().convert(base64String));
     } catch (e) {
       throw AuthorizationParserException(
           AuthorizationParserExceptionReason.malformed);

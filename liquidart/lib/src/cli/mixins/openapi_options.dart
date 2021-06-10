@@ -2,11 +2,9 @@ import 'package:liquidart/src/cli/command.dart';
 import 'package:liquidart/src/cli/metadata.dart';
 
 abstract class CLIDocumentOptions implements CLICommand {
-  @Flag("resolve-relative-urls",
-      defaultsTo: true,
-      abbr: "r",
-      help:
-          "Whether relative URLs are resolved against the first server in document")
+  @Flag("resolve-relative-urls", defaultsTo: true,
+    abbr: "r",
+    help: "Whether relative URLs are resolved against the first server in document")
   bool get resolveRelativeUrls => decode("resolve-relative-urls");
 
   @Option("title", help: "API Docs: Title")
@@ -52,13 +50,12 @@ abstract class CLIDocumentOptions implements CLICommand {
       hostValues = ["http://localhost:8888"];
     }
     return hostValues.map((str) {
-      Uri uri = Uri.parse(str);
-      dynamic uriCheck = uri;
-      if (uriCheck == null) {
-        throw CLIException("Invalid Host Option", instructions: [
-          "Host names must identify scheme, host and port. Example: https://api.myapp.com:8000"
-        ]);
-      }
+      var uri = Uri.parse(str);
+      // if (uri == null) {
+      //   throw CLIException("Invalid Host Option", instructions: [
+      //     "Host names must identify scheme, host and port. Example: https://api.myapp.com:8000"
+      //   ]);
+      // }
 
       return uri;
     }).toList();

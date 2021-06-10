@@ -25,7 +25,7 @@ abstract class AuthRedirectControllerDelegate {
   ///
   /// If not null, [scope] should also be included as an additional form parameter.
   Future<String?> render(AuthRedirectController forController, Uri requestUri,
-      String responseType, String clientID, String state, String scope);
+      String? responseType, String? clientID, String? state, String? scope);
 }
 
 /// [Controller] for issuing OAuth 2.0 authorization codes and tokens.
@@ -46,22 +46,19 @@ class AuthRedirectController extends ResourceController {
   /// Creates a new instance of an [AuthRedirectController].
   ///
   /// [authServer] is the required authorization server. If [delegate] is provided, this controller will return a login page for all GET requests.
-  AuthRedirectController(this.authServer,
-      {this.delegate, this.allowsImplicit = true}) {
+  AuthRedirectController(this.authServer, {this.delegate, this.allowsImplicit = true}) {
     acceptedContentTypes = [
       ContentType("application", "x-www-form-urlencoded")
     ];
   }
 
-  static Response _unsupportedResponseTypeResponse = Response.badRequest(
-      body: "<h1>Error</h1><p>unsupported_response_type</p>")
-    ..contentType = ContentType.html;
+  static Response _unsupportedResponseTypeResponse = Response.badRequest(body: "<h1>Error</h1><p>unsupported_response_type</p>")..contentType = ContentType.html;
 
   /// A reference to the [AuthServer] used to grant authorization codes and access tokens.
   final AuthServer? authServer;
 
   /// When true, the controller allows for the Implicit Grant Flow
-  final bool? allowsImplicit;
+  final bool allowsImplicit;
 
   /// A randomly generated value the client can use to verify the origin of the redirect.
   ///
@@ -106,12 +103,12 @@ class AuthRedirectController extends ResourceController {
       return _unsupportedResponseTypeResponse;
     }
 
-    if (responseType == "token" && !allowsImplicit!) {
+    if (responseType == "token" && !allowsImplicit) {
       return _unsupportedResponseTypeResponse;
     }
 
-    final String? renderedPage = await delegate!.render(
-        this, request!.raw!.uri, responseType!, clientID!, state!, scope!);
+    final renderedPage = await delegate!.render(
+        this, request!.raw.uri, responseType, clientID, state, scope);
     if (renderedPage == null) {
       return Response.notFound();
     }
@@ -138,13 +135,13 @@ class AuthRedirectController extends ResourceController {
 
       /// A space-delimited list of access scopes being requested.
       @Bind.query("scope") String? scope}) async {
-    final client = await authServer!.getClient(clientID!);
+    final client = await authServer!.getClient(clientID);
 
-    if (client.redirectURI == null) {
+    if (client?.redirectURI == null) {
       return Response.badRequest();
     }
 
-    if (responseType == "token" && !allowsImplicit!) {
+    if (responseType == "token" && !allowsImplicit) {
       return _unsupportedResponseTypeResponse;
     }
 
@@ -157,33 +154,27 @@ class AuthRedirectController extends ResourceController {
       final scopes = scope?.split(" ").map((s) => AuthScope(s)).toList();
 
       if (responseType == "code") {
-        if (client.hashedSecret == null) {
+        if (client!.hashedSecret == null) {
           return _redirectResponse(null, state,
-              error: AuthServerException(
-                  AuthRequestError.unauthorizedClient, client));
+              error: AuthServerException(AuthRequestError.unauthorizedClient, client));
         }
 
         final authCode = await authServer!.authenticateForCode(
-            username!, password!, clientID!,
-            requestedScopes: scopes!);
-        return _redirectResponse(client.redirectURI, state,
-            code: authCode.code);
-      } else if (responseType == "token") {
-        final token = await authServer!.authenticate(
-            username!, password!, clientID!, null,
+            username, password, clientID,
             requestedScopes: scopes);
-        return _redirectResponse(client.redirectURI, state, token: token);
+        return _redirectResponse(client.redirectURI, state, code: authCode.code);
+      } else if (responseType == "token") {
+        final token = await authServer!.authenticate(username, password, clientID, null, requestedScopes: scopes);
+        return _redirectResponse(client!.redirectURI, state, token: token);
       } else {
         return _redirectResponse(null, state,
-            error:
-                AuthServerException(AuthRequestError.invalidRequest, client));
+            error: AuthServerException(AuthRequestError.invalidRequest, client));
       }
     } on FormatException {
       return _redirectResponse(null, state,
           error: AuthServerException(AuthRequestError.invalidScope, client));
     } on AuthServerException catch (e) {
-      if (responseType == "token" &&
-          e.reason == AuthRequestError.invalidGrant) {
+      if (responseType == "token" && e.reason == AuthRequestError.invalidGrant) {
         return _redirectResponse(null, state,
             error: AuthServerException(AuthRequestError.accessDenied, client));
       }
@@ -193,10 +184,10 @@ class AuthRedirectController extends ResourceController {
   }
 
   @override
-  APIRequestBody documentOperationRequestBody(
-      APIDocumentContext context, Operation operation) {
+  APIRequestBody? documentOperationRequestBody(
+      APIDocumentContext context, Operation? operation) {
     final body = super.documentOperationRequestBody(context, operation);
-    if (operation.method == "POST") {
+    if (operation!.method == "POST") {
       body!.content!["application/x-www-form-urlencoded"]!.schema!
           .properties!["password"]!.format = "password";
       body.content!["application/x-www-form-urlencoded"]!.schema!.required = [
@@ -207,13 +198,13 @@ class AuthRedirectController extends ResourceController {
         "password"
       ];
     }
-    return body!;
+    return body;
   }
 
   @override
   List<APIParameter?> documentOperationParameters(
-      APIDocumentContext context, Operation operation) {
-    final params = super.documentOperationParameters(context, operation);
+      APIDocumentContext context, Operation? operation) {
+    final params = super.documentOperationParameters(context, operation)!;
     params.where((p) => p!.name != "scope").forEach((p) {
       p!.isRequired = true;
     });
@@ -222,8 +213,8 @@ class AuthRedirectController extends ResourceController {
 
   @override
   Map<String, APIResponse> documentOperationResponses(
-      APIDocumentContext context, Operation operation) {
-    if (operation.method == "GET") {
+      APIDocumentContext context, Operation? operation) {
+    if (operation!.method == "GET") {
       return {
         "200": APIResponse.schema(
             "Serves a login form.", APISchemaObject.string(),
@@ -252,7 +243,7 @@ class AuthRedirectController extends ResourceController {
   }
 
   @override
-  Map<String, APIOperation> documentOperations(
+  Map<String, APIOperation>? documentOperations(
       APIDocumentContext context, String route, APIPath path) {
     final ops = super.documentOperations(context, route, path);
     final uri = Uri(path: route.substring(1));
@@ -261,9 +252,10 @@ class AuthRedirectController extends ResourceController {
     return ops;
   }
 
-  Response _redirectResponse(final String? inputUri, String? clientStateOrNull,
+  Response _redirectResponse(
+      final String? inputUri, String? clientStateOrNull,
       {String? code, AuthToken? token, AuthServerException? error}) {
-    final uriString = inputUri ?? error!.client!.redirectURI;
+    final uriString = inputUri ?? error!.client?.redirectURI;
     if (uriString == null) {
       return Response.badRequest(body: {"error": error!.reasonString});
     }
@@ -277,7 +269,7 @@ class AuthRedirectController extends ResourceController {
     }
 
     final queryParameters =
-        Map<String, String>.from(redirectURI.queryParameters);
+        Map<String, String?>.from(redirectURI.queryParameters);
     String? fragment;
 
     if (responseType == "code") {
@@ -288,7 +280,7 @@ class AuthRedirectController extends ResourceController {
         queryParameters["state"] = clientStateOrNull;
       }
       if (error != null) {
-        queryParameters["error"] = error.reasonString!;
+        queryParameters["error"] = error.reasonString;
       }
     } else if (responseType == "token") {
       final params = token?.asMap() ?? {};
@@ -300,9 +292,7 @@ class AuthRedirectController extends ResourceController {
         params["error"] = error.reasonString;
       }
 
-      fragment = params.keys
-          .map((key) => "$key=${Uri.encodeComponent(params[key].toString())}")
-          .join("&");
+      fragment = params.keys.map((key) => "$key=${Uri.encodeComponent(params[key].toString())}").join("&");
     } else {
       return _unsupportedResponseTypeResponse;
     }

@@ -120,7 +120,6 @@ Matcher isSameMomentAs(DateTime date) {
 ///         expect(response, hasResponse(200, {"createdDate": isTimestamp}));
 Matcher isTimestamp = predicate((String str) {
   try {
-    // ignore: unnecessary_null_comparison
     return DateTime.parse(str) != null;
   } catch (e) {
     return false;
@@ -253,7 +252,7 @@ Matcher hasResponse(int? statusCode,
 ///           200, body: "foo", headers: {"x-foo": "foo"});
 ///         print("$response");
 TestResponse expectResponse(TestResponse response, int statusCode,
-    {dynamic body, Map<String, dynamic> headers = const {}}) {
+    {dynamic body, Map<String, dynamic>? headers}) {
   expect(response, hasResponse(statusCode, body: body, headers: headers));
   return response;
 }

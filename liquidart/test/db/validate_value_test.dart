@@ -50,7 +50,7 @@ void main() {
       expect(fk.validate().isValid, false);
       expect(fk.validate().errors.first, contains("FK.parent.id"));
 
-      fk.parent!.id = 2;
+      fk.parent.id = 2;
       expect(fk.validate().isValid, true);
     });
 
@@ -74,8 +74,8 @@ void main() {
       fk.parent = Parent()..id = 10;
       expect(fk.validate().isValid, true);
 
-      expect(fk.parent!.validate().isValid, false);
-      expect(fk.parent!.validate().errors.first, contains("Parent.id"));
+      expect(fk.parent.validate().isValid, false);
+      expect(fk.parent.validate().errors.first, contains("Parent.id"));
     });
   });
 
@@ -125,11 +125,11 @@ void main() {
     });
 
     test("greaterThanEqual/date", () {
-      var t = T()..compareDateGreaterThanEqualTo1990 = DateTime.utc(2000);
+      var t = T()..compareDateGreaterThanEqualTo1990 = DateTime(2000);
       expect(t.validate().isValid, true);
-      t.compareDateGreaterThanEqualTo1990 = DateTime.utc(1990);
+      t.compareDateGreaterThanEqualTo1990 = DateTime(1990);
       expect(t.validate().isValid, true);
-      t.compareDateGreaterThanEqualTo1990 = DateTime.utc(1980);
+      t.compareDateGreaterThanEqualTo1990 = DateTime(1980);
       expect(t.validate().isValid, false);
     });
 
@@ -296,7 +296,7 @@ void main() {
     });
 
     test("Implicitly added to enum types", () {
-      var e = EnumObject()..backing.contents!["enumValues"] = "foobar";
+      var e = EnumObject()..backing.contents["enumValues"] = "foobar";
       expect(e.validate().isValid, false);
       e.enumValues = EnumValues.abcd;
       expect(e.validate().isValid, true);
@@ -541,7 +541,7 @@ class _FK {
 
   @Validate.compare(greaterThan: 1)
   @Relate(#fk)
-  Parent? parent;
+  late Parent parent;
 }
 
 class Parent extends ManagedObject<_Parent> implements _Parent {}
@@ -613,16 +613,12 @@ class MultiValidate extends ManagedObject<_MultiValidate>
     implements _MultiValidate {}
 
 const validateReference = Validate.compare(lessThan: 100);
-
 class _MultiValidate {
   @primaryKey
   int? id;
 
   @validateReference
   @Validate.compare(lessThan: 5)
-  @Column(validators: [
-    Validate.compare(greaterThan: 3),
-    Validate.compare(equalTo: 4)
-  ])
+  @Column(validators: [Validate.compare(greaterThan: 3), Validate.compare(equalTo: 4)])
   int? canOnlyBe4;
 }

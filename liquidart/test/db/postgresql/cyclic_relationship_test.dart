@@ -6,7 +6,7 @@ void main() {
   ManagedContext? context;
 
   tearDown(() async {
-    await context!.close();
+    await context?.close();
     context = null;
   });
 
@@ -20,8 +20,8 @@ void main() {
           await Query.insertObject(context!, SelfRef()..name = "parent");
 
       var q = Query<SelfRef>(context!)
-        ..values!.name = "child"
-        ..values!.parent = parent;
+        ..values?.name = "child"
+        ..values?.parent = parent;
       final child = await q.insert();
 
       expect(parent.name, "parent");
@@ -39,7 +39,7 @@ void main() {
 
       var q = Query<SelfRef>(context!)
         ..where((s) => s.id).equalTo(parent.id)
-        ..values!.parent = parent;
+        ..values?.parent = parent;
       await q.updateOne();
 
       q = Query<SelfRef>(context!);
@@ -54,7 +54,7 @@ void main() {
     });
 
     test("Join from table without foreign key", () async {
-      var q = Query<SelfRef>(context!)..values!.name = "parent";
+      var q = Query<SelfRef>(context!)..values?.name = "parent";
       final parent = await q.insert();
 
       await Query.insertObjects(
@@ -67,7 +67,7 @@ void main() {
 
       q = Query<SelfRef>(context!)
         ..where((s) => s.id).equalTo(parent.id)
-        ..join(set: (s) => s.children!)
+        ..join(set: (s) => s.children)
             .sortBy((s) => s.name, QuerySortOrder.ascending);
       final all = await q.fetch();
       expect(all.map((s) => s.asMap()).toList(), [
@@ -97,7 +97,7 @@ void main() {
     });
 
     test("Join from table with foreign key", () async {
-      var q = Query<SelfRef>(context!)..values!.name = "parent";
+      var q = Query<SelfRef>(context!)..values?.name = "parent";
       final parent = await q.insert();
 
       final objs = await Query.insertObjects(
@@ -122,7 +122,7 @@ void main() {
     });
 
     test("Join multiple times", () async {
-      var q = Query<SelfRef>(context!)..values!.name = "parent";
+      var q = Query<SelfRef>(context!)..values?.name = "parent";
       final parent = await q.insert();
 
       final objs = await Query.insertObjects(
@@ -141,9 +141,9 @@ void main() {
 
       q = Query<SelfRef>(context!)
         ..sortBy((s) => s.name, QuerySortOrder.ascending);
-      final inner = q.join(set: (s) => s.children!)
+      final inner = q.join(set: (s) => s.children)
         ..sortBy((s) => s.name, QuerySortOrder.ascending);
-      inner.join(set: (s) => s.children!);
+      inner.join(set: (s) => s.children);
 
       final all = await q.fetch();
       expect(all.map((s) => s.asMap()).toList(), [
@@ -209,7 +209,7 @@ void main() {
     });
 
     test("Join with a where clause on the primary table", () async {
-      var q = Query<SelfRef>(context!)..values!.name = "parent";
+      var q = Query<SelfRef>(context!)..values?.name = "parent";
       final parent = await q.insert();
 
       final objs = await Query.insertObjects(
@@ -228,7 +228,7 @@ void main() {
 
       q = Query<SelfRef>(context!)..where((s) => s.id).equalTo(parent.id);
       q
-          .join(set: (s) => s.children!)
+          .join(set: (s) => s.children)
           .sortBy((s) => s.name, QuerySortOrder.ascending);
 
       final all = await q.fetch();
@@ -259,7 +259,7 @@ void main() {
     });
 
     test("Join with a where clause on the joined table", () async {
-      var q = Query<SelfRef>(context!)..values!.name = "parent";
+      var q = Query<SelfRef>(context!)..values?.name = "parent";
       final parent = await q.insert();
 
       final objs = await Query.insertObjects(
@@ -278,7 +278,7 @@ void main() {
 
       q = Query<SelfRef>(context!)
         ..sortBy((s) => s.name, QuerySortOrder.ascending);
-      q.join(set: (s) => s.children!).where((s) => s.name).greaterThan("b");
+      q.join(set: (s) => s.children).where((s) => s.name).greaterThan("b");
 
       final all = await q.fetch();
       expect(all.map((s) => s.asMap()).toList(), [
@@ -329,7 +329,7 @@ void main() {
 
     test("Join with where clause on both the primary and joined table",
         () async {
-      var q = Query<SelfRef>(context!)..values!.name = "parent";
+      var q = Query<SelfRef>(context!)..values?.name = "parent";
       final parent = await q.insert();
 
       final objs = await Query.insertObjects(
@@ -347,7 +347,7 @@ void main() {
             ..parent = objs.first);
 
       q = Query<SelfRef>(context!)..where((s) => s.name).greaterThan("o");
-      q.join(set: (s) => s.children!).where((s) => s.name).greaterThan("b");
+      q.join(set: (s) => s.children).where((s) => s.name).greaterThan("b");
 
       final all = await q.fetch();
       expect(all.map((s) => s.asMap()).toList(), [
@@ -382,13 +382,13 @@ void main() {
       final l = await Query.insertObject(context!, Left()..name = "l1");
 
       var q = Query<Right>(context!)
-        ..values!.name = "r1"
-        ..values!.belongsToLeft = l;
+        ..values?.name = "r1"
+        ..values?.belongsToLeft = l;
       final r = await q.insert();
 
       expect(l.name, "l1");
       expect(r.name, "r1");
-      expect(r.belongsToLeft!.id, l.id);
+      expect(r.belongsToLeft.id, l.id);
     });
 
     test("Updating and joining across tables", () async {
@@ -400,12 +400,11 @@ void main() {
             ..belongsToRight = r1);
       final updateQuery = Query<Right>(context!)
         ..where((r) => r.id).equalTo(r1.id)
-        ..values!.belongsToLeft = l1;
+        ..values?.belongsToLeft = l1;
       await updateQuery.updateOne();
 
       final q = Query<Left>(context!)
-        ..join<Right>(object: (l) => l.right!)
-            .join<Left>(object: (r) => r.left!);
+        ..join<Right>(object: (l) => l.right!).join<Left>(object: (r) => r.left!);
       final all = await q.fetch();
       expect(all.map((s) => s.asMap()).toList(), [
         {
@@ -427,7 +426,7 @@ void main() {
     });
 //
 //    test("Join from table without foreign key", () async {
-//      var q = Query<SelfRef>(context)..values.name = "Parent";
+//      var q = Query<SelfRef>(context)..values?.name = "Parent";
 //      final parent = await q.insert();
 //
 //      await Query.insertObjects(
@@ -470,7 +469,7 @@ void main() {
 //    });
 //
 //    test("Join from table with foreign key", () async {
-//      var q = Query<SelfRef>(context)..values.name = "Parent";
+//      var q = Query<SelfRef>(context)..values?.name = "Parent";
 //      final parent = await q.insert();
 //
 //      final objs = await Query.insertObjects(
@@ -495,7 +494,7 @@ void main() {
 //    });
 //
 //    test("Join multiple times", () async {
-//      var q = Query<SelfRef>(context)..values.name = "Parent";
+//      var q = Query<SelfRef>(context)..values?.name = "Parent";
 //      final parent = await q.insert();
 //
 //      final objs = await Query.insertObjects(
@@ -582,7 +581,7 @@ void main() {
 //    });
 //
 //    test("Join with a where clause on the primary table", () async {
-//      var q = Query<SelfRef>(context)..values.name = "Parent";
+//      var q = Query<SelfRef>(context)..values?.name = "Parent";
 //      final parent = await q.insert();
 //
 //      final objs = await Query.insertObjects(
@@ -630,7 +629,7 @@ void main() {
 //    });
 //
 //    test("Join with a where clause on the joined table", () async {
-//      var q = Query<SelfRef>(context)..values.name = "Parent";
+//      var q = Query<SelfRef>(context)..values?.name = "Parent";
 //      final parent = await q.insert();
 //
 //      final objs = await Query.insertObjects(
@@ -672,7 +671,7 @@ void main() {
 //
 //    test("Join with where clause on both the primary and joined table",
 //        () async {
-//        var q = Query<SelfRef>(context)..values.name = "Parent";
+//        var q = Query<SelfRef>(context)..values?.name = "Parent";
 //        final parent = await q.insert();
 //
 //        final objs = await Query.insertObjects(
@@ -744,5 +743,5 @@ class _Right {
   Left? left;
 
   @Relate(#right)
-  Left? belongsToLeft;
+  late Left belongsToLeft;
 }

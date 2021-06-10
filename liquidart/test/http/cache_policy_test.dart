@@ -13,7 +13,7 @@ void main() {
   HttpServer? server;
 
   tearDown(() async {
-    await server!.close(force: true);
+    await server?.close(force: true);
   });
 
   test("Prevent intermediate caching", () async {

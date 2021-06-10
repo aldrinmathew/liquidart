@@ -21,10 +21,10 @@ abstract class CLIProject implements CLICommand {
         _projectDirectory = Directory(dir).absolute;
       }
     }
-    return _projectDirectory!;
+    return _projectDirectory;
   }
 
-  Map<String, dynamic> get projectSpecification {
+  Map<String, dynamic>? get projectSpecification {
     if (_pubspec == null) {
       final file = projectSpecificationFile;
       if (!file.existsSync()) {
@@ -32,11 +32,11 @@ abstract class CLIProject implements CLICommand {
             "Failed to locate pubspec.yaml in project directory '${projectDirectory!.path}'");
       }
       var yamlContents = file.readAsStringSync();
-      final yaml = loadYaml(yamlContents) as Map<dynamic, dynamic>;
+      final yaml = loadYaml(yamlContents) as Map<dynamic, dynamic> ;
       _pubspec = yaml.cast<String, dynamic>();
     }
 
-    return _pubspec!;
+    return _pubspec;
   }
 
   File get projectSpecificationFile =>
@@ -44,14 +44,13 @@ abstract class CLIProject implements CLICommand {
 
   Uri get packageConfigUri => projectDirectory!.uri.resolve(".packages");
 
-  String get libraryName => packageName;
+  String? get libraryName => packageName;
 
-  String get packageName => projectSpecification["name"] as String;
+  String? get packageName => projectSpecification!["name"] as String?;
 
-  Version get projectVersion {
+  Version? get projectVersion {
     if (_projectVersion == null) {
-      var lockFile =
-          File.fromUri(projectDirectory!.uri.resolve("pubspec.lock"));
+      var lockFile = File.fromUri(projectDirectory!.uri.resolve("pubspec.lock"));
       if (!lockFile.existsSync()) {
         throw CLIException("No pubspec.lock file. Run `pub get`.");
       }
@@ -62,23 +61,23 @@ abstract class CLIProject implements CLICommand {
       _projectVersion = Version.parse(projectVersion);
     }
 
-    return _projectVersion!;
+    return _projectVersion;
   }
 
   Directory? _projectDirectory;
   Map<String, dynamic>? _pubspec;
   Version? _projectVersion;
 
-  static File fileInDirectory(Directory directory, String name) {
+  static File fileInDirectory(Directory? directory, String name) {
     if (path_lib.isRelative(name)) {
-      return File.fromUri(directory.uri.resolve(name));
+      return File.fromUri(directory!.uri.resolve(name));
     }
 
-    return File.fromUri(directory.uri);
+    return File.fromUri(directory!.uri);
   }
 
   File fileInProjectDirectory(String name) {
-    return fileInDirectory(projectDirectory!, name);
+    return fileInDirectory(projectDirectory, name);
   }
 
   @override
@@ -88,11 +87,11 @@ abstract class CLIProject implements CLICommand {
         displayInfo("Liquidart project version: $projectVersion");
       }
 
-      if (projectVersion.major != toolVersion.major) {
+      if (projectVersion?.major != toolVersion!.major) {
         throw CLIException(
             "CLI version is incompatible with project liquidart version.",
             instructions: [
-              "Install liquidart@${projectVersion.toString()} or upgrade your project to liquidart${toolVersion.toString()}."
+              "Install liquidart@${projectVersion?.toString()} or upgrade your project to liquidart${toolVersion.toString()}."
             ]);
       }
     } on CLIException {
@@ -101,15 +100,16 @@ abstract class CLIProject implements CLICommand {
   }
 
   Future<String> getChannelName() async {
-    final String? name = await Loner.run(GetChannelExecutable({}),
-        packageConfigURI: packageConfigUri,
-        imports: GetChannelExecutable.importsForPackage(libraryName),
-        logHandler: displayProgress);
-    if (name == null) {
-      throw CLIException(
-          "No ApplicationChannel subclass found in $packageName/$libraryName");
-    }
+    final name = await Loner.run(GetChannelExecutable({}),
+      packageConfigURI: packageConfigUri,
+      imports: GetChannelExecutable.importsForPackage(libraryName),
+      logHandler: displayProgress);
+    // if (name == null) {
+    //   throw CLIException(
+    //     "No ApplicationChannel subclass found in $packageName/$libraryName");
+    // }
 
     return name;
   }
+
 }

@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 import 'package:liquidart/src/dev/helpers.dart';
 
 void main() {
-  APIDocument? doc;
+  late APIDocument doc;
   setUpAll(() async {
     doc = await Application.document(
         Channel, ApplicationOptions(), {"version": "1.0", "name": "desc"});
@@ -17,51 +17,46 @@ void main() {
       "If method has scopes, add them to list of scopes if does not exist in Authorizer",
       () {
     expect(
-        doc!.paths["/level1-authorizer"]!.operations!["get"]!.security!.length,
-        1);
+        doc.paths["/level1-authorizer"]!.operations!["get"]!.security!.length, 1);
     expect(
-        doc!.paths["/level1-authorizer"]!.operations!["get"]!.security!.first
+        doc.paths["/level1-authorizer"]!.operations!["get"]!.security!.first
             .requirements!.length,
         1);
     expect(
-        doc!.paths["/level1-authorizer"]!.operations!["get"]!.security!.first
+        doc.paths["/level1-authorizer"]!.operations!["get"]!.security!.first
             .requirements!["oauth2"],
         ["level1"]);
 
     expect(
-        doc!.paths["/level1-authorizer"]!.operations!["post"]!.security!.length,
-        1);
+        doc.paths["/level1-authorizer"]!.operations!["post"]!.security!.length, 1);
     expect(
-        doc!.paths["/level1-authorizer"]!.operations!["post"]!.security!.first
+        doc.paths["/level1-authorizer"]!.operations!["post"]!.security!.first
             .requirements!.length,
         1);
     expect(
-        doc!.paths["/level1-authorizer"]!.operations!["post"]!.security!.first
+        doc.paths["/level1-authorizer"]!.operations!["post"]!.security!.first
+            .requirements!["oauth2"],
+        ["level1", "level2"]);
+
+    expect(doc.paths["/level1-authorizer"]!.operations!["delete"]!.security!.length,
+        1);
+    expect(
+        doc.paths["/level1-authorizer"]!.operations!["delete"]!.security!.first
+            .requirements!.length,
+        1);
+    expect(
+        doc.paths["/level1-authorizer"]!.operations!["delete"]!.security!.first
             .requirements!["oauth2"],
         ["level1", "level2"]);
 
     expect(
-        doc!.paths["/level1-authorizer"]!.operations!["delete"]!.security!
-            .length,
-        1);
+        doc.paths["/level1-authorizer"]!.operations!["put"]!.security!.length, 1);
     expect(
-        doc!.paths["/level1-authorizer"]!.operations!["delete"]!.security!.first
+        doc.paths["/level1-authorizer"]!.operations!["put"]!.security!.first
             .requirements!.length,
         1);
     expect(
-        doc!.paths["/level1-authorizer"]!.operations!["delete"]!.security!.first
-            .requirements!["oauth2"],
-        ["level1", "level2"]);
-
-    expect(
-        doc!.paths["/level1-authorizer"]!.operations!["put"]!.security!.length,
-        1);
-    expect(
-        doc!.paths["/level1-authorizer"]!.operations!["put"]!.security!.first
-            .requirements!.length,
-        1);
-    expect(
-        doc!.paths["/level1-authorizer"]!.operations!["put"]!.security!.first
+        doc.paths["/level1-authorizer"]!.operations!["put"]!.security!.first
             .requirements!["oauth2"],
         ["level1"]);
   });
@@ -69,61 +64,61 @@ void main() {
   test("If authorizer has less scope than method scope, method scope is used",
       () {
     expect(
-        doc!.paths["/level1-subscope-authorizer"]!.operations!["get"]!.security!
+        doc.paths["/level1-subscope-authorizer"]!.operations!["get"]!.security!
             .length,
         1);
     expect(
-        doc!.paths["/level1-subscope-authorizer"]!.operations!["get"]!.security!
+        doc.paths["/level1-subscope-authorizer"]!.operations!["get"]!.security!
             .first.requirements!.length,
         1);
     expect(
-        doc!.paths["/level1-subscope-authorizer"]!.operations!["get"]!.security!
+        doc.paths["/level1-subscope-authorizer"]!.operations!["get"]!.security!
             .first.requirements!["oauth2"],
         ["level1:subscope"]);
 
     expect(
-        doc!.paths["/level1-subscope-authorizer"]!.operations!["post"]!
-            .security!.length,
-        1);
-    expect(
-        doc!.paths["/level1-subscope-authorizer"]!.operations!["post"]!
-            .security!.first.requirements!.length,
-        1);
-    expect(
-        doc!.paths["/level1-subscope-authorizer"]!.operations!["post"]!
-            .security!.first.requirements!["oauth2"],
-        ["level1:subscope", "level2"]);
-
-    expect(
-        doc!.paths["/level1-subscope-authorizer"]!.operations!["put"]!.security!
+        doc.paths["/level1-subscope-authorizer"]!.operations!["post"]!.security!
             .length,
         1);
     expect(
-        doc!.paths["/level1-subscope-authorizer"]!.operations!["put"]!.security!
+        doc.paths["/level1-subscope-authorizer"]!.operations!["post"]!.security!
             .first.requirements!.length,
         1);
     expect(
-        doc!.paths["/level1-subscope-authorizer"]!.operations!["put"]!.security!
+        doc.paths["/level1-subscope-authorizer"]!.operations!["post"]!.security!
+            .first.requirements!["oauth2"],
+        ["level1:subscope", "level2"]);
+
+    expect(
+        doc.paths["/level1-subscope-authorizer"]!.operations!["put"]!.security!
+            .length,
+        1);
+    expect(
+        doc.paths["/level1-subscope-authorizer"]!.operations!["put"]!.security!
+            .first.requirements!.length,
+        1);
+    expect(
+        doc.paths["/level1-subscope-authorizer"]!.operations!["put"]!.security!
             .first.requirements!["oauth2"],
         ["level1"]);
 
     expect(
-        doc!.paths["/level1-subscope-authorizer"]!.operations!["delete"]!
-            .security!.length,
+        doc.paths["/level1-subscope-authorizer"]!.operations!["delete"]!.security!
+            .length,
         1);
     expect(
-        doc!.paths["/level1-subscope-authorizer"]!.operations!["delete"]!
-            .security!.first.requirements!.length,
+        doc.paths["/level1-subscope-authorizer"]!.operations!["delete"]!.security!
+            .first.requirements!.length,
         1);
     expect(
-        doc!.paths["/level1-subscope-authorizer"]!.operations!["delete"]!
-            .security!.first.requirements!["oauth2"],
+        doc.paths["/level1-subscope-authorizer"]!.operations!["delete"]!.security!
+            .first.requirements!["oauth2"],
         ["level1", "level2"]);
   });
 
   test("Scopes are available in securityScheme object", () {
-    final flows = doc!.components!.securitySchemes["oauth2"]!.flows;
-    expect(flows!.length, 1);
+    final flows = doc.components!.securitySchemes["oauth2"]!.flows!;
+    expect(flows.length, 1);
 
     final flow = flows.values.first;
     expect(flow.scopes!.length, 3);
@@ -145,15 +140,15 @@ class Channel extends ApplicationChannel {
     router.route("/no-authorizer").link(() => C1());
     router
         .route("/level1-authorizer")
-        .link(() => Authorizer.bearer(authServer!, scopes: ["level1"]))
+        .link(() => Authorizer.bearer(authServer, scopes: ["level1"]))!
         .link(() => C1());
     router
         .route("/level1-subscope-authorizer")
-        .link(() => Authorizer.bearer(authServer!, scopes: ["level1:subscope"]))
+        .link(() => Authorizer.bearer(authServer, scopes: ["level1:subscope"]))!
         .link(() => C1());
     router
         .route("/authorizer")
-        .link(() => Authorizer.bearer(authServer!))
+        .link(() => Authorizer.bearer(authServer))!
         .link(() => C1());
 
     return router;

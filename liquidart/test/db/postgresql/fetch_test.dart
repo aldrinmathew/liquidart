@@ -5,7 +5,7 @@ import 'package:liquidart/src/dev/helpers.dart';
 void main() {
   ManagedContext? context;
   tearDown(() async {
-    await context!.close();
+    await context?.close();
     context = null;
   });
 
@@ -20,8 +20,8 @@ void main() {
       ..predicate = QueryPredicate("id = @id", {"id": item.id});
     item = await req.fetchOne();
 
-    expect(item!.name, "Joe");
-    expect(item.email, "a@a.com");
+    expect(item?.name, "Joe");
+    expect(item?.email, "a@a.com");
   });
 
   test("Query with dynamic entity and mis-matched context throws exception",
@@ -54,9 +54,9 @@ void main() {
 
     item = await req.fetchOne();
 
-    expect(item!.name, "Joe");
-    expect(item.id, id);
-    expect(item.email, isNull);
+    expect(item?.name, "Joe");
+    expect(item?.id, id);
+    expect(item?.email, isNull);
   });
 
   test("Returning properties for undefined attributes fails", () async {
@@ -104,9 +104,9 @@ void main() {
       ..sortBy((t) => t.id, QuerySortOrder.ascending);
     result = await req.fetch();
 
-    int idIndex = 0;
+    int? idIndex = 0;
     for (TestModel m in result) {
-      int next = m.id!;
+      int? next = m.id;
       expect(next, greaterThan(idIndex));
       idIndex = next;
     }
@@ -269,7 +269,7 @@ void main() {
     query.where((o) => o.owner).identifiedBy(u1.id);
     res = await query.fetch();
 
-    GenUser user = res.first.owner!;
+    GenUser? user = res.first.owner;
     expect(user, isNotNull);
     expect(res.length, 5);
     expect(
@@ -283,14 +283,13 @@ void main() {
 
   test("Fetch object with null reference", () async {
     context = await contextWithModels([GenUser, GenPost]);
-    GenPost? p1 = await (Query<GenPost>(context!)
-          ..values = (GenPost()..text = "1"))
+    GenPost? p1 = await (Query<GenPost>(context!)..values = (GenPost()..text = "1"))
         .insert();
 
     var req = Query<GenPost>(context!);
     p1 = await req.fetchOne();
 
-    expect(p1!.owner, isNull);
+    expect(p1?.owner, isNull);
   });
 
   test("Omits specific keys", () async {
@@ -300,14 +299,14 @@ void main() {
 
     var result = await iq.insert();
     expect(result.id, greaterThan(0));
-    expect(result.backing.contents!["text"], isNull);
+    expect(result.backing.contents["text"], isNull);
 
     var fq = Query<Omit>(context!)
       ..predicate = QueryPredicate("id=@id", {"id": result.id});
 
-    var fResult = await fq.fetchOne();
-    expect(fResult!.id, result.id);
-    expect(fResult.backing.contents!["text"], isNull);
+    Omit? fResult = await fq.fetchOne();
+    expect(fResult?.id, result.id);
+    expect(fResult?.backing.contents["text"], isNull);
   });
 
   test(
@@ -323,7 +322,7 @@ void main() {
     }
 
     try {
-      var q = Query<GenUser>(context!)..join(set: (u) => u.posts!);
+      var q = Query<GenUser>(context!)..join(set: (u) => u.posts);
 
       await q.fetchOne();
 
@@ -339,11 +338,11 @@ void main() {
       () async {
     context = await contextWithModels([GenUser, GenPost]);
 
-    var u1 = await (Query<GenUser>(context!)..values!.name = "Joe").insert();
+    var u1 = await (Query<GenUser>(context!)..values?.name = "Joe").insert();
 
     await (Query<GenPost>(context!)
-          ..values!.text = "text"
-          ..values!.owner = u1)
+          ..values?.text = "text"
+          ..values?.owner = u1)
         .insert();
 
     var q = Query<GenPost>(context!)
@@ -351,7 +350,7 @@ void main() {
 
     var result = await q.fetchOne();
     expect(result!.owner!.id, 1);
-    expect(result.owner!.backing.contents!.length, 1);
+    expect(result.owner!.backing.contents.length, 1);
 
     try {
       q = Query<GenPost>(context!)
@@ -377,7 +376,7 @@ void main() {
       () async {
     context = await contextWithModels([EnumObject]);
 
-    var q = Query<EnumObject>(context!)..values!.enumValues = EnumValues.abcd;
+    var q = Query<EnumObject>(context!)..values?.enumValues = EnumValues.abcd;
 
     await q.insert();
 
@@ -400,13 +399,13 @@ void main() {
   test("Can fetch enum value that is null", () async {
     context = await contextWithModels([EnumObject]);
 
-    var q = Query<EnumObject>(context!)..values!.enumValues = null;
+    var q = Query<EnumObject>(context!)..values?.enumValues = null;
 
     await q.insert();
     q = Query<EnumObject>(context!);
-    var result = await q.fetchOne();
-    expect(result!.enumValues, null);
-    expect(result.asMap()["enumValues"], isNull);
+    EnumObject? result = await q.fetchOne();
+    expect(result?.enumValues, null);
+    expect(result?.asMap()["enumValues"], isNull);
   });
 
   test("When fetching invalid enum value from db, throws error", () async {
@@ -447,8 +446,8 @@ void main() {
     });
 
     test("If object exists and type is specified, find object", () async {
-      final o = await context!.fetchObjectWithID<TestModel>(id);
-      expect(o!.name, "bob");
+      TestModel? o = await context!.fetchObjectWithID<TestModel>(id);
+      expect(o?.name, "bob");
     });
 
     test("If object does not exist and type is specified, return null",
@@ -486,8 +485,8 @@ void main() {
 
 class TestModel extends ManagedObject<_TestModel> implements _TestModel {
   TestModel({String? name, String? email}) {
-    this.name = name!;
-    this.email = email!;
+    this.name = name;
+    this.email = email;
   }
 }
 
@@ -500,10 +499,9 @@ class _TestModel {
   @Column(nullable: true, unique: true)
   String? email;
 
-  // ignore: unused_element
-  static String tableName() {
-    return "simple";
-  }
+  // static String tableName() {
+  //   return "simple";
+  // }
 
   @override
   String toString() {
@@ -521,10 +519,9 @@ class _GenUser {
 
   ManagedSet<GenPost>? posts;
 
-  // ignore: unused_element
-  static String tableName() {
-    return "GenUser";
-  }
+  // static String tableName() {
+  //   return "GenUser";
+  // }
 }
 
 class GenPost extends ManagedObject<_GenPost> implements _GenPost {}
@@ -555,11 +552,11 @@ class PrivateField extends ManagedObject<_PrivateField>
     _private = "x";
   }
 
-  set public(String p) {
+  set public(String? p) {
     _private = p;
   }
 
-  String get public => _private!;
+  String? get public => _private;
 }
 
 class _PrivateField {

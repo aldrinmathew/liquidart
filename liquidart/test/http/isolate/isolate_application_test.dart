@@ -10,22 +10,22 @@ import 'package:test/test.dart';
 
 void main() {
   group("Lifecycle", () {
-    Application<TestChannel>? app;
+    late Application<TestChannel> app;
 
     setUp(() async {
       app = Application<TestChannel>();
-      await app!.start(numberOfInstances: 2, consoleLogging: true);
+      await app.start(numberOfInstances: 2, consoleLogging: true);
       print("started");
     });
 
     tearDown(() async {
       print("stopping");
-      await app!.stop();
+      await app.stop();
       print("stopped");
     });
 
     test("Application starts", () async {
-      expect(app!.supervisors.length, 2);
+      expect(app.supervisors.length, 2);
     });
 
     test("Application responds to request", () async {
@@ -69,14 +69,14 @@ void main() {
     });
 
     test("Application stops", () async {
-      await app!.stop();
+      await app.stop();
 
       try {
         await http.get(Uri.parse("http://localhost:8888/t"));
         // ignore: empty_catches
       } on SocketException {}
 
-      await app!.start(numberOfInstances: 2, consoleLogging: true);
+      await app.start(numberOfInstances: 2, consoleLogging: true);
 
       var resp = await http.get(Uri.parse("http://localhost:8888/t"));
       expect(resp.statusCode, 200);
@@ -95,25 +95,25 @@ void main() {
   });
 
   group("App launch status", () {
-    Application<TestChannel>? app;
+    late Application<TestChannel> app;
 
     tearDown(() async {
-      await app!.stop();
+      await app.stop();
     });
 
     test(
         "didFinishLaunching is false before launch, true after, false after stop",
         () async {
       app = Application<TestChannel>();
-      expect(app!.isRunning, false);
+      expect(app.isRunning, false);
 
-      var future = app!.start(numberOfInstances: 2, consoleLogging: true);
-      expect(app!.isRunning, false);
+      var future = app.start(numberOfInstances: 2, consoleLogging: true);
+      expect(app.isRunning, false);
       await future;
-      expect(app!.isRunning, true);
+      expect(app.isRunning, true);
 
-      await app!.stop();
-      expect(app!.isRunning, false);
+      await app.stop();
+      expect(app.isRunning, false);
     });
   });
 }

@@ -18,7 +18,7 @@ abstract class MockServer<T> {
   Future open();
 
   /// Concrete implementations override this method to close an event listener.
-  Future close();
+  Future? close();
 
   /// Adds an event to this server.
   void add(T value) {
@@ -83,7 +83,7 @@ class MockHTTPServer extends MockServer<Request> {
   MockHTTPServer(this.port) : super();
 
   /// The port to listen on.
-  int? port;
+  int port;
 
   /// The underlying [HttpServer] listening for requests.
   HttpServer? server;
@@ -112,7 +112,7 @@ class MockHTTPServer extends MockServer<Request> {
   /// the response to simulate long-running tasks or network issues.
   void queueResponse(Response resp, {Duration? delay}) {
     _responseQueue
-        .add(_MockServerResponse(object: resp, delay: delay ?? defaultDelay!));
+        .add(_MockServerResponse(object: resp, delay: delay ?? defaultDelay));
   }
 
   /// Enqueues a function that creates a response for the next request.
@@ -124,7 +124,7 @@ class MockHTTPServer extends MockServer<Request> {
   /// Optionally includes a [delay] before sending the response to simulate long-running tasks or network issues.
   void queueHandler(Response handler(Request request), {Duration? delay}) {
     _responseQueue.add(
-        _MockServerResponse(handler: handler, delay: delay ?? defaultDelay!));
+        _MockServerResponse(handler: handler, delay: delay ?? defaultDelay));
   }
 
   /// Enqueues an outage; the next request will not receive a response.
@@ -139,13 +139,13 @@ class MockHTTPServer extends MockServer<Request> {
   /// Begins listening for HTTP requests on [port].
   @override
   Future open() async {
-    server = await HttpServer.bind(InternetAddress.loopbackIPv4, port!);
+    server = await HttpServer.bind(InternetAddress.loopbackIPv4, port);
     server!.map((req) => Request(req)).listen((req) async {
       add(req);
 
-      await req.body!.decode();
+      await req.body.decode();
 
-      final Response? response = await _dequeue(req);
+      final response = await _dequeue(req);
       if (response != null) {
         await req.respond(response);
       }
@@ -154,8 +154,8 @@ class MockHTTPServer extends MockServer<Request> {
 
   /// Shuts down the server listening for HTTP requests.
   @override
-  Future close() {
-    return server!.close();
+  Future? close() {
+    return server?.close();
   }
 
   Future<Response?> _dequeue(Request incoming) async {
@@ -206,7 +206,7 @@ class _MockServerResponse {
     if (handler != null) {
       return handler!(req);
     } else if (object != null) {
-      return object!;
+      return object;
     }
 
     return null;

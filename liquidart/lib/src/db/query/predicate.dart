@@ -17,7 +17,7 @@ class QueryPredicate {
   ///
   /// The [format] and [parameters] of this predicate. [parameters] may be null.
   QueryPredicate(this.format, this.parameters) {
-    format ??= "";
+    // format;
     parameters ??= {};
   }
 
@@ -25,8 +25,8 @@ class QueryPredicate {
   ///
   /// The format string is the empty string and parameters is the empty map.
   QueryPredicate.empty()
-      : format = "",
-        parameters = {};
+    : format = "",
+      parameters = {};
 
   /// Combines [predicates] with 'AND' keyword.
   ///
@@ -40,11 +40,10 @@ class QueryPredicate {
   /// If [predicates] is null or empty, an empty predicate is returned. If [predicates] contains only
   /// one predicate, that predicate is returned.
   factory QueryPredicate.and(Iterable<QueryPredicate?>? predicates) {
-    List<QueryPredicate?>? predicateList = predicates!
-        .where((p) => p!.format != null && p.format!.isNotEmpty)
-        .toList();
-    dynamic? predicateListCheck = predicateList;
-    if (predicateListCheck == null) {
+    var predicateList = predicates
+      ?.where((p) => p?.format != null && p!.format.isNotEmpty)
+      .toList();
+    if (predicateList == null) {
       return QueryPredicate.empty();
     }
 
@@ -59,19 +58,19 @@ class QueryPredicate {
     // If we have duplicate keys anywhere, we need to disambiguate them.
     int dupeCounter = 0;
     final allFormatStrings = [];
-    final valueMap = <String, dynamic>{};
+    final valueMap = <String?, dynamic>{};
     for (var predicate in predicateList) {
       final duplicateKeys = predicate!.parameters?.keys
-              .where((k) => valueMap.keys.contains(k))
-              .toList() ??
-          [];
+        .where((k) => valueMap.keys.contains(k))
+        .toList() ??
+        [];
 
       if (duplicateKeys.isNotEmpty) {
         var fmt = predicate.format;
-        Map<String, String> dupeMap = {};
+        Map<String?, String> dupeMap = {};
         duplicateKeys.forEach((key) {
           final replacementKey = "$key$dupeCounter";
-          fmt = fmt!.replaceAll("@$key", "@$replacementKey");
+          fmt = fmt.replaceAll("@$key", "@$replacementKey");
           dupeMap[key] = replacementKey;
           dupeCounter++;
         });
@@ -94,11 +93,11 @@ class QueryPredicate {
   ///
   /// This is the predicate text. Do not write dynamic values directly to the format string, instead, prefix an identifier with @
   /// and add that identifier to the [parameters] map.
-  String? format;
+  String format;
 
   /// A map of values to replace in the format string at execution time.
   ///
   /// Input values should not be in the format string, but instead provided in this map.
   /// Keys of this map will be searched for in the format string and be replaced by the value in this map.
-  Map<String, dynamic>? parameters;
+  Map<String?, dynamic>? parameters;
 }

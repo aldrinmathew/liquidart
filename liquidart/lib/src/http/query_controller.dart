@@ -36,19 +36,19 @@ abstract class QueryController<InstanceType extends ManagedObject>
 
   @override
   FutureOr<RequestOrResponse> willProcessRequest(Request req) {
-    if (req.path!.orderedVariableNames.isNotEmpty) {
-      var firstVarName = req.path!.orderedVariableNames.first;
-      var idValue = req.path!.variables[firstVarName];
+    if (req.path.orderedVariableNames.isNotEmpty) {
+      var firstVarName = req.path.orderedVariableNames.first;
+      var idValue = req.path.variables[firstVarName];
 
       if (idValue != null) {
-        var primaryKeyDesc = query!.entity.attributes[query!.entity.primaryKey];
-        if (primaryKeyDesc!.isAssignableWith(idValue)) {
-          query!.where((o) => o[query!.entity.primaryKey!]).equalTo(idValue);
-        } else if (primaryKeyDesc.type.kind == ManagedPropertyType.bigInteger ||
-            primaryKeyDesc.type.kind == ManagedPropertyType.integer) {
+        var primaryKeyDesc = query!.entity!.attributes[query!.entity!.primaryKey]!;
+        if (primaryKeyDesc.isAssignableWith(idValue)) {
+          query!.where((o) => o[query!.entity!.primaryKey]).equalTo(idValue);
+        } else if (primaryKeyDesc.type!.kind == ManagedPropertyType.bigInteger ||
+            primaryKeyDesc.type!.kind == ManagedPropertyType.integer) {
           try {
             query!
-                .where((o) => o[query!.entity.primaryKey!])
+                .where((o) => o[query!.entity!.primaryKey])
                 .equalTo(int.parse(idValue));
           } on FormatException {
             return Response.notFound();
@@ -64,8 +64,7 @@ abstract class QueryController<InstanceType extends ManagedObject>
 
   @override
   void didDecodeRequestBody(RequestBody body) {
-    query!.values!.readFromMap(body.as());
-    query!.values!
-        .removePropertyFromBackingMap(query!.values!.entity.primaryKey!);
+    query!.values?.readFromMap(body.as());
+    query!.values?.removePropertyFromBackingMap(query!.values?.entity.primaryKey);
   }
 }

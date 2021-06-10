@@ -14,7 +14,7 @@ class CLIServer extends CLICommand with CLIProject {
   @Option("timeout",
       help: "Number of seconds to wait to ensure startup succeeded.",
       defaultsTo: "45")
-  int get startupTimeout => decode("timeout");
+  int? get startupTimeout => decode<int>("timeout");
 
   @Option("ssl-key-path",
       help:
@@ -27,36 +27,36 @@ class CLIServer extends CLICommand with CLIProject {
   String? get certificatePath => decode("ssl-certificate-path");
 
   @Flag("observe", help: "Enables Dart Observatory", defaultsTo: false)
-  bool get shouldRunObservatory => decode("observe");
+  bool? get shouldRunObservatory => decode("observe");
 
   @Flag("ipv6-only",
       help: "Limits listening to IPv6 connections only.",
       negatable: false,
       defaultsTo: false)
-  bool get ipv6Only => decode("ipv6-only");
+  bool? get ipv6Only => decode<bool>("ipv6-only");
 
   @Option("port",
       abbr: "p",
       help: "The port number to listen for HTTP requests on.",
       defaultsTo: "8888")
-  int get port => decode("port");
+  int? get port => decode<int>("port");
 
   @Option("isolates", abbr: "n", help: "Number of isolates processing requests")
-  int get numberOfIsolates => decode("isolates") ?? 0;
+  int? get numberOfIsolates => decode<int>("isolates");
 
   @Option("address",
       abbr: "a",
       help:
           "The address to listen on. See HttpServer.bind for more details; this value is used as the String passed to InternetAddress.lookup."
           " Using the default will listen on any address.")
-  String get address => decode("address");
+  String? get address => decode("address");
 
   @Option("channel",
       abbr: "s",
       help:
           "The name of the ApplicationChannel subclass to be instantiated to serve requests. "
           "By default, this subclass is determined by reflecting on the application library in the [directory] being served.")
-  String? get channelType => decode("channel") ?? derivedChannelType;
+  String? get channelType => decode("channel") ?? derivedChannelType!;
 
   @Option("config-path",
       abbr: "c",
@@ -64,7 +64,7 @@ class CLIServer extends CLICommand with CLIProject {
           "The path to a configuration file. This File is available in the ApplicationOptions"
           "for a ApplicationChannel to use to read application-specific configuration values. Relative paths are relative to [directory].",
       defaultsTo: "config.yaml")
-  File get configurationFile => File(decode("config-path")).absolute;
+  File? get configurationFile => File(decode("config-path")).absolute;
 
   ReceivePort? messagePort;
   ReceivePort? errorPort;
@@ -96,14 +96,14 @@ class CLIServer extends CLICommand with CLIProject {
   /////
 
   Future<StoppableProcess> start() async {
-    var replacements = {
+    Map<String, dynamic?> replacements = {
       "PACKAGE_NAME": packageName,
       "LIBRARY_NAME": libraryName,
       "CHANNEL_TYPE": channelType,
       "PORT": port,
       "ADDRESS": address,
       "IPV6_ONLY": ipv6Only,
-      "CONFIGURATION_FILE_PATH": configurationFile.path,
+      "CONFIGURATION_FILE_PATH": configurationFile?.path,
       "SSL_KEY_PATH": keyPath,
       "SSL_CERTIFICATE_PATH": certificatePath,
       "NUMBER_OF_ISOLATES": numberOfIsolates
@@ -111,7 +111,7 @@ class CLIServer extends CLICommand with CLIProject {
 
     displayInfo("Starting application '$packageName/$libraryName'");
     displayProgress("Channel: $channelType");
-    displayProgress("Config: ${configurationFile.path}");
+    displayProgress("Config: ${configurationFile?.path}");
     displayProgress("Port: $port");
 
     errorPort = ReceivePort();
@@ -137,10 +137,10 @@ class CLIServer extends CLICommand with CLIProject {
 
     messagePort!.listen((msg) {
       final message = msg as Map<dynamic, dynamic>;
-      switch (message["status"] as String) {
+      switch (message["status"] as String?) {
         case "ok":
           {
-            startupCompleter.complete(message["port"] as SendPort);
+            startupCompleter.complete(message["port"] as SendPort?);
           }
           break;
         case "stopped":
@@ -152,7 +152,7 @@ class CLIServer extends CLICommand with CLIProject {
 
     isolate.resume(isolate.pauseCapability!);
 
-    if (shouldRunObservatory) {
+    if (shouldRunObservatory ?? false) {
       final observatory = await Service.controlWebServer(enable: true);
       if (await supportsLaunchObservatory()) {
         await launchObservatory(observatory.serverUri.toString());
@@ -160,7 +160,7 @@ class CLIServer extends CLICommand with CLIProject {
     }
 
     final sendPort = await startupCompleter.future
-        .timeout(Duration(seconds: startupTimeout));
+        .timeout(Duration(seconds: startupTimeout ?? 0));
     final process = StoppableProcess((reason) async {
       displayInfo("Stopping application.");
       displayProgress("Reason: $reason");
@@ -229,7 +229,7 @@ Future main(List<String> args, dynamic sendPort) async {
     """;
 
     return contents.replaceAllMapped(RegExp("___([A-Za-z0-9_-]+)___"), (match) {
-      return values[match.group(1)].toString();
+      return values[match.group(1)!].toString();
     });
   }
 

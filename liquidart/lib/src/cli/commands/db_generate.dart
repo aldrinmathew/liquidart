@@ -70,15 +70,15 @@ class CLIDatabaseGenerate extends CLICommand
         await generateMigrationFileForProject(this, schema, versionNumber);
 
     displayInfo("The following ManagedObject<T> subclasses were found:");
-    displayProgress("${result.tablesEvaluated.join(", ")}");
+    displayProgress("${result.tablesEvaluated!.join(", ")}");
     displayProgress("");
     displayProgress(
         "* If you were expecting more declarations, ensure the files are visible in the application library file.");
     displayProgress("");
 
-    result.changeList.forEach(displayProgress);
+    result.changeList?.forEach(displayProgress);
 
-    newMigrationFile.writeAsStringSync(result.source);
+    newMigrationFile.writeAsStringSync(result.source!);
 
     displayInfo("Created new migration file (version $versionNumber).",
         color: CLIColor.boldGreen);

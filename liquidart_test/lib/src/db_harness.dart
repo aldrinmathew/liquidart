@@ -4,10 +4,10 @@ import 'package:liquidart/liquidart.dart';
 import 'package:liquidart_test/liquidart_test.dart';
 import 'package:test/test.dart';
 
-/// Use methods from this class to test applications that use the Liquidart ORM.
+/// Use methods from this class to test applications that use the liquidart ORM.
 ///
 /// This class is mixed in to your [TestHarness] subclass to provide test
-/// utilities for applications that use use the Liquidart ORM. Methods from this class
+/// utilities for applications that use use the liquidart ORM. Methods from this class
 /// manage setting up and tearing down your application's data model in a temporary database
 /// for the purpose of testing.
 ///
@@ -31,7 +31,7 @@ abstract class TestHarnessORMMixin {
   ///
   /// An [ApplicationChannel] should expose its [ManagedContext] service as a property.
   /// Return the context from this method.
-  ManagedContext get context;
+  ManagedContext? get context;
 
   /// Override this method to insert static data for each test run.
   ///
@@ -54,8 +54,8 @@ abstract class TestHarnessORMMixin {
   /// This method should be invoked in [TestHarness.afterStart] and typically is invoked
   /// in [tearDown] for your test suite.
   Future resetData({Logger? logger}) async {
-    await context.persistentStore!.close();
-    await addSchema(logger: logger!);
+    await context!.persistentStore?.close();
+    await addSchema(logger: logger);
     await seed();
   }
 
@@ -65,12 +65,12 @@ abstract class TestHarnessORMMixin {
   /// It is invoked by [resetData].
   Future addSchema({Logger? logger}) async {
     final builder = SchemaBuilder.toSchema(
-        context.persistentStore!, Schema.fromDataModel(context.dataModel!),
+        context!.persistentStore, Schema.fromDataModel(context!.dataModel!),
         isTemporary: true);
 
     for (var cmd in builder.commands) {
       logger?.info("$cmd");
-      await context.persistentStore!.execute(cmd);
+      await context!.persistentStore?.execute(cmd);
     }
   }
 }

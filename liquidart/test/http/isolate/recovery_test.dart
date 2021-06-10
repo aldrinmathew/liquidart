@@ -46,8 +46,7 @@ void main() {
       expect(errorMessage.stackTrace, isNotNull);
 
       // And then we should make sure everything is working just fine.
-      expect((await http.get(Uri.parse("http://localhost:8888/"))).statusCode,
-          200);
+      expect((await http.get(Uri.parse("http://localhost:8888/"))).statusCode, 200);
       print("succeeded in final request");
     });
 
@@ -96,7 +95,7 @@ class TestChannel extends ApplicationChannel {
 class UncaughtCrashController extends Controller {
   @override
   FutureOr<RequestOrResponse> handle(Request req) {
-    if (req.raw!.uri.queryParameters["crash"] == "true") {
+    if (req.raw.uri.queryParameters["crash"] == "true") {
       Future(() {
         dynamic x;
         x.foo();

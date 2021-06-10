@@ -1,6 +1,6 @@
 ![Liquidart](https://github.com/aldrinsartfactory/liquidart/raw/main/resources/images/liquidart.png)
 
-[![OSX/Linux Build Status](https://travis-ci.org/stablekernel/liquidart.svg?branch=master)](https://travis-ci.org/stablekernel/aqueduct) [![Windows Build status](https://ci.appveyor.com/api/projects/status/l2uy4r0yguhg4pis?svg=true)](https://ci.appveyor.com/project/joeconwaystk/aqueduct) [![codecov](https://codecov.io/gh/stablekernel/aqueduct/branch/master/graph/badge.svg)](https://codecov.io/gh/stablekernel/aqueduct)
+[![OSX/Linux Build Status](https://travis-ci.org/stablekernel/liquidart.svg?branch=master)](https://travis-ci.org/stablekernel/liquidart) [![Windows Build status](https://ci.appveyor.com/api/projects/status/l2uy4r0yguhg4pis?svg=true)](https://ci.appveyor.com/project/joeconwaystk/liquidart) [![codecov](https://codecov.io/gh/stablekernel/liquidart/branch/master/graph/badge.svg)](https://codecov.io/gh/stablekernel/liquidart)
 
 Liquidart is a modern Dart HTTP server framework. The framework is composed of libraries for handling and routing HTTP requests, object-relational mapping (ORM), authentication and authorization (OAuth 2.0 provider) and documentation (OpenAPI). These libraries are used to build scalable REST APIs that run on the Dart VM.
 
@@ -27,6 +27,6 @@ You can find the API reference [here](https://www.dartdocs.org/documentation/liq
 
 You can find in-depth and conceptual guides [here](https://aldrinsartfactory.github.io/liquidart/).
 
-An ever-expanding repository of Liquidart examples is [here](https://github.com/stablekernel/aqueduct_examples).
+An ever-expanding repository of Liquidart examples is [here](https://github.com/stablekernel/liquidart_examples).
 
 *If you are migrating from Liquidart 2.5 to Liquidart 3.0, see [the migration guide](https://aldrinsartfactory.github.io/liquidart/migration/).*

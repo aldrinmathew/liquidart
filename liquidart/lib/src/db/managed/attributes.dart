@@ -78,20 +78,20 @@ class Relate {
   ///
   /// This value must be the symbol for the property in the related [ManagedObject]. This creates the link between
   /// two sides of a relationship between a [ManagedObject].
-  final Symbol? inversePropertyName;
+  final Symbol inversePropertyName;
 
   /// The delete rule to use when a related instance is deleted.
   ///
   /// This rule dictates how the database should handle deleting objects that have relationships. See [DeleteRule] for possible options.
   ///
   /// If [isRequired] is true, this value may not be [DeleteRule.nullify]. This value defaults to [DeleteRule.nullify].
-  final DeleteRule? onDelete;
+  final DeleteRule onDelete;
 
   /// Whether or not this relationship is required.
   ///
   /// By default, [Relate] properties are not required to support the default value of [onDelete].
   /// By setting this value to true, an instance of this entity cannot be created without a valid value for the relationship property.
-  final bool? isRequired;
+  final bool isRequired;
 
   bool get isDeferred {
     return inversePropertyName == _deferredSymbol;
@@ -120,10 +120,10 @@ class Column {
   /// [defaultValue] is sent as-is to the database, therefore, if the default value is the integer value 2,
   /// pass the string "2". If the default value is a string, it must also be wrapped in single quotes: "'defaultValue'".
   const Column(
-      {bool primaryKey = false,
-      ManagedPropertyType databaseType = ManagedPropertyType.integer,
+      {
+      ManagedPropertyType? databaseType,bool primaryKey = false,
       bool nullable = false,
-      String defaultValue = '',
+      String? defaultValue,
       bool unique = false,
       bool indexed = false,
       bool omitByDefault = false,
@@ -139,10 +139,11 @@ class Column {
         autoincrement = autoincrement,
         validators = validators;
 
+
   /// When true, indicates that this property is the primary key.
   ///
   /// Only one property of a class may have primaryKey equal to true.
-  final bool? isPrimaryKey;
+  final bool isPrimaryKey;
 
   /// The type of the field in the database.
   ///
@@ -153,7 +154,7 @@ class Column {
   /// Indicates whether or not the property can be null or not.
   ///
   /// By default, properties are not nullable.
-  final bool? isNullable;
+  final bool isNullable;
 
   /// The default value of the property.
   ///
@@ -172,23 +173,23 @@ class Column {
   /// Whether or not the property is unique among all instances.
   ///
   /// By default, properties are not unique.
-  final bool? isUnique;
+  final bool isUnique;
 
   /// Whether or not the backing database should generate an index for this property.
   ///
   /// By default, properties are not indexed. Properties that are used often in database queries should be indexed.
-  final bool? isIndexed;
+  final bool isIndexed;
 
   /// Whether or not fetching an instance of this type should include this property.
   ///
   /// By default, all properties on a [ManagedObject] are returned if not specified (unless they are has-one or has-many relationship properties).
   /// This flag will remove the associated property from the result set unless it is explicitly specified by [Query.returningProperties].
-  final bool? shouldOmitByDefault;
+  final bool shouldOmitByDefault;
 
   /// A sequence generator will be used to generate the next value for this column when a row is inserted.
   ///
   /// When this flag is true, the database will generate a value for this column on insert.
-  final bool? autoincrement;
+  final bool autoincrement;
 
   /// A list of validators to apply to the annotated property.
   ///
@@ -196,7 +197,7 @@ class Column {
   ///
   /// When the data model is compiled, this list is combined with any `Validate` annotations on the annotated property.
   ///
-  final List<Validate>? validators;
+  final List<Validate> validators;
 }
 
 /// Annotation for [ManagedObject] properties that allows them to participate in [ManagedObject.asMap] and/or [ManagedObject.readFromMap].
@@ -219,10 +220,10 @@ class Serialize {
         isAvailableAsOutput = output;
 
   /// See constructor.
-  final bool? isAvailableAsInput;
+  final bool isAvailableAsInput;
 
   /// See constructor.
-  final bool? isAvailableAsOutput;
+  final bool isAvailableAsOutput;
 }
 
 /// Primary key annotation for a ManagedObject table definition property.
@@ -236,7 +237,7 @@ class Serialize {
 ///
 /// The validator [Validate.constant] is automatically applied to a property with this annotation.
 const Column primaryKey = Column(
-    primaryKey: true,
-    databaseType: ManagedPropertyType.bigInteger,
-    autoincrement: true,
-    validators: [Validate.constant()]);
+  primaryKey: true,
+  databaseType: ManagedPropertyType.bigInteger,
+  autoincrement: true,
+  validators: [Validate.constant()]);

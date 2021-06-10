@@ -93,7 +93,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
 
   /// Used during OpenAPI documentation.
   final APISecuritySchemeOAuth2Flow documentedImplicitFlow =
-      APISecuritySchemeOAuth2Flow.empty()..scopes = {};
+  APISecuritySchemeOAuth2Flow.empty()..scopes = {};
 
   static const String tokenTypeBearer = "bearer";
 
@@ -123,7 +123,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
   /// Returns a [AuthClient] record for its [clientID].
   ///
   /// Returns null if none exists.
-  Future<AuthClient> getClient(String clientID) async {
+  Future<AuthClient?> getClient(String? clientID) async {
     return delegate.getClient(this, clientID);
   }
 
@@ -143,7 +143,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
   ///
   /// All authorization codes and tokens for the [ResourceOwner] identified by [identifier]
   /// will be revoked.
-  Future revokeAllGrantsForResourceOwner(int? identifier) async {
+  Future revokeAllGrantsForResourceOwner(dynamic identifier) async {
     if (identifier == null) {
       throw ArgumentError.notNull("identifier");
     }
@@ -157,15 +157,15 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
   /// If credentials are not correct, it will throw the appropriate [AuthRequestError].
   ///
   /// After [expiration], this token will no longer be valid.
-  Future<AuthToken> authenticate(String? username, String? password,
-      String? clientID, String? clientSecret,
+  Future<AuthToken> authenticate(
+      String? username, String? password, String? clientID, String? clientSecret,
       {Duration expiration = const Duration(hours: 24),
       List<AuthScope>? requestedScopes}) async {
     if (clientID == null) {
       throw AuthServerException(AuthRequestError.invalidClient, null);
     }
 
-    final AuthClient? client = await getClient(clientID);
+    final client = await getClient(clientID);
     if (client == null) {
       throw AuthServerException(AuthRequestError.invalidClient, null);
     }
@@ -188,23 +188,22 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
       }
     }
 
-    final ResourceOwner? authenticatable =
-        await delegate.getResourceOwner(this, username);
+    final authenticatable = await delegate.getResourceOwner(this, username)!;
     if (authenticatable == null) {
       throw AuthServerException(AuthRequestError.invalidGrant, client);
     }
 
-    final dbSalt = authenticatable.salt;
+    final dbSalt = authenticatable.salt!;
     final dbPassword = authenticatable.hashedPassword;
-    final hash = hashPassword(password, dbSalt!);
+    final hash = hashPassword(password, dbSalt);
     if (hash != dbPassword) {
       throw AuthServerException(AuthRequestError.invalidGrant, client);
     }
 
     final validScopes =
-        _validatedScopes(client, authenticatable, requestedScopes!);
+        _validatedScopes(client, authenticatable, requestedScopes);
     final token = _generateToken(
-        authenticatable.id!, client.id!, expiration.inSeconds,
+        authenticatable.id, client.id, expiration.inSeconds,
         allowRefresh: !client.isPublic, scopes: validScopes);
     await delegate.addToken(this, token);
 
@@ -221,17 +220,16 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
       throw AuthServerException(AuthRequestError.invalidRequest, null);
     }
 
-    final AuthToken? t =
-        await delegate.getToken(this, byAccessToken: accessToken);
+    final t = await delegate.getToken(this, byAccessToken: accessToken)!;
     if (t == null || t.isExpired) {
       throw AuthServerException(
-          AuthRequestError.invalidGrant, AuthClient(t!.clientID!, null, null));
+          AuthRequestError.invalidGrant, AuthClient(t?.clientID, null, null));
     }
 
     if (scopesRequired != null) {
-      if (!AuthScope.verify(scopesRequired, t.scopes!)) {
+      if (!AuthScope.verify(scopesRequired, t.scopes)) {
         throw AuthServerException(
-            AuthRequestError.invalidScope, AuthClient(t.clientID!, null, null));
+            AuthRequestError.invalidScope, AuthClient(t.clientID, null, null));
       }
     }
 
@@ -251,7 +249,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
       throw AuthServerException(AuthRequestError.invalidClient, null);
     }
 
-    final AuthClient? client = await getClient(clientID);
+    final client = await getClient(clientID);
     if (client == null) {
       throw AuthServerException(AuthRequestError.invalidClient, null);
     }
@@ -260,8 +258,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
       throw AuthServerException(AuthRequestError.invalidRequest, client);
     }
 
-    final AuthToken? t =
-        await delegate.getToken(this, byRefreshToken: refreshToken);
+    final t = await delegate.getToken(this, byRefreshToken: refreshToken)!;
     if (t == null || t.clientID != clientID) {
       throw AuthServerException(AuthRequestError.invalidGrant, client);
     }
@@ -312,8 +309,8 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
       ..resourceOwnerIdentifier = t.resourceOwnerIdentifier
       ..clientID = t.clientID;
 
-    await delegate.updateToken(this, t.accessToken!, newToken.accessToken!,
-        newToken.issueDate!, newToken.expirationDate!);
+    await delegate.updateToken(this, t.accessToken, newToken.accessToken,
+        newToken.issueDate, newToken.expirationDate);
 
     return newToken;
   }
@@ -330,7 +327,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
       throw AuthServerException(AuthRequestError.invalidClient, null);
     }
 
-    final AuthClient? client = await getClient(clientID);
+    final client = await getClient(clientID);
     if (client == null) {
       throw AuthServerException(AuthRequestError.invalidClient, null);
     }
@@ -343,22 +340,21 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
       throw AuthServerException(AuthRequestError.unauthorizedClient, client);
     }
 
-    final ResourceOwner? authenticatable =
-        await delegate.getResourceOwner(this, username);
+    final authenticatable = await delegate.getResourceOwner(this, username)!;
     if (authenticatable == null) {
       throw AuthServerException(AuthRequestError.accessDenied, client);
     }
 
-    final dbSalt = authenticatable.salt;
+    final dbSalt = authenticatable.salt!;
     final dbPassword = authenticatable.hashedPassword;
-    if (hashPassword(password, dbSalt!) != dbPassword) {
+    if (hashPassword(password, dbSalt) != dbPassword) {
       throw AuthServerException(AuthRequestError.accessDenied, client);
     }
 
     final validScopes =
-        _validatedScopes(client, authenticatable, requestedScopes!);
+        _validatedScopes(client, authenticatable, requestedScopes);
     final authCode = _generateAuthCode(
-        authenticatable.id!, client, expirationInSeconds,
+        authenticatable.id, client, expirationInSeconds,
         scopes: validScopes);
     await delegate.addCode(this, authCode);
     return authCode;
@@ -376,7 +372,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
       throw AuthServerException(AuthRequestError.invalidClient, null);
     }
 
-    final AuthClient? client = await getClient(clientID);
+    final client = await getClient(clientID);
     if (client == null) {
       throw AuthServerException(AuthRequestError.invalidClient, null);
     }
@@ -393,14 +389,14 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
       throw AuthServerException(AuthRequestError.invalidClient, client);
     }
 
-    final AuthCode? authCode = await delegate.getCode(this, authCodeString);
+    final authCode = await delegate.getCode(this, authCodeString)!;
     if (authCode == null) {
       throw AuthServerException(AuthRequestError.invalidGrant, client);
     }
 
     // check if valid still
     if (authCode.isExpired) {
-      await delegate.removeCode(this, authCode.code!);
+      await delegate.removeCode(this, authCode.code);
       throw AuthServerException(AuthRequestError.invalidGrant, client);
     }
 
@@ -416,8 +412,8 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
       throw AuthServerException(AuthRequestError.invalidGrant, client);
     }
     final token = _generateToken(
-        authCode.resourceOwnerIdentifier!, client.id!, expirationInSeconds,
-        scopes: authCode.requestedScopes!);
+        authCode.resourceOwnerIdentifier, client.id, expirationInSeconds,
+        scopes: authCode.requestedScopes);
     await delegate.addToken(this, token, issuedFrom: authCode);
 
     return token;
@@ -432,7 +428,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
     final basic = APISecurityScheme.http("basic")
       ..description =
           "This endpoint requires an OAuth2 Client ID and Secret as the Basic Authentication username and password. "
-              "If the client ID does not have a secret (public client), the password is the empty string (retain the separating colon, e.g. 'com.liquidart.app:').";
+          "If the client ID does not have a secret (public client), the password is the empty string (retain the separating colon, e.g. 'com.liquidart.app:').";
     context.securitySchemes.register("oauth2-client-authentication", basic);
 
     final oauth2 = APISecurityScheme.oauth2({
@@ -499,7 +495,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
     final username = credentials.username;
     final password = credentials.password;
 
-    final AuthClient? client = await getClient(username!);
+    final client = await getClient(username);
 
     if (client == null) {
       throw AuthServerException(AuthRequestError.invalidClient, null);
@@ -507,7 +503,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
 
     if (client.hashedSecret == null) {
       if (password == "") {
-        return Authorization(client.id!, null, this, credentials: credentials);
+        return Authorization(client.id, null, this, credentials: credentials);
       }
 
       throw AuthServerException(AuthRequestError.invalidClient, client);
@@ -520,15 +516,15 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
     return Authorization(client.id, null, this, credentials: credentials);
   }
 
-  List<AuthScope> _validatedScopes(AuthClient client,
-      ResourceOwner authenticatable, List<AuthScope> requestedScopes) {
+  List<AuthScope>? _validatedScopes(AuthClient client,
+      ResourceOwner authenticatable, List<AuthScope>? requestedScopes) {
     List<AuthScope>? validScopes;
     if (client.supportsScopes) {
-      if (requestedScopes.isEmpty) {
+      if ((requestedScopes?.length ?? 0) == 0) {
         throw AuthServerException(AuthRequestError.invalidScope, client);
       }
 
-      validScopes = requestedScopes
+      validScopes = requestedScopes!
           .where((incomingScope) => client.allowsScope(incomingScope))
           .toList();
 
@@ -540,7 +536,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
           delegate.getAllowedScopes(authenticatable);
       if (!identical(validScopesForAuthenticatable, AuthScope.any)) {
         validScopes.retainWhere((clientAllowedScope) =>
-            validScopesForAuthenticatable.any((userScope) =>
+            validScopesForAuthenticatable!.any((userScope) =>
                 clientAllowedScope.isSubsetOrEqualTo(userScope)));
 
         if (validScopes.isEmpty) {
@@ -549,11 +545,11 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
       }
     }
 
-    return validScopes!;
+    return validScopes;
   }
 
   AuthToken _generateToken(
-      int ownerID, String clientID, int expirationInSeconds,
+      int? ownerID, String? clientID, int expirationInSeconds,
       {bool allowRefresh = true, List<AuthScope>? scopes}) {
     final now = DateTime.now().toUtc();
     final token = AuthToken()
@@ -573,7 +569,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
   }
 
   AuthCode _generateAuthCode(
-      int ownerID, AuthClient client, int expirationInSeconds,
+      int? ownerID, AuthClient client, int expirationInSeconds,
       {List<AuthScope>? scopes}) {
     final now = DateTime.now().toUtc();
     return AuthCode()

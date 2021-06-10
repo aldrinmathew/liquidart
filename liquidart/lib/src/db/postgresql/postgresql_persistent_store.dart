@@ -73,7 +73,7 @@ class PostgreSQLPersistentStore extends PersistentStore
   final String? timeZone;
 
   /// Whether this connection is established over SSL.
-  final bool? isSSLConnection;
+  final bool isSSLConnection;
 
   /// Whether or not the underlying database connection is open.
   ///
@@ -92,15 +92,15 @@ class PostgreSQLPersistentStore extends PersistentStore
   /// Defaults to 30 seconds.
   final Duration connectTimeout = const Duration(seconds: 30);
 
-  PostgreSQLConnection? _databaseConnection;
+  late PostgreSQLConnection? _databaseConnection;
   Completer<PostgreSQLConnection>? _pendingConnectionCompleter;
+
 
   /// Retrieves the query execution context of this store.
   ///
   /// Use this property to execute raw queries on the underlying database connection.
   /// If running a transaction, this context is the transaction context.
-  Future<PostgreSQLExecutionContext> get executionContext =>
-      getDatabaseConnection();
+  Future<PostgreSQLExecutionContext> get executionContext => getDatabaseConnection();
 
   /// Retrieves a connection to the database this instance connects to.
   ///
@@ -134,7 +134,7 @@ class PostgreSQLPersistentStore extends PersistentStore
 
   @override
   Query<T> newQuery<T extends ManagedObject>(
-      ManagedContext context, ManagedEntity entity,
+      ManagedContext context, ManagedEntity? entity,
       {T? values}) {
     final query = PostgresQuery<T>.withEntity(context, entity);
     if (values != null) {
@@ -179,7 +179,7 @@ class PostgreSQLPersistentStore extends PersistentStore
       Future<T> transactionBlock(ManagedContext transaction)) async {
     final dbConnection = await getDatabaseConnection();
 
-    T? output;
+    late T output;
     Rollback? rollback;
     try {
       await dbConnection.transaction((dbTransactionContext) async {
@@ -195,8 +195,7 @@ class PostgreSQLPersistentStore extends PersistentStore
         }
       });
     } on PostgreSQLException catch (e) {
-      final QueryException<PostgreSQLException>? interpreted =
-          _interpretException(e);
+      final interpreted = _interpretException(e);
       if (interpreted != null) {
         throw interpreted;
       }
@@ -205,10 +204,10 @@ class PostgreSQLPersistentStore extends PersistentStore
     }
 
     if (rollback != null) {
-      throw rollback as Object;
+      throw rollback!;
     }
 
-    return output!;
+    return output;
   }
 
   @override
@@ -232,11 +231,11 @@ class PostgreSQLPersistentStore extends PersistentStore
   }
 
   @override
-  Future<Schema> upgrade(Schema fromSchema, List<Migration> withMigrations,
+  Future<Schema?> upgrade(Schema? fromSchema, List<Migration> withMigrations,
       {bool temporary = false}) async {
     var connection = await getDatabaseConnection();
 
-    Schema schema = fromSchema;
+    Schema? schema = fromSchema;
 
     await connection.transaction((ctx) async {
       final transactionStore =
@@ -248,7 +247,7 @@ class PostgreSQLPersistentStore extends PersistentStore
       for (var migration in withMigrations) {
         migration.database =
             SchemaBuilder(transactionStore, schema, isTemporary: temporary);
-        migration.database!.store = transactionStore;
+        migration.database.store = transactionStore;
 
         var existingVersionRows = await ctx.query(
             "SELECT versionNumber, dateOfUpgrade FROM $versionTableName WHERE versionNumber >= @v:int4",
@@ -262,7 +261,7 @@ class PostgreSQLPersistentStore extends PersistentStore
         logger.info("Applying migration version ${migration.version}...");
         await migration.upgrade();
 
-        for (var cmd in migration.database!.commands) {
+        for (var cmd in migration.database.commands) {
           logger.info("\t$cmd");
           await ctx.execute(cmd);
         }
@@ -286,8 +285,8 @@ class PostgreSQLPersistentStore extends PersistentStore
 
   @override
   Future<dynamic> executeQuery(
-      String formatString, Map<String, dynamic>? values, int timeoutInSeconds,
-      {PersistentStoreQueryReturnType returnType =
+      String formatString, Map<String?, dynamic>? values, int timeoutInSeconds,
+      {PersistentStoreQueryReturnType? returnType =
           PersistentStoreQueryReturnType.rows}) async {
     var now = DateTime.now().toUtc();
     try {
@@ -296,10 +295,10 @@ class PostgreSQLPersistentStore extends PersistentStore
 
       if (returnType == PersistentStoreQueryReturnType.rows) {
         results = await dbConnection.query(formatString,
-            substitutionValues: values, timeoutInSeconds: timeoutInSeconds);
+            substitutionValues: values as Map<String, dynamic>?, timeoutInSeconds: timeoutInSeconds);
       } else {
         results = await dbConnection.execute(formatString,
-            substitutionValues: values, timeoutInSeconds: timeoutInSeconds);
+            substitutionValues: values as Map<String, dynamic>?, timeoutInSeconds: timeoutInSeconds);
       }
 
       logger.fine(() =>
@@ -312,7 +311,7 @@ class PostgreSQLPersistentStore extends PersistentStore
     } on PostgreSQLException catch (e) {
       logger.fine(() =>
           "Query (${DateTime.now().toUtc().difference(now).inMilliseconds}ms) $formatString $values");
-      logger.warning(e.toString());
+      logger.warning(e.toString);
       final interpreted = _interpretException(e);
       if (interpreted != null) {
         throw interpreted;
@@ -366,7 +365,7 @@ class PostgreSQLPersistentStore extends PersistentStore
         username: username,
         password: password,
         timeZone: timeZone!,
-        useSSL: isSSLConnection!);
+        useSSL: isSSLConnection);
     try {
       await connection.open();
     } catch (e) {

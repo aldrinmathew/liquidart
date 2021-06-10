@@ -37,14 +37,14 @@ class Authorizer extends Controller {
   /// If [scopes] is provided, the authorization granted must have access to *all* scopes according to [validator].
   Authorizer(this.validator,
       {this.parser = const AuthorizationBearerParser(), List<String>? scopes})
-      : scopes = scopes!.map((s) => AuthScope(s)).toList();
+      : scopes = scopes?.map((s) => AuthScope(s)).toList();
 
   /// Creates an instance of [Authorizer] with Basic Authentication parsing.
   ///
   /// Parses a username and password from the request's Basic Authentication data in the Authorization header, e.g.:
   ///
   ///         Authorization: Basic base64(username:password)
-  Authorizer.basic(AuthValidator validator)
+  Authorizer.basic(AuthValidator? validator)
       : this(validator, parser: const AuthorizationBasicParser());
 
   /// Creates an instance of [Authorizer] with Bearer token parsing.
@@ -54,7 +54,7 @@ class Authorizer extends Controller {
   ///         Authorization: Bearer ap9ijlarlkz8jIOa9laweo
   ///
   /// If [scopes] is provided, the bearer token must have access to *all* scopes according to [validator].
-  Authorizer.bearer(AuthValidator validator, {List<String>? scopes})
+  Authorizer.bearer(AuthValidator? validator, {List<String>? scopes})
       : this(validator,
             parser: const AuthorizationBearerParser(), scopes: scopes);
 
@@ -63,7 +63,7 @@ class Authorizer extends Controller {
   /// This object will check credentials parsed from the Authorization header and produce an
   /// [Authorization] object representing the authorization the credentials have. It may also
   /// reject a request. This is typically an instance of [AuthServer].
-  final AuthValidator validator;
+  final AuthValidator? validator;
 
   /// The list of required scopes.
   ///
@@ -84,8 +84,7 @@ class Authorizer extends Controller {
 
   @override
   FutureOr<RequestOrResponse> handle(Request request) async {
-    final authData =
-        request.raw!.headers.value(HttpHeaders.authorizationHeader);
+    final authData = request.raw.headers.value(HttpHeaders.authorizationHeader);
     if (authData == null) {
       return Response.unauthorized();
     }
@@ -93,7 +92,7 @@ class Authorizer extends Controller {
     try {
       final value = parser.parse(authData);
       request.authorization =
-          await validator.validate(parser, value, requiredScope: scopes!);
+          await validator!.validate(parser, value, requiredScope: scopes);
       if (request.authorization == null) {
         return Response.unauthorized();
       }
@@ -187,15 +186,15 @@ class Authorizer extends Controller {
   @override
   Map<String, APIOperation> documentOperations(
       APIDocumentContext context, String route, APIPath path) {
-    final operations = super.documentOperations(context, route, path);
+    final operations = super.documentOperations(context, route, path)!;
 
     operations.forEach((_, op) {
       op.addResponse(400, context.responses["MalformedAuthorizationHeader"]);
       op.addResponse(401, context.responses["InsufficientAccess"]);
       op.addResponse(403, context.responses["InsufficientScope"]);
 
-      final requirements = validator
-          .documentRequirementsForAuthorizer(context, this, scopes: scopes!);
+      final requirements = validator!
+          .documentRequirementsForAuthorizer(context, this, scopes: scopes);
       requirements.forEach((req) {
         op.addSecurityRequirement(req);
       });

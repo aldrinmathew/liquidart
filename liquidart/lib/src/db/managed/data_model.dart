@@ -4,6 +4,7 @@ import 'package:liquidart/src/utilities/reference_counting_list.dart';
 import 'package:liquidart/src/db/query/query.dart';
 
 import 'package:liquidart/src/db/managed/managed.dart';
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:replica/replica.dart';
 
 /// Instances of this class contain descriptions and metadata for mapping [ManagedObject]s to database rows.
@@ -26,22 +27,21 @@ class ManagedDataModel extends Object
   ///       new DataModel([User, Token, Post]);
   ManagedDataModel(List<Type> instanceTypes) {
     final runtimes = RuntimeContext.current.replicas!.iterable
-        .whereType<ManagedEntityRuntime?>()
+        .whereType<ManagedEntityRuntime>()
         .toList();
     final expectedRuntimes = instanceTypes
-        .map((t) => runtimes.firstWhere((e) => e!.entity.instanceType == t,
-            orElse: () => null))
+        .map((t) => runtimes.firstWhereOrNull((e) => e.entity!.instanceType == t))
         .toList();
 
     final notFound = expectedRuntimes.where((e) => e == null).toList();
     if (notFound.isNotEmpty) {
       throw ManagedDataModelError(
-          "Data model types were not found: ${notFound.map((e) => e!.entity.name).join(", ")}");
+          "Data model types were not found: ${notFound.map((e) => e!.entity!.name).join(", ")}");
     }
 
     expectedRuntimes.forEach((runtime) {
-      _entities[runtime!.entity.instanceType!] = runtime.entity;
-      _tableDefinitionToEntityMap[runtime.entity.tableDefinition!] =
+      _entities[runtime!.entity!.instanceType] = runtime.entity;
+      _tableDefinitionToEntityMap[runtime.entity!.tableDefinition] =
           runtime.entity;
     });
     expectedRuntimes.forEach((runtime) => runtime!.finalize(this));
@@ -61,16 +61,16 @@ class ManagedDataModel extends Object
         .whereType<ManagedEntityRuntime>();
 
     runtimes.forEach((runtime) {
-      _entities[runtime.entity.instanceType!] = runtime.entity;
-      _tableDefinitionToEntityMap[runtime.entity.tableDefinition!] =
+      _entities[runtime.entity!.instanceType] = runtime.entity;
+      _tableDefinitionToEntityMap[runtime.entity!.tableDefinition] =
           runtime.entity;
     });
     runtimes.forEach((runtime) => runtime.finalize(this));
   }
 
-  Iterable<ManagedEntity> get entities => _entities.values;
-  Map<Type, ManagedEntity> _entities = {};
-  Map<String, ManagedEntity> _tableDefinitionToEntityMap = {};
+  Iterable<ManagedEntity?> get entities => _entities.values;
+  Map<Type, ManagedEntity?> _entities = {};
+  Map<String, ManagedEntity?> _tableDefinitionToEntityMap = {};
 
   /// Returns a [ManagedEntity] for a [Type].
   ///
@@ -82,13 +82,13 @@ class ManagedDataModel extends Object
   ///           @primaryKey
   ///           int id;
   ///         }
-  ManagedEntity entityForType(Type type) {
-    return _entities[type] ?? _tableDefinitionToEntityMap[type.toString()]!;
+  ManagedEntity? entityForType(Type type) {
+    return _entities[type] ?? _tableDefinitionToEntityMap[type.toString()];
   }
 
   @override
   void documentComponents(APIDocumentContext context) {
-    entities.forEach((e) => e.documentComponents(context));
+    entities.forEach((e) => e!.documentComponents(context));
   }
 }
 

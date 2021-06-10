@@ -6,9 +6,9 @@ void main() {
     var dataModel =
         ManagedDataModel([OverriddenTotalModel, PartialReferenceModel]);
 
-    var entity = dataModel.entityForType(OverriddenTotalModel);
-    var field = entity.attributes["field"];
-    expect(field!.isUnique, true);
+    var entity = dataModel.entityForType(OverriddenTotalModel)!;
+    var field = entity.attributes["field"]!;
+    expect(field.isUnique, true);
     expect(field.validators.length, 1);
   });
 }

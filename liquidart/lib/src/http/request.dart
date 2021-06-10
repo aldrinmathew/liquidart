@@ -15,7 +15,7 @@ typedef _ResponseModifier = void Function(Response resp);
 class Request implements RequestOrResponse {
   /// Creates an instance of [Request], no need to do so manually.
   Request(this.raw)
-      : path = RequestPath(raw!.uri.pathSegments),
+      : path = RequestPath(raw.uri.pathSegments),
         body = RequestBody(raw);
 
   /// The underlying [HttpRequest] of this instance.
@@ -34,18 +34,18 @@ class Request implements RequestOrResponse {
   ///           await req.response.close(); // Respond manually to request
   ///           return null; // Take request out of channel; no subsequent controllers will see this request.
   ///         });
-  final HttpRequest? raw;
+  final HttpRequest raw;
 
   /// HTTP method of this request.
   ///
   /// Always uppercase. e.g., GET, POST, PUT.
-  String get method => raw!.method.toUpperCase();
+  String get method => raw.method.toUpperCase();
 
   /// The path of the request URI.
   ///
   /// Provides convenient access to the request URI path. Also provides path variables and wildcard path values
   /// after this instance is handled by a [Router].
-  final RequestPath? path;
+  final RequestPath path;
 
   /// The request body object.
   ///
@@ -54,18 +54,18 @@ class Request implements RequestOrResponse {
   /// an object (or objects).
   ///
   /// This value is is always non-null. If there is no request body, [RequestBody.isEmpty] is true.
-  final RequestBody? body;
+  final RequestBody body;
 
   /// Information about the client connection.
   ///
   /// Note: accessing this property incurs a significant performance penalty.
-  HttpConnectionInfo get connectionInfo => raw!.connectionInfo!;
+  HttpConnectionInfo? get connectionInfo => raw.connectionInfo;
 
   /// The response object of this [Request].
   ///
   /// Do not write to this value manually. [Controller]s are responsible for
   /// using a [Response] instance to fill out this property.
-  HttpResponse get response => raw!.response;
+  HttpResponse get response => raw.response;
 
   /// Authorization information associated with this request.
   ///
@@ -85,14 +85,15 @@ class Request implements RequestOrResponse {
   /// a q-value (if one exists) and the specificity of the content-type.
   ///
   /// See also [acceptsContentType].
-  List<ContentType> get acceptableContentTypes {
+  List<ContentType>? get acceptableContentTypes {
     if (_cachedAcceptableTypes == null) {
       try {
-        var contentTypes = raw!.headers[HttpHeaders.acceptHeader]!
-            .expand((h) => h.split(",").map((s) => s.trim()))
-            .where((h) => h.isNotEmpty)
-            .map(ContentType.parse)
-            .toList();
+        var contentTypes = raw.headers[HttpHeaders.acceptHeader]
+                ?.expand((h) => h.split(",").map((s) => s.trim()))
+                .where((h) => h.isNotEmpty)
+                .map(ContentType.parse)
+                .toList() ??
+            [];
 
         contentTypes.sort((c1, c2) {
           num q1 = num.parse(c1.parameters["q"] ?? "1.0");
@@ -122,7 +123,7 @@ class Request implements RequestOrResponse {
             body: {"error": "accept header is malformed"});
       }
     }
-    return _cachedAcceptableTypes!;
+    return _cachedAcceptableTypes;
   }
 
   List<ContentType>? _cachedAcceptableTypes;
@@ -134,11 +135,11 @@ class Request implements RequestOrResponse {
   ///
   /// Note that if no Accept header is present, this method always returns true.
   bool acceptsContentType(ContentType contentType) {
-    if (acceptableContentTypes.isEmpty) {
+    if (acceptableContentTypes!.isEmpty) {
       return true;
     }
 
-    return acceptableContentTypes.any((acceptable) {
+    return acceptableContentTypes!.any((acceptable) {
       if (acceptable.primaryType == "*") {
         return true;
       }
@@ -160,15 +161,15 @@ class Request implements RequestOrResponse {
   /// Whether or not this request is a CORS request.
   ///
   /// This is true if there is an Origin header.
-  bool get isCORSRequest => raw!.headers.value("origin") != null;
+  bool get isCORSRequest => raw.headers.value("origin") != null;
 
   /// Whether or not this is a CORS preflight request.
   ///
   /// This is true if the request HTTP method is OPTIONS and the headers contains Access-Control-Request-Method.
   bool get isPreflightRequest {
     return isCORSRequest &&
-        raw!.method == "OPTIONS" &&
-        raw!.headers.value("access-control-request-method") != null;
+        raw.method == "OPTIONS" &&
+        raw.headers.value("access-control-request-method") != null;
   }
 
   /// Container for any data a [Controller] wants to attach to this request for the purpose of being used by a later [Controller].
@@ -208,7 +209,7 @@ class Request implements RequestOrResponse {
   String get _sanitizedHeaders {
     StringBuffer buf = StringBuffer("{");
 
-    raw!.headers.forEach((k, v) {
+    raw.headers.forEach((k, v) {
       buf.write("${_truncatedString(k)} : ${_truncatedString(v.join(","))}\\n");
     });
     buf.write("}");
@@ -242,7 +243,7 @@ class Request implements RequestOrResponse {
       modifier(liquidartResponse);
     });
 
-    _Reference<String> compressionType = _Reference(null);
+    _Reference<String?> compressionType = _Reference(null);
     var body = liquidartResponse.body;
     if (body is! Stream) {
       // Note: this pre-encodes the body in memory, such that encoding fails this will throw and we can return a 500
@@ -265,8 +266,8 @@ class Request implements RequestOrResponse {
       return response.close();
     }
 
-    response.headers.add(HttpHeaders.contentTypeHeader,
-        liquidartResponse.contentType.toString());
+    response.headers.add(
+        HttpHeaders.contentTypeHeader, liquidartResponse.contentType.toString());
 
     if (body is List<int>) {
       if (compressionType.value != null) {
@@ -280,8 +281,7 @@ class Request implements RequestOrResponse {
       return response.close();
     } else if (body is Stream) {
       // Otherwise, body is stream
-      final bodyStream =
-          _responseBodyStream(liquidartResponse, compressionType);
+      final bodyStream = _responseBodyStream(liquidartResponse, compressionType)!;
       if (compressionType.value != null) {
         response.headers
             .add(HttpHeaders.contentEncodingHeader, compressionType.value!);
@@ -300,7 +300,7 @@ class Request implements RequestOrResponse {
   }
 
   List<int>? _responseBodyBytes(
-      Response resp, _Reference<String> compressionType) {
+      Response resp, _Reference<String?> compressionType) {
     if (resp.body == null) {
       return null;
     }
@@ -308,14 +308,14 @@ class Request implements RequestOrResponse {
     Codec<dynamic, List<int>>? codec;
     if (resp.encodeBody) {
       codec =
-          CodecRegistry.defaultInstance.codecForContentType(resp.contentType)!;
+          CodecRegistry.defaultInstance.codecForContentType(resp.contentType);
     }
 
     // todo(joeconwaystk): Set minimum threshold on number of bytes needed to perform gzip, do not gzip otherwise.
     // There isn't a great way of doing this that I can think of except splitting out gzip from the fused codec,
     // have to measure the value of fusing vs the cost of gzipping smaller data.
     var canGzip = CodecRegistry.defaultInstance
-            .isContentTypeCompressable(resp.contentType!) &&
+            .isContentTypeCompressable(resp.contentType!)! &&
         _acceptsGzipResponseBody;
 
     if (codec == null) {
@@ -324,10 +324,10 @@ class Request implements RequestOrResponse {
             "Invalid response body. Body of type '${resp.body.runtimeType}' cannot be encoded as content-type '${resp.contentType}'.");
       }
 
-      final bytes = resp.body as List<int>;
+      final bytes = resp.body as List<int>?;
       if (canGzip) {
         compressionType.value = "gzip";
-        return gzip.encode(bytes);
+        return gzip.encode(bytes!);
       }
       return bytes;
     }
@@ -340,16 +340,16 @@ class Request implements RequestOrResponse {
     return codec.encode(resp.body);
   }
 
-  Stream<List<int>> _responseBodyStream(
-      Response resp, _Reference<String> compressionType) {
+  Stream<List<int>>? _responseBodyStream(
+      Response resp, _Reference<String?> compressionType) {
     Codec<dynamic, List<int>>? codec;
     if (resp.encodeBody) {
       codec =
-          CodecRegistry.defaultInstance.codecForContentType(resp.contentType!)!;
+          CodecRegistry.defaultInstance.codecForContentType(resp.contentType);
     }
 
     var canGzip = CodecRegistry.defaultInstance
-            .isContentTypeCompressable(resp.contentType!) &&
+            .isContentTypeCompressable(resp.contentType!)! &&
         _acceptsGzipResponseBody;
     if (codec == null) {
       if (resp.body is! Stream<List<int>>) {
@@ -357,10 +357,10 @@ class Request implements RequestOrResponse {
             "Invalid response body. Body of type '${resp.body.runtimeType}' cannot be encoded as content-type '${resp.contentType}'.");
       }
 
-      final stream = resp.body as Stream<List<int>>;
+      final stream = resp.body as Stream<List<int>>?;
       if (canGzip) {
         compressionType.value = "gzip";
-        return gzip.encoder.bind(stream);
+        return gzip.encoder.bind(stream!);
       }
 
       return stream;
@@ -375,14 +375,14 @@ class Request implements RequestOrResponse {
   }
 
   bool get _acceptsGzipResponseBody {
-    return raw!.headers[HttpHeaders.acceptEncodingHeader]
+    return raw.headers[HttpHeaders.acceptEncodingHeader]
             ?.any((v) => v.split(",").any((s) => s.trim() == "gzip")) ??
         false;
   }
 
   @override
   String toString() {
-    return "${raw!.method} ${raw!.uri} (${receivedDate.millisecondsSinceEpoch})";
+    return "${raw.method} ${raw.uri} (${receivedDate.millisecondsSinceEpoch})";
   }
 
   /// A string that represents more details about the request, typically used for logging.
@@ -398,23 +398,23 @@ class Request implements RequestOrResponse {
       bool includeHeaders = false}) {
     var builder = StringBuffer();
     if (includeRequestIP) {
-      builder.write("${raw!.connectionInfo?.remoteAddress.address} ");
+      builder.write("${raw.connectionInfo?.remoteAddress.address} ");
     }
     if (includeMethod) {
-      builder.write("${raw!.method} ");
+      builder.write("${raw.method} ");
     }
     if (includeResource) {
-      builder.write("${raw!.uri} ");
+      builder.write("${raw.uri} ");
     }
     if (includeElapsedTime && respondDate != null) {
       builder
           .write("${respondDate!.difference(receivedDate).inMilliseconds}ms ");
     }
     if (includeStatusCode) {
-      builder.write("${raw!.response.statusCode} ");
+      builder.write("${raw.response.statusCode} ");
     }
     if (includeContentSize) {
-      builder.write("${raw!.response.contentLength} ");
+      builder.write("${raw.response.contentLength} ");
     }
     if (includeHeaders) {
       builder.write("$_sanitizedHeaders ");
@@ -434,5 +434,5 @@ class HTTPStreamingException implements Exception {
 class _Reference<T> {
   _Reference(this.value);
 
-  T? value;
+  T value;
 }

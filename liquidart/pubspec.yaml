@@ -1,6 +1,6 @@
 name: liquidart
 version: 5.0.0-b7
-description: A modern HTTP server application framework, ORM and OAuth2 provider with OpenAPI 3.0 integration. Foundation for REST, RPC or GraphQL services. Revival of the AQUEDUCT Project.
+description: A modern HTTP server application framework, ORM and OAuth2 provider with OpenAPI 3.0 integration. Foundation for REST, RPC or GraphQL services. Revival of the liquidart Project.
 homepage: https://github.com/aldrinsartfactory/liquidart
 repository: https://github.com/aldrinsartfactory/liquidart
 issue_tracker: https://github.com/aldrinsartfactory/liquidart/issues
@@ -32,8 +32,9 @@ dev_dependencies:
   test: ^1.16.8
   http: ^0.13.1
   cli_agent: ^2.0.0-b1
-  liquidart_test: ^3.0.0-b2
-    # path: ../liquidart_test
+  # liquidart_test: ^3.0.0-b2
+  liquidart_test:
+    path: ../liquidart_test
 
 executables:
   liquidart: liquidart

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:liquidart/src/auth/auth.dart';
 import 'package:liquidart/src/http/resource_controller_interfaces.dart';
 import 'package:liquidart/src/openapi/openapi.dart';
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:replica/replica.dart';
@@ -61,15 +62,15 @@ import 'http.dart';
 ///           }
 ///         }
 ///
-/// Bindings will automatically parse values into other types and validate that requests have the desired values. See [Bind] for all possible bindings and https://aldrinsartfactory.github.io/liquidart/http/resource_controller/ for more details.
+/// Bindings will automatically parse values into other types and validate that requests have the desired values. See [Bind] for all possible bindings and https://liquidart.io/docs/http/resource_controller/ for more details.
 ///
 /// To access the request directly, use [request]. Note that the [Request.body] of [request] will be decoded prior to invoking an operation method.
 abstract class ResourceController extends Controller
     implements Recyclable<Null> {
   ResourceController() {
     _runtime =
-        (RuntimeContext.current.replicas![runtimeType] as ControllerRuntime)
-            .resourceController;
+        (RuntimeContext.current.replicas![runtimeType] as ControllerRuntime?)
+            ?.resourceController;
   }
 
   @override
@@ -88,7 +89,7 @@ abstract class ResourceController extends Controller
   /// These values are attached by a [Router] instance that precedes this [Controller]. Is null
   /// if no [Router] preceded the controller and is the empty map if there are no values. The keys
   /// are the case-sensitive name of the path variables as defined by [Router.route].
-  Map<String, String> get pathVariables => request!.path!.variables;
+  Map<String, String> get pathVariables => request!.path.variables;
 
   /// Types of content this [ResourceController] will accept.
   ///
@@ -99,7 +100,7 @@ abstract class ResourceController extends Controller
   /// will automatically respond with an Unsupported Media Type response.
   ///
   /// By default, an instance will accept HTTP request bodies with 'application/json; charset=utf-8' encoding.
-  List<ContentType?> acceptedContentTypes = [ContentType.json];
+  List<ContentType> acceptedContentTypes = [ContentType.json];
 
   /// The default content type of responses from this [ResourceController].
   ///
@@ -155,10 +156,10 @@ abstract class ResourceController extends Controller
   /// this method. When overriding this method, call the superclass' implementation and add the additional parameters
   /// to the returned list before returning the combined list.
   @mustCallSuper
-  List<APIParameter?> documentOperationParameters(
-      APIDocumentContext context, Operation operation) {
-    return _runtime!.documenter!
-        .documentOperationParameters(this, context, operation);
+  List<APIParameter?>? documentOperationParameters(
+      APIDocumentContext context, Operation? operation) {
+    return _runtime!.documenter
+        ?.documentOperationParameters(this, context, operation);
   }
 
   /// Returns a documented summary for [operation].
@@ -166,7 +167,7 @@ abstract class ResourceController extends Controller
   /// By default, this method returns null and the summary is derived from documentation comments
   /// above the operation method. You may override this method to manually add a summary to an operation.
   String? documentOperationSummary(
-      APIDocumentContext context, Operation operation) {
+      APIDocumentContext context, Operation? operation) {
     return null;
   }
 
@@ -175,7 +176,7 @@ abstract class ResourceController extends Controller
   /// By default, this method returns null and the description is derived from documentation comments
   /// above the operation method. You may override this method to manually add a description to an operation.
   String? documentOperationDescription(
-      APIDocumentContext context, Operation operation) {
+      APIDocumentContext context, Operation? operation) {
     return null;
   }
 
@@ -185,9 +186,9 @@ abstract class ResourceController extends Controller
   /// that describes the bound body type. You may override this method to take an alternative approach or to augment the
   /// automatically generated request body documentation.
   APIRequestBody? documentOperationRequestBody(
-      APIDocumentContext context, Operation operation) {
-    return _runtime!.documenter!
-        .documentOperationRequestBody(this, context, operation);
+      APIDocumentContext context, Operation? operation) {
+    return _runtime!.documenter
+        ?.documentOperationRequestBody(this, context, operation);
   }
 
   /// Returns a map of possible responses for [operation].
@@ -196,7 +197,7 @@ abstract class ResourceController extends Controller
   /// possible responses. The key is a [String] representation of a status code (e.g., "200") and the value
   /// is an [APIResponse] object.
   Map<String, APIResponse> documentOperationResponses(
-      APIDocumentContext context, Operation operation) {
+      APIDocumentContext context, Operation? operation) {
     return {"200": APIResponse("Successful response.")};
   }
 
@@ -207,54 +208,53 @@ abstract class ResourceController extends Controller
   /// to provide additional tags. You should call the superclass' implementation to retain
   /// the controller grouping tag.
   List<String> documentOperationTags(
-      APIDocumentContext context, Operation operation) {
+      APIDocumentContext context, Operation? operation) {
     final tag = "$runtimeType".replaceAll("Controller", "");
     return [tag];
   }
 
   @override
-  Map<String, APIOperation> documentOperations(
+  Map<String, APIOperation>? documentOperations(
       APIDocumentContext context, String route, APIPath path) {
-    return _runtime!.documenter!.documentOperations(this, context, route, path);
+    return _runtime!.documenter?.documentOperations(this, context, route, path);
   }
 
   @override
   void documentComponents(APIDocumentContext context) {
-    _runtime!.documenter!.documentComponents(this, context);
+    _runtime!.documenter?.documentComponents(this, context);
   }
 
-  bool _requestContentTypeIsSupported(Request req) {
-    var incomingContentType = request!.raw!.headers.contentType;
-    return acceptedContentTypes.firstWhere((ct) {
-          return ct!.primaryType == incomingContentType!.primaryType &&
+  bool _requestContentTypeIsSupported(Request? req) {
+    var incomingContentType = request!.raw.headers.contentType;
+    return acceptedContentTypes.firstWhereOrNull((ct) {
+          return ct.primaryType == incomingContentType!.primaryType &&
               ct.subType == incomingContentType.subType;
-        }, orElse: () => null) !=
+        }) !=
         null;
   }
 
-  List<String?> _allowedMethodsForPathVariables(
-      Iterable<String> pathVariables) {
+  List<String> _allowedMethodsForPathVariables(Iterable<String?> pathVariables) {
     return _runtime!.operations
-        .where((op) => op!.isSuitableForRequest(null, pathVariables.toList()))
-        .map((op) => op!.httpMethod)
+        .where((op) => op.isSuitableForRequest(null, pathVariables.toList()))
+        .map((op) => op.httpMethod)
         .toList();
   }
 
   Future<Response> _process() async {
-    if (!request!.body!.isEmpty) {
-      if (!_requestContentTypeIsSupported(request!)) {
+    if (!request!.body.isEmpty) {
+      if (!_requestContentTypeIsSupported(request)) {
         return Response(HttpStatus.unsupportedMediaType, null, null);
       }
     }
 
     final operation = _runtime!.getOperationRuntime(
-        request!.raw!.method, request!.path!.variables.keys.toList());
+        request!.raw.method, request!.path.variables.keys.toList());
     if (operation == null) {
       throw Response(
           405,
           {
             "Allow":
-                _allowedMethodsForPathVariables(request!.path!.variables.keys)
+                _allowedMethodsForPathVariables(request!.path.variables.keys)
                     .join(", ")
           },
           null);
@@ -269,8 +269,7 @@ abstract class ResourceController extends Controller
         throw Response.serverError();
       }
 
-      if (!AuthScope.verify(
-          operation.scopes, request!.authorization!.scopes!)) {
+      if (!AuthScope.verify(operation.scopes, request!.authorization!.scopes)) {
         throw Response.forbidden(body: {
           "error": "insufficient_scope",
           "scope": operation.scopes!.map((s) => s.toString()).join(" ")
@@ -278,10 +277,10 @@ abstract class ResourceController extends Controller
       }
     }
 
-    if (!request!.body!.isEmpty) {
-      willDecodeRequestBody(request!.body!);
-      await request!.body!.decode();
-      didDecodeRequestBody(request!.body!);
+    if (!request!.body.isEmpty) {
+      willDecodeRequestBody(request!.body);
+      await request!.body.decode();
+      didDecodeRequestBody(request!.body);
     }
 
     /* Begin decoding bindings */
@@ -296,22 +295,22 @@ abstract class ResourceController extends Controller
       }
       return null;
     };
-    final checkIfMissingRequiredAndEmitErrorIfSo =
-        (ResourceControllerParameter p, dynamic v) {
+    final checkIfMissingRequiredAndEmitErrorIfSo = (ResourceControllerParameter p, dynamic v) {
       if (v == null && p.isRequired) {
         if (p.location == BindingType.body) {
           errors.add("missing required ${p.locationName}");
         } else {
-          errors.add("missing required ${p.locationName} '${p.name ?? ""}'");
+          errors.add(
+            "missing required ${p.locationName} '${p.name ?? ""}'");
         }
         return null;
       }
     };
 
-    args.positionalArguments = operation.positionalParameters!
+    args.positionalArguments = operation.positionalParameters
         .map((p) {
-          return errorCatchWrapper(p!, () {
-            final value = p.decode(request!);
+          return errorCatchWrapper(p, () {
+            final value = p.decode(request);
 
             checkIfMissingRequiredAndEmitErrorIfSo(p, value);
 
@@ -321,10 +320,10 @@ abstract class ResourceController extends Controller
         .where((p) => p != null)
         .toList();
 
-    final namedEntries = operation.namedParameters!
+    final namedEntries = operation.namedParameters
         .map((p) {
-          return errorCatchWrapper(p!, () {
-            final value = p.decode(request!);
+          return errorCatchWrapper(p, () {
+            final value = p.decode(request);
             if (value == null) {
               return null;
             }
@@ -337,10 +336,10 @@ abstract class ResourceController extends Controller
 
     args.namedArguments = Map<String, dynamic>.fromEntries(namedEntries);
 
-    final ivarEntries = _runtime!.ivarParameters
+    final ivarEntries = _runtime!.ivarParameters!
         .map((p) {
           return errorCatchWrapper(p, () {
-            final value = p.decode(request!);
+            final value = p.decode(request);
 
             checkIfMissingRequiredAndEmitErrorIfSo(p, value);
 
@@ -360,7 +359,7 @@ abstract class ResourceController extends Controller
 
     /* bind and invoke */
     _runtime!.applyRequestProperties(this, args);
-    final response = await operation.invoker(this, args);
+    final response = await operation.invoker(this, args)!;
     if (!response.hasExplicitlySetContentType) {
       response.contentType = responseContentType;
     }

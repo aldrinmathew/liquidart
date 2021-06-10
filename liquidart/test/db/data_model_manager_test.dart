@@ -7,7 +7,7 @@ void main() {
   ManagedContext? ctx;
 
   tearDown(() async {
-    await ctx!.close();
+    await ctx?.close();
   });
 
   test("Throws exception if no context has been created", () {

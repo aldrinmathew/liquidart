@@ -17,7 +17,7 @@ void main() {
   });
 
   tearDown(() async {
-    await server!.close(force: true);
+    await server?.close(force: true);
 
     server = null;
   });
@@ -153,8 +153,7 @@ void main() {
     await server!.close(force: true);
 
     server = await enableController("/:time", () => DateTimeController());
-    res = await http
-        .get(Uri.parse("http://localhost:4040/2001-01-01T00:00:00.000000Z"));
+    res = await http.get(Uri.parse("http://localhost:4040/2001-01-01T00:00:00.000000Z"));
     expect(res.statusCode, 200);
     expect(res.body, "\"2001-01-01 00:00:05.000Z\"");
 
@@ -177,16 +176,16 @@ void main() {
     await server!.close(force: true);
 
     server = await enableController("/a", () => DateTimeController());
-    res = await http.get(
-        Uri.parse("http://localhost:4040/a?opt=2001-01-01T00:00:00.000000Z"));
+    res = await http
+        .get(Uri.parse("http://localhost:4040/a?opt=2001-01-01T00:00:00.000000Z"));
     expect(res.statusCode, 200);
     expect(res.body, "\"2001-01-01 00:00:00.000Z\"");
 
     res = await http.get(Uri.parse("http://localhost:4040/a?opt=word"));
     expect(res.statusCode, 400);
 
-    res = await http.get(
-        Uri.parse("http://localhost:4040/a?foo=2001-01-01T00:00:00.000000Z"));
+    res = await http
+        .get(Uri.parse("http://localhost:4040/a?foo=2001-01-01T00:00:00.000000Z"));
     expect(res.statusCode, 200);
   });
 
@@ -244,16 +243,15 @@ void main() {
     var resp = await http.get(Uri.parse("http://localhost:4040/a"));
     expect(resp.statusCode, 200);
 
-    resp = await http
-        .get(Uri.parse("http://localhost:4040/a"), headers: {"Ignore": "true"});
+    resp =
+        await http.get(Uri.parse("http://localhost:4040/a"), headers: {"Ignore": "true"});
     expect(resp.statusCode, 400);
     expect(resp.body, '"ignored"');
   });
 
   test("Request with multiple query parameters of same key", () async {
     server = await enableController("/a", () => MultiQueryParamController());
-    var resp =
-        await http.get(Uri.parse("http://localhost:4040/a?params=1&params=2"));
+    var resp = await http.get(Uri.parse("http://localhost:4040/a?params=1&params=2"));
     expect(resp.statusCode, 200);
     expect(resp.body, '"1,2"');
   });
@@ -280,8 +278,8 @@ void main() {
 
   test("Content-Type can be set adjusting responseContentType", () async {
     server = await enableController("/a", () => ContentTypeController());
-    var resp = await http
-        .get(Uri.parse("http://localhost:4040/a?opt=responseContentType"));
+    var resp =
+        await http.get(Uri.parse("http://localhost:4040/a?opt=responseContentType"));
     expect(resp.statusCode, 200);
     expect(resp.headers["content-type"], "text/plain");
     expect(resp.body, "body");
@@ -311,8 +309,7 @@ void main() {
     test("are supplied correctly", () async {
       server = await enableController("/a", () => HTTPParameterController());
       var resp = await http.get(
-          Uri.parse(
-              "http://localhost:4040/a?number=3&Shaqs=1&Table=IKEA&table_legs=8"),
+          Uri.parse("http://localhost:4040/a?number=3&Shaqs=1&Table=IKEA&table_legs=8"),
           headers: {
             "x-request-id": "3423423adfea90",
             "location": "Nowhere",
@@ -335,12 +332,11 @@ void main() {
 
     test("optional parameters aren't required", () async {
       server = await enableController("/a", () => HTTPParameterController());
-      var resp = await http.get(
-          Uri.parse("http://localhost:4040/a?Shaqs=1&Table=IKEA"),
-          headers: {
-            "x-request-id": "3423423adfea90",
-            "Cookie": "Chips Ahoy",
-          });
+      var resp = await http
+          .get(Uri.parse("http://localhost:4040/a?Shaqs=1&Table=IKEA"), headers: {
+        "x-request-id": "3423423adfea90",
+        "Cookie": "Chips Ahoy",
+      });
 
       expect(resp.statusCode, 200);
       expect(json.decode(resp.body), {
@@ -357,11 +353,10 @@ void main() {
 
     test("missing required controller header param fails", () async {
       server = await enableController("/a", () => HTTPParameterController());
-      var resp = await http.get(
-          Uri.parse("http://localhost:4040/a?Shaqs=1&Table=IKEA"),
-          headers: {
-            "Cookie": "Chips Ahoy",
-          });
+      var resp = await http
+          .get(Uri.parse("http://localhost:4040/a?Shaqs=1&Table=IKEA"), headers: {
+        "Cookie": "Chips Ahoy",
+      });
 
       expect(resp.statusCode, 400);
       expect(json.decode(resp.body),
@@ -370,24 +365,22 @@ void main() {
 
     test("missing required controller query param fails", () async {
       server = await enableController("/a", () => HTTPParameterController());
-      var resp = await http
-          .get(Uri.parse("http://localhost:4040/a?Table=IKEA"), headers: {
+      var resp = await http.get(Uri.parse("http://localhost:4040/a?Table=IKEA"), headers: {
         "x-request-id": "3423423adfea90",
         "Cookie": "Chips Ahoy",
       });
 
       expect(resp.statusCode, 400);
-      expect(
-          json.decode(resp.body), {"error": "missing required query 'Shaqs'"});
+      expect(json.decode(resp.body),
+          {"error": "missing required query 'Shaqs'"});
     });
 
     test("missing required method header param fails", () async {
       server = await enableController("/a", () => HTTPParameterController());
-      var resp = await http.get(
-          Uri.parse("http://localhost:4040/a?Shaqs=1&Table=IKEA"),
-          headers: {
-            "x-request-id": "3423423adfea90",
-          });
+      var resp = await http
+          .get(Uri.parse("http://localhost:4040/a?Shaqs=1&Table=IKEA"), headers: {
+        "x-request-id": "3423423adfea90",
+      });
 
       expect(resp.statusCode, 400);
       expect(json.decode(resp.body),
@@ -396,15 +389,14 @@ void main() {
 
     test("missing require method query param fails", () async {
       server = await enableController("/a", () => HTTPParameterController());
-      var resp = await http
-          .get(Uri.parse("http://localhost:4040/a?Shaqs=1"), headers: {
+      var resp = await http.get(Uri.parse("http://localhost:4040/a?Shaqs=1"), headers: {
         "x-request-id": "3423423adfea90",
         "Cookie": "Chips Ahoy",
       });
 
       expect(resp.statusCode, 400);
-      expect(
-          json.decode(resp.body), {"error": "missing required query 'Table'"});
+      expect(json.decode(resp.body),
+          {"error": "missing required query 'Table'"});
     });
 
     test("reports all missing required parameters", () async {
@@ -422,8 +414,7 @@ void main() {
     test("Headers are case-INsensitive", () async {
       server = await enableController("/a", () => HTTPParameterController());
       var resp = await http.get(
-          Uri.parse(
-              "http://localhost:4040/a?number=3&Shaqs=1&Table=IKEA&table_legs=8"),
+          Uri.parse("http://localhost:4040/a?number=3&Shaqs=1&Table=IKEA&table_legs=8"),
           headers: {
             "X-Request-ID": "3423423adfea90",
             "location": "Nowhere",
@@ -446,17 +437,16 @@ void main() {
 
     test("Query parameters are case-SENSITIVE", () async {
       server = await enableController("/a", () => HTTPParameterController());
-      var resp = await http.get(
-          Uri.parse("http://localhost:4040/a?SHAQS=1&table=IKEA"),
-          headers: {
-            "X-Request-ID": "3423423adfea90",
-            "Cookie": "Chips Ahoy",
-          });
+      var resp = await http
+          .get(Uri.parse("http://localhost:4040/a?SHAQS=1&table=IKEA"), headers: {
+        "X-Request-ID": "3423423adfea90",
+        "Cookie": "Chips Ahoy",
+      });
 
       expect(resp.statusCode, 400);
 
-      expect(
-          json.decode(resp.body)["error"], contains("missing required query"));
+      expect(json.decode(resp.body)["error"],
+          contains("missing required query"));
       expect(json.decode(resp.body)["error"], contains("Table"));
       expect(json.decode(resp.body)["error"], contains("Shaqs"));
     });
@@ -464,8 +454,8 @@ void main() {
     test("May only be one query parameter if arg type is not List<T>",
         () async {
       server = await enableController("/a", () => DuplicateParamController());
-      var resp = await http.get(
-          Uri.parse("http://localhost:4040/a?list=a&list=b&single=x&single=y"));
+      var resp = await http
+          .get(Uri.parse("http://localhost:4040/a?list=a&list=b&single=x&single=y"));
 
       expect(resp.statusCode, 400);
 
@@ -476,8 +466,8 @@ void main() {
     test("Can be more than one query parameters for arg type that is List<T>",
         () async {
       server = await enableController("/a", () => DuplicateParamController());
-      var resp = await http
-          .get(Uri.parse("http://localhost:4040/a?list=a&list=b&single=x"));
+      var resp =
+          await http.get(Uri.parse("http://localhost:4040/a?list=a&list=b&single=x"));
 
       expect(resp.statusCode, 200);
 
@@ -490,8 +480,7 @@ void main() {
     test("Can be exactly one query parameter for arg type that is List<T>",
         () async {
       server = await enableController("/a", () => DuplicateParamController());
-      var resp =
-          await http.get(Uri.parse("http://localhost:4040/a?list=a&single=x"));
+      var resp = await http.get(Uri.parse("http://localhost:4040/a?list=a&single=x"));
 
       expect(resp.statusCode, 200);
 
@@ -554,7 +543,7 @@ class FilteringController extends ResourceController {
 
   @override
   Future<RequestOrResponse> willProcessRequest(Request req) async {
-    if (req.raw!.headers.value("ignore") != null) {
+    if (req.raw.headers.value("ignore") != null) {
       return Response.badRequest(body: "ignored");
     }
     return super.willProcessRequest(req);
@@ -585,7 +574,7 @@ class TController extends ResourceController {
 
   @Operation.post()
   Future<Response> post() async {
-    Map<String, dynamic> body = request!.body!.as();
+    Map<String, dynamic> body = request!.body.as();
 
     return Response.ok(body);
   }
@@ -648,8 +637,7 @@ class DateTimeController extends ResourceController {
 
 class MultiQueryParamController extends ResourceController {
   @Operation.get()
-  Future<Response> get(
-      {@Bind.query("params") List<String> params = const []}) async {
+  Future<Response> get({@Bind.query("params") required List<String> params}) async {
     return Response.ok(params.join(","));
   }
 }
@@ -675,7 +663,7 @@ class HTTPParameterController extends ResourceController {
 
   @Operation.get()
   Future<Response> get(@Bind.header("Cookie") String cookieBrand,
-      @Bind.query("Table") String? tableBrand,
+      @Bind.query("Table") String tableBrand,
       {@Bind.header("Milk") String? milkBrand,
       @Bind.query("table_legs") int? numberOfTableLegs}) async {
     return Response.ok({
@@ -771,12 +759,11 @@ class DecodeCallbackController extends ResourceController {
 class NoBindController extends ResourceController {
   @Operation.get("id")
   Future<Response> getOne() async {
-    return Response.ok({"id": request!.path!.variables["id"]});
+    return Response.ok({"id": request!.path.variables["id"]});
   }
 }
 
-Future<HttpServer> enableController(
-    String pattern, Controller instantiate()) async {
+Future<HttpServer> enableController(String pattern, Controller instantiate()) async {
   var router = Router();
   router.route(pattern).link(instantiate);
   router.didAddToChannel();

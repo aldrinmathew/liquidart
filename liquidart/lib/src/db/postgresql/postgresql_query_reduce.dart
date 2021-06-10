@@ -12,13 +12,13 @@ class PostgresQueryReduce<T extends ManagedObject>
 
   final PostgresQuery<T> query;
 
-  @override
-  Future<double> average(num selector(T object)) {
+  @override 
+  Future<double?> average(num? selector(T object)) {
     return _execute("avg(${_columnName(selector)})::float");
   }
 
   @override
-  Future<int> count() {
+  Future<int?> count() {
     return _execute("count(*)");
   }
 
@@ -37,8 +37,8 @@ class PostgresQueryReduce<T extends ManagedObject>
     return _execute("sum(${_columnName(selector)})");
   }
 
-  String _columnName(dynamic selector(T object)) {
-    return query.entity.identifyAttribute(selector).name;
+  String? _columnName(dynamic selector(T object)) {
+    return query.entity!.identifyAttribute(selector).name;
   }
 
   Future<U> _execute<U>(String function) async {
@@ -52,11 +52,11 @@ class PostgresQueryReduce<T extends ManagedObject>
     }
 
     final store = query.context.persistentStore as PostgreSQLPersistentStore;
-    final connection = await store.executionContext;
+    final connection = await store.executionContext ;
     try {
       final result = await connection
-          .query(buffer.toString(), substitutionValues: builder.variables)
-          .timeout(Duration(seconds: query.timeoutInSeconds!));
+          .query(buffer.toString(), substitutionValues: builder.variables as Map<String, dynamic>?)
+          .timeout(Duration(seconds: query.timeoutInSeconds));
       return result.first.first as U;
     } on TimeoutException catch (e) {
       throw QueryException.transport("timed out connecting to database",

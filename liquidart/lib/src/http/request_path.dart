@@ -13,22 +13,22 @@ class RequestPath {
   /// There is no need to invoke this constructor manually.
   RequestPath(this.segments);
 
-  void setSpecification(RouteSpecification spec, {int segmentOffset = 0}) {
+  void setSpecification(RouteSpecification? spec, {int segmentOffset = 0}) {
     var requestIterator = segments.iterator;
     for (var i = 0; i < segmentOffset; i++) {
       requestIterator.moveNext();
     }
 
-    for (var segment in spec.segments) {
+    for (var segment in spec!.segments!) {
       requestIterator.moveNext();
       var requestSegment = requestIterator.current;
 
       if (segment.isVariable) {
         variables[segment.variableName!] = requestSegment;
-        orderedVariableNames.add(segment.variableName!);
+        orderedVariableNames.add(segment.variableName);
       } else if (segment.isRemainingMatcher) {
         var remaining = [];
-        remaining.add(requestIterator.current);
+        remaining.add(requestIterator.current );
         while (requestIterator.moveNext()) {
           remaining.add(requestIterator.current);
         }
@@ -64,7 +64,7 @@ class RequestPath {
   ///
   /// The remaining path will will be a single string, including any path delimiters (/),
   /// but will not have a leading path delimiter.
-  String? remainingPath;
+  late String remainingPath;
 
   /// An ordered list of variable names (the keys in [variables]) based on their position in the path.
   ///
@@ -72,7 +72,7 @@ class RequestPath {
   /// available for the specific request are in this list. For example, if a route has two path variables,
   /// but the incoming request this [RequestPath] represents only has one variable, only that one variable
   /// will appear in this property.
-  List<String> orderedVariableNames = [];
+  List<String?> orderedVariableNames = [];
 
   /// The path of the requested URI.
   ///

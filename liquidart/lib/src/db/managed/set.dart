@@ -19,7 +19,7 @@ import 'managed.dart';
 ///          @Relate(#posts)
 ///          User user;
 ///        }
-class ManagedSet<InstanceType extends ManagedObject> extends Object
+class ManagedSet<InstanceType extends ManagedObject?> extends Object
     with ListMixin<InstanceType> {
   /// Creates an empty [ManagedSet].
   ManagedSet() {
@@ -36,7 +36,7 @@ class ManagedSet<InstanceType extends ManagedObject> extends Object
     _innerValues = List<InstanceType>.from(items);
   }
 
-  List<InstanceType> _innerValues = [];
+  late List<InstanceType> _innerValues;
 
   /// The number of elements in this set.
   @override

@@ -6,14 +6,14 @@ import 'package:liquidart/src/db/query/query.dart';
 
 class ColumnExpressionBuilder extends ColumnBuilder {
   ColumnExpressionBuilder(
-      TableBuilder table, ManagedPropertyDescription property, this.expression,
+      TableBuilder table, ManagedPropertyDescription? property, this.expression,
       {this.prefix = ""})
       : super(table, property);
 
-  final String prefix;
-  PredicateExpression expression;
+  final String? prefix;
+  PredicateExpression? expression;
 
-  String get defaultPrefix => "$prefix${table.sqlTableReference}_";
+  String get defaultPrefix => "$prefix${table!.sqlTableReference}_";
 
   QueryPredicate get predicate {
     final expr = expression;
@@ -37,19 +37,19 @@ class ColumnExpressionBuilder extends ColumnBuilder {
   }
 
   QueryPredicate comparisonPredicate(
-      PredicateOperator operator, dynamic value) {
+      PredicateOperator? operator, dynamic value) {
     final name = sqlColumnName(withTableNamespace: true);
     final variableName = sqlColumnName(withPrefix: defaultPrefix);
 
     return QueryPredicate(
-        "$name ${ColumnBuilder.symbolTable[operator]} @$variableName$sqlTypeSuffix",
+        "$name ${ColumnBuilder.symbolTable[operator!]} @$variableName$sqlTypeSuffix",
         {variableName: convertValueForStorage(value)});
   }
 
   QueryPredicate containsPredicate(Iterable<dynamic> values,
       {bool within = true}) {
     var tokenList = [];
-    var pairedMap = <String, dynamic>{};
+    var pairedMap = <String?, dynamic>{};
 
     var counter = 0;
     values.forEach((value) {
@@ -119,7 +119,6 @@ class ColumnExpressionBuilder extends ColumnBuilder {
   }
 
   String escapeLikeString(String input) {
-    return input.replaceAllMapped(
-        RegExp(r"(\\|%|_)"), (Match m) => "\\${m[0]}");
+    return input.replaceAllMapped(RegExp(r"(\\|%|_)"), (Match m) => "\\${m[0]}");
   }
 }

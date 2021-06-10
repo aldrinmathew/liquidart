@@ -7,64 +7,64 @@ import 'package:test/test.dart';
 
 void main() {
   group("App launch status", () {
-    Application<TestChannel>? app;
+    late Application<TestChannel> app;
 
     tearDown(() async {
-      await app!.stop();
+      await app.stop();
     });
 
     test(
         "didFinishLaunching is false before launch, true after, false after stop",
         () async {
       app = Application<TestChannel>();
-      expect(app!.isRunning, false);
+      expect(app.isRunning, false);
 
-      await app!.startOnCurrentIsolate();
-      expect(app!.isRunning, true);
+      await app.startOnCurrentIsolate();
+      expect(app.isRunning, true);
 
-      await app!.stop();
-      expect(app!.isRunning, false);
+      await app.stop();
+      expect(app.isRunning, false);
     });
   });
 
   group("Application lifecycle", () {
-    Application<TestChannel>? app;
+    late Application<TestChannel> app;
 
     setUp(() async {
       app = Application<TestChannel>();
-      await app!.startOnCurrentIsolate();
+      await app.startOnCurrentIsolate();
     });
 
     tearDown(() async {
-      await app!.stop();
+      await app.stop();
     });
 
     test("Application starts", () async {
-      expect(app!.channel, isNotNull);
-      expect(app!.supervisors.length, 0);
+      expect(app.channel, isNotNull);
+      expect(app.supervisors.length, 0);
     });
 
     test("Application responds to request", () async {
-      var response = await http.get(Uri.parse('http://localhost:8888/t'));
+      var response = await http.get(Uri.parse("http://localhost:8888/t"));
       expect(response.statusCode, 200);
     });
 
     test("Application properly routes request", () async {
-      var tResponse = await http.get(Uri.parse('http://localhost:8888/t'));
-      var rResponse = await http.get(Uri.parse('http://localhost:8888/r'));
+      var tResponse = await http.get(Uri.parse("http://localhost:8888/t"));
+      var rResponse = await http.get(Uri.parse("http://localhost:8888/r"));
 
       expect(tResponse.body, '"t_ok"');
       expect(rResponse.body, '"r_ok"');
     });
 
     test("Application gzips content", () async {
-      var resp = await http.get(Uri.parse("http://localhost:8888/t"),
-          headers: {"Accept-Encoding": "gzip"});
+      var resp = await http
+          .get(Uri.parse("http://localhost:8888/t"), headers: {"Accept-Encoding": "gzip"});
       expect(resp.headers["content-encoding"], "gzip");
     });
 
     test("Application stops", () async {
-      await app!.stop();
+      await app.stop();
 
       var successful = false;
       try {
@@ -75,7 +75,7 @@ void main() {
       }
       expect(successful, false);
 
-      await app!.startOnCurrentIsolate();
+      await app.startOnCurrentIsolate();
       var resp = await http.get(Uri.parse("http://localhost:8888/t"));
       expect(resp.statusCode, 200);
     });

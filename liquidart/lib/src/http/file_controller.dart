@@ -2,10 +2,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:liquidart/src/openapi/openapi.dart';
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:path/path.dart' as path;
 import 'http.dart';
 
-typedef _OnFileNotFound = FutureOr<Response> Function(FileController controller, Request req);
+typedef _OnFileNotFound = FutureOr<Response> Function(
+    FileController controller, Request req);
 
 /// Serves files from a directory on the filesystem.
 ///
@@ -39,9 +41,10 @@ class FileController extends Controller {
   ///
   /// Note that the 'Last-Modified' header is always applied to a response served from this instance.
   FileController(String pathOfDirectoryToServe,
-      {FutureOr<Response> onFileNotFound(FileController controller, Request req)?})
-      : _servingDirectory = Uri.directory(pathOfDirectoryToServe),
-        _onFileNotFound = onFileNotFound!;
+    {FutureOr<Response> onFileNotFound(
+      FileController controller, Request req)?})
+    : _servingDirectory = Uri.directory(pathOfDirectoryToServe),
+      _onFileNotFound = onFileNotFound;
 
   static Map<String, ContentType> _defaultExtensionMap = {
     /* Web content */
@@ -76,8 +79,8 @@ class FileController extends Controller {
   };
 
   final Map<String, ContentType> _extensionMap = Map.from(_defaultExtensionMap);
-  final List<_PolicyPair?> _policyPairs = [];
-  final Uri? _servingDirectory;
+  final List<_PolicyPair> _policyPairs = [];
+  final Uri _servingDirectory;
   final _OnFileNotFound? _onFileNotFound;
 
   /// Returns a [ContentType] for a file extension.
@@ -88,9 +91,9 @@ class FileController extends Controller {
   /// Returns null if there is no entry for [extension]. Entries can be added with [setContentTypeForExtension].
   ContentType? contentTypeForExtension(String extension) {
     if (extension.startsWith(".")) {
-      return _extensionMap[extension.substring(1)]!;
+      return _extensionMap[extension.substring(1)];
     }
-    return _extensionMap[extension]!;
+    return _extensionMap[extension];
   }
 
   /// Sets the associated content type for a file extension.
@@ -136,16 +139,9 @@ class FileController extends Controller {
   /// Evaluates each policy added by [addCachePolicy] against the [path] and
   /// returns it if exists.
   CachePolicy? cachePolicyForPath(String path) {
-    List<_PolicyPair?> policyPairsList = _policyPairs;
-    for (int i = 0; i < policyPairsList.length; i++) {
-      _PolicyPair? pair = policyPairsList[i];
-      if (pair != null) {
-        if(pair.shouldApplyToPath(path)) {
-          return pair.policy;
-        }
-      }
-    }
-    return null;
+    return _policyPairs
+        .firstWhereOrNull((pair) => pair.shouldApplyToPath(path))
+        ?.policy;
   }
 
   @override
@@ -154,8 +150,8 @@ class FileController extends Controller {
       return Response(HttpStatus.methodNotAllowed, null, null);
     }
 
-    var relativePath = request.path!.remainingPath;
-    var fileUri = _servingDirectory!.resolve(relativePath!);
+    var relativePath = request.path.remainingPath;
+    var fileUri = _servingDirectory.resolve(relativePath);
     File file;
     if (FileSystemEntity.isDirectorySync(fileUri.toFilePath())) {
       file = File.fromUri(fileUri.resolve("index.html"));
@@ -178,7 +174,8 @@ class FileController extends Controller {
     }
 
     var lastModifiedDate = file.lastModifiedSync();
-    var ifModifiedSince = request.raw!.headers.value(HttpHeaders.ifModifiedSinceHeader);
+    var ifModifiedSince =
+        request.raw.headers.value(HttpHeaders.ifModifiedSinceHeader);
     if (ifModifiedSince != null) {
       var date = HttpDate.parse(ifModifiedSince);
       if (!lastModifiedDate.isAfter(date)) {

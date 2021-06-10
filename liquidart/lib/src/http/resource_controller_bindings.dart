@@ -70,7 +70,7 @@ class Operation {
         _pathVariable3 = pathVariable3,
         _pathVariable4 = pathVariable4;
 
-  final String? method;
+  final String method;
   final String? _pathVariable1;
   final String? _pathVariable2;
   final String? _pathVariable3;
@@ -207,7 +207,7 @@ class Bind {
         reject = null;
 
   final String? name;
-  final BindingType? bindingType;
+  final BindingType bindingType;
 
   final List<String>? accept;
   final List<String>? ignore;

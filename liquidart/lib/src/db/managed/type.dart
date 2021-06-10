@@ -48,7 +48,7 @@ class ManagedType {
   /// The primitive kind of this type.
   ///
   /// All types have a kind. If kind is a map or list, it will also have [elements].
-  final ManagedPropertyType? kind;
+  final ManagedPropertyType kind;
 
   /// The primitive kind of each element of this type.
   ///
@@ -57,10 +57,10 @@ class ManagedType {
   final ManagedType? elements;
 
   /// Dart representation of this type.
-  final Type? type;
+  final Type type;
 
   /// Whether this is an enum type.
-  bool? get isEnumerated => enumerationMap != null;
+  bool get isEnumerated => enumerationMap != null;
 
   /// For enumerated types, this is a map of the name of the option to its Dart enum type.
   final Map<String, dynamic>? enumerationMap;
@@ -98,6 +98,8 @@ class ManagedType {
       default:
         return false;
     }
+
+    
   }
 
   @override

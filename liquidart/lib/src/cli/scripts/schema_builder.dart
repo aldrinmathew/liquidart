@@ -27,20 +27,16 @@ class SchemaBuilderExecutable extends Executable<Map<String, dynamic>> {
     PostgreSQLPersistentStore.logger.level = Level.ALL;
     PostgreSQLPersistentStore.logger.onRecord
         .listen((r) => log("${r.message}"));
+
     try {
-      var outputSchema = inputSchema;
+      Schema? outputSchema = inputSchema;
       for (var source in sources) {
-        Migration instance = instanceOf(
-          source.name!,
-          positionalArguments: const [],
-          namedArguments: const <Symbol, dynamic>{},
-          constructorName: const Symbol(""),
-        );
+        Migration instance = instanceOf(source.name!);
         instance.database = SchemaBuilder(null, outputSchema);
         await instance.upgrade();
         outputSchema = instance.currentSchema;
       }
-      return outputSchema.asMap();
+      return outputSchema!.asMap();
     } on SchemaException catch (e) {
       return {
         "error":

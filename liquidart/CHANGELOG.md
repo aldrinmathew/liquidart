@@ -74,7 +74,7 @@
 
 ## 4.0.0-b1
 
-- Renamed and refactored project to Liquidart, since the Aqueduct project has been abandoned by StableKernel Team.
+- Renamed and refactored project to Liquidart, since the liquidart project has been abandoned by StableKernel Team.
     - The refactoring is astonishingly dirty and clunky.
     - Lot of commits to correct link errors and renaming nightmare and what not.
     - Not even sure if the package runs well, at this point.
@@ -92,7 +92,7 @@
 
 ## 3.2.2-dev
 
-- [#723](https://github.com/stablekernel/aqueduct/pull/723) Fixes issue that prevented the `AuthServer` from granting tokens with sub-scopes when the servers `AuthServerDelegate.getAllowedScopes()` didn't return `AuthScope.any`.
+- [#723](https://github.com/stablekernel/liquidart/pull/723) Fixes issue that prevented the `AuthServer` from granting tokens with sub-scopes when the servers `AuthServerDelegate.getAllowedScopes()` didn't return `AuthScope.any`.
 - Deprecates `AuthScope.allowsScope()`, use `AuthScope.isSubsetOrEqualTo()` instead.
 
 ## 3.2.1

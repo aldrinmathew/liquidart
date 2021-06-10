@@ -10,39 +10,38 @@ import 'package:liquidart/src/db/query/matcher_expression.dart';
 import 'package:liquidart/src/db/query/matcher_internal.dart';
 import 'package:liquidart/src/db/query/predicate.dart';
 import 'package:liquidart/src/db/query/query.dart';
+import 'package:collection/collection.dart' show IterableExtension;
 
 class TableBuilder implements Returnable {
   TableBuilder(PostgresQuery query, {this.parent, this.joinedBy})
       : entity = query.entity,
-        _manualPredicate = query.predicate! {
+        _manualPredicate = query.predicate {
     if (parent != null) {
       tableAlias = createTableAlias();
     }
-    returning = ColumnBuilder.fromKeys(this, query.propertiesToFetch ?? []);
+    returning = ColumnBuilder.fromKeys(this, query.propertiesToFetch );
 
-    columnSortBuilders = query.sortDescriptors!
-        .map((s) => ColumnSortBuilder(this, s.key, s.order))
-        .toList();
+    columnSortBuilders = query.sortDescriptors
+            ?.map((s) => ColumnSortBuilder(this, s.key, s.order))
+            .toList() ??
+        [];
 
     if (query.pageDescriptor != null) {
-      columnSortBuilders.add(ColumnSortBuilder(this,
-          query.pageDescriptor!.propertyName, query.pageDescriptor!.order));
+      columnSortBuilders.add(ColumnSortBuilder(
+          this, query.pageDescriptor!.propertyName, query.pageDescriptor!.order));
 
       if (query.pageDescriptor!.boundingValue != null) {
         final prop = entity!.properties[query.pageDescriptor!.propertyName];
         final operator = query.pageDescriptor!.order == QuerySortOrder.ascending
             ? PredicateOperator.greaterThan
             : PredicateOperator.lessThan;
-        final expr = ColumnExpressionBuilder(
-            this,
-            prop!,
-            ComparisonExpression(
-                query.pageDescriptor!.boundingValue, operator));
-        expressionBuilders!.add(expr);
+        final expr = ColumnExpressionBuilder(this, prop,
+            ComparisonExpression(query.pageDescriptor!.boundingValue, operator));
+        expressionBuilders.add(expr);
       }
     }
 
-    query.subQueries.forEach((relationshipDesc, subQuery) {
+    query.subQueries?.forEach((relationshipDesc, subQuery) {
       addJoinTableBuilder(TableBuilder(subQuery as PostgresQuery,
           parent: this, joinedBy: relationshipDesc));
     });
@@ -50,8 +49,8 @@ class TableBuilder implements Returnable {
     addColumnExpressions(query.expressions);
   }
 
-  TableBuilder.implicit(this.parent, this.joinedBy)
-      : entity = joinedBy!.inverse.entity,
+  TableBuilder.implicit(this.parent, ManagedRelationshipDescription this.joinedBy)
+      : entity = joinedBy.inverse!.entity,
         _manualPredicate = QueryPredicate.empty() {
     tableAlias = createTableAlias();
     returning = <Returnable>[];
@@ -61,18 +60,18 @@ class TableBuilder implements Returnable {
   final ManagedEntity? entity;
   final TableBuilder? parent;
   final ManagedRelationshipDescription? joinedBy;
-  List<ColumnExpressionBuilder>? expressionBuilders;
+  final List<ColumnExpressionBuilder> expressionBuilders = [];
   String? tableAlias;
   QueryPredicate? predicate;
-  List<ColumnSortBuilder> columnSortBuilders = [];
-  List<Returnable> returning = [];
+  late List<ColumnSortBuilder> columnSortBuilders;
+  List<Returnable>? returning;
   int aliasCounter = 0;
 
-  final QueryPredicate _manualPredicate;
+  final QueryPredicate? _manualPredicate;
 
-  ManagedRelationshipDescription get foreignKeyProperty =>
+  ManagedRelationshipDescription? get foreignKeyProperty =>
       joinedBy!.relationshipType == ManagedRelationshipType.belongsTo
-          ? joinedBy!
+          ? joinedBy
           : joinedBy!.inverse;
 
   bool isJoinOnProperty(ManagedRelationshipDescription relationship) {
@@ -82,7 +81,7 @@ class TableBuilder implements Returnable {
   }
 
   List<ColumnBuilder> get flattenedColumnsToReturn {
-    return returning.fold(<ColumnBuilder>[], (prev, c) {
+    return returning!.fold(<ColumnBuilder>[], (prev, c) {
       if (c is TableBuilder) {
         prev.addAll(c.flattenedColumnsToReturn);
       } else if (c is ColumnBuilder) {
@@ -95,10 +94,10 @@ class TableBuilder implements Returnable {
   QueryPredicate get joiningPredicate {
     ColumnBuilder left, right;
     if (identical(foreignKeyProperty, joinedBy)) {
-      left = ColumnBuilder(parent!, joinedBy!);
+      left = ColumnBuilder(parent, joinedBy);
       right = ColumnBuilder(this, entity!.primaryKeyAttribute);
     } else {
-      left = ColumnBuilder(parent!, parent!.entity!.primaryKeyAttribute);
+      left = ColumnBuilder(parent, parent!.entity!.primaryKeyAttribute);
       right = ColumnBuilder(this, joinedBy!.inverse);
     }
 
@@ -117,25 +116,25 @@ class TableBuilder implements Returnable {
     return "t$aliasCounter";
   }
 
-  void finalize(Map<String, dynamic> variables) {
+  void finalize(Map<String?, dynamic> variables) {
     final allExpressions = [_manualPredicate]
-      ..addAll(expressionBuilders!.map((c) => c.predicate));
+      ..addAll(expressionBuilders.map((c) => c.predicate));
 
     predicate = QueryPredicate.and(allExpressions);
     if (predicate?.parameters != null) {
       variables.addAll(predicate!.parameters!);
     }
 
-    returning.whereType<TableBuilder>().forEach((r) {
+    returning!.whereType<TableBuilder>().forEach((r) {
       r.finalize(variables);
     });
   }
 
   void addColumnExpressions(
-      List<QueryExpression<dynamic, dynamic>>? expressions) {
-    if (expressions == null) {
-      return;
-    }
+      List<QueryExpression<dynamic, dynamic>> expressions) {
+    // if (expressions == null) {
+    //   return;
+    // }
 
     expressions.forEach((expression) {
       final firstElement = expression.keyPath.path.first;
@@ -158,7 +157,7 @@ class TableBuilder implements Returnable {
           // This will occur if we selected a column.
           final expr =
               ColumnExpressionBuilder(this, lastElement, expression.expression);
-          expressionBuilders!.add(expr);
+          expressionBuilders.add(expr);
           return;
         }
       } else if (isForeignKey) {
@@ -166,7 +165,7 @@ class TableBuilder implements Returnable {
         // primary key. In either case, this is a column in this table (a foreign key column).
         final expr = ColumnExpressionBuilder(
             this, expression.keyPath.path.first, expression.expression);
-        expressionBuilders!.add(expr);
+        expressionBuilders.add(expr);
         return;
       }
 
@@ -179,16 +178,16 @@ class TableBuilder implements Returnable {
     TableBuilder joinedTable = _findJoinedTable(expression.keyPath);
     final lastElement = expression.keyPath.path.last;
     if (lastElement is ManagedRelationshipDescription) {
-      final inversePrimaryKey = lastElement.inverse.entity.primaryKeyAttribute;
+      final inversePrimaryKey = lastElement.inverse!.entity!.primaryKeyAttribute;
       final expr = ColumnExpressionBuilder(
           joinedTable, inversePrimaryKey, expression.expression,
-          prefix: tableAlias!);
-      expressionBuilders!.add(expr);
+          prefix: tableAlias);
+      expressionBuilders.add(expr);
     } else {
       final expr = ColumnExpressionBuilder(
           joinedTable, lastElement, expression.expression,
-          prefix: tableAlias!);
-      expressionBuilders!.add(expr);
+          prefix: tableAlias);
+      expressionBuilders.add(expr);
     }
   }
 
@@ -201,12 +200,12 @@ class TableBuilder implements Returnable {
         keyPath[0] is! ManagedRelationshipDescription) {
       return this;
     } else {
-      final head = keyPath[0] as ManagedRelationshipDescription;
-      TableBuilder? join = returning
-          .whereType<TableBuilder?>()
-          .firstWhere((m) => m!.isJoinOnProperty(head), orElse: () => null);
+      final head = keyPath[0] as ManagedRelationshipDescription?;
+      TableBuilder? join = returning!
+          .whereType<TableBuilder>()
+          .firstWhereOrNull((m) => m.isJoinOnProperty(head!));
       if (join == null) {
-        join = TableBuilder.implicit(this, head);
+        join = TableBuilder.implicit(this, head!);
         addJoinTableBuilder(join);
       }
       return join._findJoinedTable(KeyPath.byRemovingFirstNKeys(keyPath, 1));
@@ -214,14 +213,14 @@ class TableBuilder implements Returnable {
   }
 
   void addJoinTableBuilder(TableBuilder r) {
-    returning.add(r);
+    returning!.add(r);
 
     // If we're fetching the primary key of the joined table, remove
     // the foreign key from the columns returning from this table.
     // They are the same value, but this guarantees the row instantiator
     // that it only sees the value once and makes its logic more straightforward.
-    if (r.returning.isNotEmpty) {
-      returning.removeWhere((m) {
+    if (r.returning!.isNotEmpty) {
+      returning!.removeWhere((m) {
         if (m is ColumnBuilder) {
           return identical(m.property, r.joinedBy);
         }
@@ -237,7 +236,7 @@ class TableBuilder implements Returnable {
       Methods that return portions of a SQL statement for this object
    */
 
-  String get sqlTableName {
+  String? get sqlTableName {
     if (tableAlias == null) {
       return entity!.tableName;
     }
@@ -245,11 +244,11 @@ class TableBuilder implements Returnable {
     return "${entity!.tableName} $tableAlias";
   }
 
-  String get sqlTableReference => tableAlias ?? entity!.tableName;
+  String? get sqlTableReference => tableAlias ?? entity!.tableName;
 
   String get sqlInnerSelect {
     var nestedJoins =
-        returning.whereType<TableBuilder>().map((t) => t.sqlJoin).join(" ");
+        returning!.whereType<TableBuilder>().map((t) => t.sqlJoin).join(" ");
 
     var flattenedColumns = flattenedColumnsToReturn;
 
@@ -268,7 +267,7 @@ class TableBuilder implements Returnable {
 
   String get sqlJoin {
     if (parent == null) {
-      return returning
+      return returning!
           .whereType<TableBuilder>()
           .map((e) => e.sqlJoin)
           .join(" ");
@@ -277,8 +276,8 @@ class TableBuilder implements Returnable {
     // At this point, we know that this table is being joined.
     // If we have a predicate that references a column in a joined table,
     // then we can't use a simple join, we have to use an inner select.
-    final joinedTables = returning.whereType<TableBuilder>().toList();
-    if (expressionBuilders!.any((e) => joinedTables.contains(e.table))) {
+    final joinedTables = returning!.whereType<TableBuilder>().toList();
+    if (expressionBuilders.any((e) => joinedTables.contains(e.table))) {
       return sqlInnerSelect;
     }
 
@@ -287,8 +286,8 @@ class TableBuilder implements Returnable {
     var thisJoin =
         "LEFT OUTER JOIN $sqlTableName ON ${totalJoinPredicate.format}";
 
-    if (returning.any((p) => p is TableBuilder)) {
-      var nestedJoins = returning.whereType<TableBuilder>().map((p) {
+    if (returning!.any((p) => p is TableBuilder)) {
+      var nestedJoins = returning!.whereType<TableBuilder>().map((p) {
         return p.sqlJoin;
       }).toList();
       nestedJoins.insert(0, thisJoin);

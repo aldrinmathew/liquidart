@@ -4,6 +4,7 @@ import 'package:liquidart/src/auth/auth.dart';
 import 'package:liquidart/src/http/http.dart';
 import 'package:liquidart/src/http/resource_controller_bindings.dart';
 import 'package:liquidart/src/http/resource_controller_scope.dart';
+import 'package:collection/collection.dart' show IterableExtension;
 
 bool isOperation(DeclarationMirror m) {
   return getMethodOperationMetadata(m) != null;
@@ -15,21 +16,11 @@ List<AuthScope>? getMethodScopes(DeclarationMirror m) {
   }
 
   final method = m as MethodMirror;
-  Scope? metadata;
-  final List<InstanceMirror?> metadataList = method.metadata;
-  for (int i = 0; i < metadataList.length; i++) {
-    if (metadataList[i] != null) {
-      InstanceMirror im = metadataList[i]!;
-      if (im.reflectee is Scope) {
-        metadata = im.reflectee as Scope;
-      }
-    }
-  }
-  if (metadata != null) {
-    return metadata.scopes.map((scope) => AuthScope(scope)).toList();
-  } else {
-    return null;
-  }
+  final metadata = method.metadata
+      .firstWhereOrNull((im) => im.reflectee is Scope)
+      ?.reflectee as Scope?;
+
+  return metadata?.scopes.map((scope) => AuthScope(scope)).toList();
 }
 
 Operation? getMethodOperationMetadata(DeclarationMirror m) {
@@ -41,15 +32,10 @@ Operation? getMethodOperationMetadata(DeclarationMirror m) {
   if (!method.isRegularMethod || method.isStatic) {
     return null;
   }
-  Operation? metadata;
-  final List<InstanceMirror?> metadataList = method.metadata;
-  for(int i = 0; i < metadataList.length; i++) {
-    if(metadataList[i]!= null) {
-      InstanceMirror im = metadataList[i]!;
-      if(im.reflectee is Operation) {
-        metadata = im.reflectee as Operation;
-      }
-    }
-  }
+
+  final metadata = method.metadata
+      .firstWhereOrNull((im) => im.reflectee is Operation)
+      ?.reflectee as Operation?;
+
   return metadata;
 }

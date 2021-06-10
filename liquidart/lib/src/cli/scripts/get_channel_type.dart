@@ -10,22 +10,17 @@ class GetChannelExecutable extends Executable<String> {
 
   @override
   Future<String> execute() async {
-    final channels =
-        RuntimeContext.current.replicas!.iterable.whereType<ChannelRuntime>();
+    final channels = RuntimeContext.current.replicas!.iterable.whereType<ChannelRuntime>();
     if (channels.length != 1) {
-      throw StateError(
-          "No ApplicationChannel subclass was found for this project. "
-          "Make sure it is imported in your application library file.");
+      throw StateError("No ApplicationChannel subclass was found for this project. "
+        "Make sure it is imported in your application library file.");
     }
-    ChannelRuntime runtime = channels.first;
+    ChannelRuntime? runtime = channels.first;
 
-    // if (runtime == null) {
-    //   return null;
-    // }
     return MirrorSystem.getName(reflectClass(runtime.channelType).simpleName);
   }
 
-  static List<String> importsForPackage(String packageName) => [
+  static List<String> importsForPackage(String? packageName) => [
         "package:liquidart/liquidart.dart",
         "package:$packageName/$packageName.dart",
         "package:replica/replica.dart"

@@ -7,7 +7,7 @@ void main() {
       () {
     final dm = ManagedDataModel.fromCurrentMirrorSystem();
     final ctx = ManagedContext(dm, null);
-    final m = ctx.dataModel!.entityForType(Mixin);
+    final m = ctx.dataModel!.entityForType(Mixin)!;
     expect(m.attributes["serialized"]!.isTransient, true);
 
     final o = Mixin();
@@ -23,7 +23,7 @@ void main() {
       () {
     final dm = ManagedDataModel([Mixin]);
     final ctx = ManagedContext(dm, null);
-    final m = ctx.dataModel!.entityForType(Mixin);
+    final m = ctx.dataModel!.entityForType(Mixin)!;
     expect(m.properties.length, 3);
     expect(m.attributes["serialized"]!.isTransient, true);
     expect(m.attributes["y"]!.isTransient, true);

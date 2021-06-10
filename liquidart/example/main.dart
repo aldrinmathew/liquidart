@@ -32,39 +32,39 @@ class App extends ApplicationChannel {
         AppConfiguration.fromFile(File(options!.configurationFilePath!));
     final db = config.database;
     final persistentStore = PostgreSQLPersistentStore.fromConnectionInfo(
-        db.username!, db.password!, db.host!, db.port!, db.databaseName!);
+        db.username, db.password, db.host, db.port, db.databaseName);
     context = ManagedContext(
         ManagedDataModel.fromCurrentMirrorSystem(), persistentStore);
 
-    authServer = AuthServer(ManagedAuthDelegate(context!));
+    authServer = AuthServer(ManagedAuthDelegate(context));
   }
 
   @override
   Controller get entryPoint {
     return Router()
-      ..route('/auth/token').link(() => AuthController(authServer!))
+      ..route('/auth/token').link(() => AuthController(authServer))
       ..route('/users/[:id]')
-          .link(() => Authorizer(authServer!))
-          .link(() => UserController(context!, authServer!));
+          .link(() => Authorizer(authServer))!
+          .link(() => UserController(context, authServer));
   }
 }
 
 class UserController extends ResourceController {
   UserController(this.context, this.authServer);
 
-  final ManagedContext context;
-  final AuthServer authServer;
+  final ManagedContext? context;
+  final AuthServer? authServer;
 
   @Operation.get()
   Future<Response> getUsers() async {
-    final query = Query<User>(context);
+    final query = Query<User>(context!);
     return Response.ok(await query.fetch());
   }
 
   @Operation.get('id')
   Future<Response> getUserById(@Bind.path('id') int id) async {
-    final q = Query<User>(context)..where((o) => o.id).equalTo(id);
-    final User? user = await q.fetchOne();
+    final q = Query<User>(context!)..where((o) => o.id).equalTo(id);
+    final user = await q.fetchOne();
 
     if (user == null) {
       return Response.notFound();
@@ -81,18 +81,18 @@ class UserController extends ResourceController {
     }
 
     final salt = AuthUtility.generateRandomSalt();
-    final hashedPassword = authServer.hashPassword(user.password!, salt);
+    final hashedPassword = authServer!.hashPassword(user.password!, salt);
 
-    final query = Query<User>(context)
+    final query = Query<User>(context!)
       ..values = user
-      ..values!.hashedPassword = hashedPassword
-      ..values!.salt = salt
-      ..values!.email = user.username;
+      ..values?.hashedPassword = hashedPassword
+      ..values?.salt = salt
+      ..values?.email = user.username;
 
     final u = await query.insert();
-    final token = await authServer.authenticate(
-        u.username!,
-        query.values!.password!,
+    final token = await authServer!.authenticate(
+        u.username,
+        query.values?.password,
         request!.authorization!.credentials!.username,
         request!.authorization!.credentials!.password);
 
@@ -103,7 +103,7 @@ class UserController extends ResourceController {
 class AppConfiguration extends Configuration {
   AppConfiguration.fromFile(File file) : super.fromFile(file);
 
-  DatabaseConfiguration database = DatabaseConfiguration();
+  DatabaseConfiguration database  = DatabaseConfiguration();
 }
 
 class User extends ManagedObject<_User>

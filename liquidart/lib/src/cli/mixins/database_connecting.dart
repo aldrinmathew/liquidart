@@ -11,7 +11,7 @@ import 'package:liquidart/src/cli/command.dart';
 abstract class CLIDatabaseConnectingCommand implements CLICommand, CLIProject {
   static const String flavorPostgreSQL = "postgres";
 
-  DatabaseConfiguration? connectedDatabase;
+  late DatabaseConfiguration connectedDatabase;
 
   @Flag("use-ssl",
       help: "Whether or not the database connection should use SSL",
@@ -43,9 +43,9 @@ abstract class CLIDatabaseConnectingCommand implements CLICommand, CLIProject {
 
   PersistentStore? _persistentStore;
 
-  PersistentStore get persistentStore {
+  PersistentStore? get persistentStore {
     if (_persistentStore != null) {
-      return _persistentStore!;
+      return _persistentStore;
     }
 
     if (decode("flavor") == null) {
@@ -56,7 +56,7 @@ abstract class CLIDatabaseConnectingCommand implements CLICommand, CLIProject {
       if (databaseConnectionString != null) {
         try {
           connectedDatabase = DatabaseConfiguration();
-          connectedDatabase!.decode(databaseConnectionString);
+          connectedDatabase.decode(databaseConnectionString);
         } catch (_) {
           throw CLIException("Invalid database configuration.", instructions: [
             "Invalid connection string was: $databaseConnectionString",
@@ -86,11 +86,11 @@ abstract class CLIDatabaseConnectingCommand implements CLICommand, CLIProject {
       }
 
       return _persistentStore = PostgreSQLPersistentStore(
-          connectedDatabase!.username!,
-          connectedDatabase!.password!,
-          connectedDatabase!.host!,
-          connectedDatabase!.port!,
-          connectedDatabase!.databaseName!,
+          connectedDatabase.username,
+          connectedDatabase.password,
+          connectedDatabase.host,
+          connectedDatabase.port,
+          connectedDatabase.databaseName,
           useSSL: useSSL);
     }
 
@@ -98,7 +98,7 @@ abstract class CLIDatabaseConnectingCommand implements CLICommand, CLIProject {
   }
 
   @override
-  Future cleanup() async {
+  Future? cleanup() async {
     return _persistentStore?.close();
   }
 

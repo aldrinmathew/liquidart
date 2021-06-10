@@ -40,7 +40,7 @@ class ManagedAuthToken extends ManagedObject<_ManagedAuthToken>
   /// Instance from an [AuthToken].
   ManagedAuthToken.fromToken(AuthToken t) : super() {
     final tokenResourceOwner =
-        entity.relationships!["resourceOwner"]!.destinationEntity.instanceOf();
+        entity.relationships!["resourceOwner"]!.destinationEntity!.instanceOf()!;
     tokenResourceOwner["id"] = t.resourceOwnerIdentifier;
     this
       ..accessToken = t.accessToken
@@ -48,7 +48,7 @@ class ManagedAuthToken extends ManagedObject<_ManagedAuthToken>
       ..issueDate = t.issueDate
       ..expirationDate = t.expirationDate
       ..type = t.type
-      ..scope = t.scopes!.map((s) => s.toString()).join(" ")
+      ..scope = t.scopes?.map((s) => s.toString()).join(" ")
       ..resourceOwner = tokenResourceOwner as ResourceOwnerTableDefinition
       ..client = (ManagedAuthClient()..id = t.clientID);
   }
@@ -56,7 +56,7 @@ class ManagedAuthToken extends ManagedObject<_ManagedAuthToken>
   /// Instance from an [AuthCode].
   ManagedAuthToken.fromCode(AuthCode code) : super() {
     final tokenResourceOwner =
-        entity.relationships!["resourceOwner"]!.destinationEntity.instanceOf();
+        entity.relationships!["resourceOwner"]!.destinationEntity!.instanceOf()!;
     tokenResourceOwner["id"] = code.resourceOwnerIdentifier;
 
     this
@@ -64,33 +64,33 @@ class ManagedAuthToken extends ManagedObject<_ManagedAuthToken>
       ..resourceOwner = tokenResourceOwner as ResourceOwnerTableDefinition
       ..issueDate = code.issueDate
       ..expirationDate = code.expirationDate
-      ..scope = code.requestedScopes!.map((s) => s.toString()).join(" ")
+      ..scope = code.requestedScopes?.map((s) => s.toString()).join(" ")
       ..client = (ManagedAuthClient()..id = code.clientID);
   }
 
   /// As an [AuthToken].
   AuthToken asToken() {
     return AuthToken()
-      ..accessToken = accessToken!
-      ..refreshToken = refreshToken!
-      ..issueDate = issueDate!
-      ..expirationDate = expirationDate!
-      ..type = type!
-      ..resourceOwnerIdentifier = resourceOwner!.id!
-      ..scopes = scope!.split(" ").map((s) => AuthScope(s)).toList()
-      ..clientID = client!.id!;
+      ..accessToken = accessToken
+      ..refreshToken = refreshToken
+      ..issueDate = issueDate
+      ..expirationDate = expirationDate
+      ..type = type
+      ..resourceOwnerIdentifier = resourceOwner!.id
+      ..scopes = scope?.split(" ").map((s) => AuthScope(s)).toList()
+      ..clientID = client.id;
   }
 
   /// As an [AuthCode].
   AuthCode asAuthCode() {
     return AuthCode()
       ..hasBeenExchanged = accessToken != null
-      ..code = code!
-      ..resourceOwnerIdentifier = resourceOwner!.id!
-      ..issueDate = issueDate!
-      ..requestedScopes = scope!.split(" ").map((s) => AuthScope(s)).toList()
-      ..expirationDate = expirationDate!
-      ..clientID = client!.id!;
+      ..code = code
+      ..resourceOwnerIdentifier = resourceOwner!.id
+      ..issueDate = issueDate
+      ..requestedScopes = scope?.split(" ").map((s) => AuthScope(s)).toList()
+      ..expirationDate = expirationDate
+      ..clientID = client.id;
   }
 }
 
@@ -98,7 +98,7 @@ class ManagedAuthToken extends ManagedObject<_ManagedAuthToken>
 class _ManagedAuthToken {
   /// A primary key identifier.
   @primaryKey
-  int? id;
+  String? id;
 
   /// The authorization code of this token.
   ///
@@ -144,7 +144,7 @@ class _ManagedAuthToken {
 
   /// The client this token was issued for.
   @Relate(Symbol('tokens'), onDelete: DeleteRule.cascade, isRequired: true)
-  ManagedAuthClient? client;
+  late ManagedAuthClient client;
 
   /// The value 'bearer'.
   @Column(indexed: true, nullable: true)
@@ -170,14 +170,14 @@ class ManagedAuthClient extends ManagedObject<_ManagedAuthClient>
     hashedSecret = client.hashedSecret;
     salt = client.salt;
     redirectURI = client.redirectURI;
-    allowedScope = client.allowedScopes!.map((s) => s.toString()).join(" ");
+    allowedScope = client.allowedScopes?.map((s) => s.toString()).join(" ");
   }
 
   /// As an [AuthClient].
   AuthClient asClient() {
-    final scopes = allowedScope!.split(" ").map((s) => AuthScope(s)).toList();
+    final scopes = allowedScope?.split(" ").map((s) => AuthScope(s)).toList();
 
-    return AuthClient.withRedirectURI(id!, hashedSecret!, salt!, redirectURI!,
+    return AuthClient.withRedirectURI(id, hashedSecret, salt, redirectURI,
         allowedScopes: scopes);
   }
 }
@@ -292,8 +292,8 @@ class ManagedAuthDelegate<T extends ManagedAuthResourceOwner>
   /// [context]'s [ManagedDataModel] must contain [T], [ManagedAuthToken] and [ManagedAuthClient].
   ManagedAuthDelegate(this.context, {this.tokenLimit = 40});
 
-  /// The [ManagedContext] this instance uses to store and retrieve values.
-  final ManagedContext context;
+  /// The [ManagedContext] this instance uses to store and retrieve values?.
+  final ManagedContext? context;
 
   /// The number of tokens and authorization codes a user can have at a time.
   ///
@@ -301,22 +301,22 @@ class ManagedAuthDelegate<T extends ManagedAuthResourceOwner>
   final int tokenLimit;
 
   @override
-  Future removeTokens(AuthServer server, int resourceOwnerID) {
-    final tokenQuery = Query<ManagedAuthToken>(context)
+  Future removeTokens(AuthServer server, dynamic resourceOwnerID) {
+    final tokenQuery = Query<ManagedAuthToken>(context!)
       ..where((o) => o.resourceOwner).identifiedBy(resourceOwnerID);
 
     return tokenQuery.delete();
   }
 
   @override
-  Future<AuthToken> getToken(AuthServer server,
+  FutureOr<AuthToken?> getToken(AuthServer server,
       {String? byAccessToken, String? byRefreshToken}) async {
     if (byAccessToken != null && byRefreshToken != null) {
       throw ArgumentError(
           "Exactly one of 'byAccessToken' or 'byRefreshToken' must be non-null.");
     }
 
-    final query = Query<ManagedAuthToken>(context);
+    final query = Query<ManagedAuthToken>(context!);
     if (byAccessToken != null) {
       query.where((o) => o.accessToken).equalTo(byAccessToken);
     } else if (byRefreshToken != null) {
@@ -326,14 +326,14 @@ class ManagedAuthDelegate<T extends ManagedAuthResourceOwner>
           "Exactly one of 'byAccessToken' or 'byRefreshToken' must be non-null.");
     }
 
-    final token = await query.fetchOne();
+    ManagedAuthToken? token = await query.fetchOne();
 
-    return token!.asToken();
+    return token?.asToken();
   }
 
   @override
-  Future<T?> getResourceOwner(AuthServer server, String username) {
-    final query = Query<T>(context)
+  FutureOr<T?> getResourceOwner(AuthServer server, String username) {
+    final query = Query<T>(context!)
       ..where((o) => o.username).equalTo(username)
       ..returningProperties(
           (t) => [t.id, t.hashedPassword, t.salt, t.username]);
@@ -343,7 +343,7 @@ class ManagedAuthDelegate<T extends ManagedAuthResourceOwner>
 
   @override
   Future removeToken(AuthServer server, AuthCode grantedByCode) {
-    final query = Query<ManagedAuthToken>(context)
+    final query = Query<ManagedAuthToken>(context!)
       ..where((o) => o.code).equalTo(grantedByCode.code);
 
     return query.delete();
@@ -353,16 +353,16 @@ class ManagedAuthDelegate<T extends ManagedAuthResourceOwner>
   Future addToken(AuthServer server, AuthToken token,
       {AuthCode? issuedFrom}) async {
     final storage = ManagedAuthToken.fromToken(token);
-    final query = Query<ManagedAuthToken>(context)..values = storage;
+    final query = Query<ManagedAuthToken>(context!)..values = storage;
 
     if (issuedFrom != null) {
       query.where((o) => o.code).equalTo(issuedFrom.code);
-      query.values!.code = issuedFrom.code;
+      query.values?.code = issuedFrom.code;
 
-      final ManagedAuthToken? outToken = await query.updateOne();
+      final outToken = await query.updateOne();
       if (outToken == null) {
         throw AuthServerException(AuthRequestError.invalidGrant,
-            AuthClient(token.clientID!, null, null));
+            AuthClient(token.clientID, null, null));
       }
     } else {
       await query.insert();
@@ -374,15 +374,15 @@ class ManagedAuthDelegate<T extends ManagedAuthResourceOwner>
   @override
   Future updateToken(
       AuthServer server,
-      String oldAccessToken,
-      String newAccessToken,
-      DateTime newIssueDate,
-      DateTime newExpirationDate) {
-    final query = Query<ManagedAuthToken>(context)
+      String? oldAccessToken,
+      String? newAccessToken,
+      DateTime? newIssueDate,
+      DateTime? newExpirationDate) {
+    final query = Query<ManagedAuthToken>(context!)
       ..where((o) => o.accessToken).equalTo(oldAccessToken)
-      ..values!.accessToken = newAccessToken
-      ..values!.issueDate = newIssueDate
-      ..values!.expirationDate = newExpirationDate;
+      ..values?.accessToken = newAccessToken
+      ..values?.issueDate = newIssueDate
+      ..values?.expirationDate = newExpirationDate;
 
     return query.updateOne();
   }
@@ -390,7 +390,7 @@ class ManagedAuthDelegate<T extends ManagedAuthResourceOwner>
   @override
   Future addCode(AuthServer server, AuthCode code) async {
     final storage = ManagedAuthToken.fromCode(code);
-    final query = Query<ManagedAuthToken>(context)..values = storage;
+    final query = Query<ManagedAuthToken>(context!)..values = storage;
 
     await query.insert();
 
@@ -398,17 +398,17 @@ class ManagedAuthDelegate<T extends ManagedAuthResourceOwner>
   }
 
   @override
-  Future<AuthCode> getCode(AuthServer server, String code) async {
-    final query = Query<ManagedAuthToken>(context)
+  FutureOr<AuthCode?> getCode(AuthServer server, String code) async {
+    final query = Query<ManagedAuthToken>(context!)
       ..where((o) => o.code).equalTo(code);
 
     final storage = await query.fetchOne();
-    return storage!.asAuthCode();
+    return storage?.asAuthCode();
   }
 
   @override
-  Future removeCode(AuthServer server, String code) {
-    final query = Query<ManagedAuthToken>(context)
+  Future removeCode(AuthServer server, String? code) {
+    final query = Query<ManagedAuthToken>(context!)
       ..where((o) => o.code).equalTo(code);
 
     return query.delete();
@@ -417,23 +417,23 @@ class ManagedAuthDelegate<T extends ManagedAuthResourceOwner>
   @override
   Future addClient(AuthServer server, AuthClient client) async {
     final storage = ManagedAuthClient.fromClient(client);
-    final query = Query<ManagedAuthClient>(context)..values = storage;
+    final query = Query<ManagedAuthClient>(context!)..values = storage;
     return query.insert();
   }
 
   @override
-  Future<AuthClient> getClient(AuthServer server, String clientID) async {
-    final query = Query<ManagedAuthClient>(context)
+  FutureOr<AuthClient?> getClient(AuthServer server, String? clientID) async {
+    final query = Query<ManagedAuthClient>(context!)
       ..where((o) => o.id).equalTo(clientID);
 
     final storage = await query.fetchOne();
 
-    return storage!.asClient();
+    return storage?.asClient();
   }
 
   @override
   Future removeClient(AuthServer server, String clientID) {
-    final query = Query<ManagedAuthClient>(context)
+    final query = Query<ManagedAuthClient>(context!)
       ..where((o) => o.id).equalTo(clientID);
 
     return query.delete();
@@ -448,7 +448,7 @@ class ManagedAuthDelegate<T extends ManagedAuthResourceOwner>
   /// There is rarely a need to invoke this method directly, as it is invoked each
   /// time a new token is issued.
   Future pruneTokens(dynamic resourceOwnerIdentifier) async {
-    final oldTokenQuery = Query<ManagedAuthToken>(context)
+    final oldTokenQuery = Query<ManagedAuthToken>(context!)
       ..where((o) => o.resourceOwner).identifiedBy(resourceOwnerIdentifier)
       ..sortBy((t) => t.expirationDate, QuerySortOrder.descending)
       ..offset = tokenLimit
@@ -457,7 +457,7 @@ class ManagedAuthDelegate<T extends ManagedAuthResourceOwner>
 
     final results = await oldTokenQuery.fetch();
     if (results.length == 1) {
-      final deleteQ = Query<ManagedAuthToken>(context)
+      final deleteQ = Query<ManagedAuthToken>(context!)
         ..where((o) => o.resourceOwner).identifiedBy(resourceOwnerIdentifier)
         ..where((o) => o.expirationDate)
             .lessThanEqualTo(results.first.expirationDate);

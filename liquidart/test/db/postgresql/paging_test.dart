@@ -15,7 +15,7 @@ void main() {
     });
 
     tearDownAll(() async {
-      await context!.close();
+      await context?.close();
       context = null;
     });
 
@@ -71,7 +71,7 @@ void main() {
     });
 
     tearDownAll(() async {
-      await context!.close();
+      await context?.close();
       context = null;
     });
 
@@ -290,7 +290,7 @@ void main() {
     });
 
     tearDownAll(() async {
-      await context!.close();
+      await context?.close();
       context = null;
     });
 

@@ -39,7 +39,6 @@ class Harness extends TestHarness<WildfireChannel>
   }
 
   Future<Agent> registerUser(User user, {Agent withClient}) async {
-    withClient ??= publicAgent;
 
     final req = withClient.request("/register")
       ..body = {"username": user.username, "password": user.password};

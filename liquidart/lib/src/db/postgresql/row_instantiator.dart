@@ -8,16 +8,16 @@ class RowInstantiator {
   RowInstantiator(this.rootTableBuilder, this.returningValues);
 
   final TableBuilder rootTableBuilder;
-  final List<Returnable> returningValues;
+  final List<Returnable>? returningValues;
 
   Map<TableBuilder, Map<dynamic, ManagedObject>> distinctObjects = {};
 
   List<U> instancesForRows<U extends ManagedObject>(List<List<dynamic>> rows) {
     try {
       return rows
-          .map((row) => instanceFromRow(row.iterator, returningValues.iterator))
-          .where((wrapper) => wrapper!.isNew)
-          .map((wrapper) => wrapper!.instance as U)
+          .map((row) => instanceFromRow(row.iterator, returningValues!.iterator))
+          .where((wrapper) => wrapper?.isNew ?? false)
+          .map((wrapper) => wrapper?.instance as U)
           .toList();
     } on ValidationException catch (e) {
       throw StateError("Database error when retrieving value. ${e.toString()}");
@@ -40,8 +40,7 @@ class RowInstantiator {
     }
 
     var alreadyExists = true;
-    ManagedObject<dynamic>? instance =
-        getExistingInstance(table, primaryKeyValue);
+    var instance = getExistingInstance(table, primaryKeyValue);
     if (instance == null) {
       alreadyExists = false;
       instance = createInstanceWithPrimaryKeyValue(table, primaryKeyValue);
@@ -62,9 +61,9 @@ class RowInstantiator {
 
   ManagedObject createInstanceWithPrimaryKeyValue(
       TableBuilder table, dynamic primaryKeyValue) {
-    var instance = table.entity!.instanceOf();
+    var instance = table.entity!.instanceOf()!;
 
-    instance[table.entity!.primaryKey!] = primaryKeyValue;
+    instance[table.entity!.primaryKey] = primaryKeyValue;
 
     var typeMap = distinctObjects[table];
     if (typeMap == null) {
@@ -72,7 +71,7 @@ class RowInstantiator {
       distinctObjects[table] = typeMap;
     }
 
-    typeMap[instance[instance.entity.primaryKey!]] = instance;
+    typeMap[instance[instance.entity.primaryKey]] = instance;
 
     return instance;
   }
@@ -94,15 +93,14 @@ class RowInstantiator {
     }
 
     var innerInstanceWrapper =
-        instanceFromRow(rowIterator, table.returning.iterator, table: table);
+        instanceFromRow(rowIterator, table.returning!.iterator, table: table);
 
     if (table.joinedBy!.relationshipType == ManagedRelationshipType.hasMany) {
       // If to many, put in a managed set.
-      final list = (instance[table.joinedBy!.name] ??
-          table.joinedBy!.destinationEntity.setOf([])) as ManagedSet;
+      final list = (instance[table.joinedBy!.name] ?? table.joinedBy!.destinationEntity!.setOf([])) as ManagedSet?;
 
       if (innerInstanceWrapper != null && innerInstanceWrapper.isNew) {
-        list.add(innerInstanceWrapper.instance);
+        list!.add(innerInstanceWrapper.instance);
       }
       instance[table.joinedBy!.name] = list;
     } else {
@@ -126,8 +124,8 @@ class RowInstantiator {
     if (desc is ManagedRelationshipDescription) {
       // This is a belongsTo relationship (otherwise it wouldn't be a column), keep the foreign key.
       if (value != null) {
-        var innerInstance = desc.destinationEntity.instanceOf();
-        innerInstance[desc.destinationEntity.primaryKey!] = value;
+        var innerInstance = desc.destinationEntity!.instanceOf()!;
+        innerInstance[desc.destinationEntity!.primaryKey] = value;
         instance[desc.name] = innerInstance;
       } else {
         // If null, explicitly add null to map so the value is populated.
@@ -143,7 +141,7 @@ class RowInstantiator {
     while (returningIterator.moveNext()) {
       var ret = returningIterator.current;
       if (ret is TableBuilder) {
-        var _ = instanceFromRow(rowIterator, ret.returning.iterator);
+        var _ = instanceFromRow(rowIterator, ret.returning!.iterator);
       } else {
         rowIterator.moveNext();
       }

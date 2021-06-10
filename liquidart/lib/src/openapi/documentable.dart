@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:liquidart/liquidart.dart';
-import 'package:open_api_data/v3.dart';
 
 /// The methods you implement to document OpenAPI components.
 ///
@@ -46,7 +45,7 @@ abstract class APIOperationDocumenter {
   ///
   /// This method is implemented by [Router] to provide the paths of an OpenAPI document
   /// and typically shouldn't be overridden by another controller.
-  Map<String, APIPath> documentPaths(APIDocumentContext context);
+  Map<String, APIPath>? documentPaths(APIDocumentContext context);
 
   /// Tells this object to return all [APIOperation]s it handles.
   ///
@@ -90,7 +89,7 @@ abstract class APIOperationDocumenter {
   ///
   ///         return ops;
   ///       }
-  Map<String, APIOperation> documentOperations(
+  Map<String, APIOperation>? documentOperations(
       APIDocumentContext context, String route, APIPath path);
 }
 
@@ -160,7 +159,7 @@ class APIDocumentContext {
   Future<Map<String, dynamic>> finalize() async {
     final ops = _deferredOperations;
     _deferredOperations = [];
-    await Future.forEach(ops, (op) => op!); // (op) => op()
+    await Future.forEach(ops, (dynamic op) => op());
 
     document.paths.values
         .expand((p) => p.operations!.values)
@@ -168,8 +167,8 @@ class APIDocumentContext {
         .expand((op) => op.security!)
         .forEach((req) {
       req.requirements!.forEach((schemeName, scopes) {
-        final scheme = document.components!.securitySchemes[schemeName];
-        if (scheme!.type == APISecuritySchemeType.oauth2) {
+        final scheme = document.components!.securitySchemes[schemeName]!;
+        if (scheme.type == APISecuritySchemeType.oauth2) {
           scheme.flows!.values.forEach((flow) {
             scopes.forEach((scope) {
               if (!flow.scopes!.containsKey(scope)) {
@@ -192,7 +191,7 @@ class APIComponentCollection<T extends APIObject> {
   APIComponentCollection._(this._typeName, this._componentMap);
 
   final String _typeName;
-  final Map<String, T> _componentMap;
+  final Map<String?, T> _componentMap;
   final Map<Type, T> _typeReferenceMap = {};
   final Map<Type, Completer<T>> _resolutionMap = {};
 
@@ -203,7 +202,7 @@ class APIComponentCollection<T extends APIObject> {
   ///
   /// If this component is represented by a class, provide it as [representation].
   /// Objects may reference either [name] or [representation] when using a component.
-  void register(String name, T component, {Type? representation}) {
+  void register(String? name, T component, {Type? representation}) {
     if (_componentMap.containsKey(name)) {
       return;
     }
@@ -239,7 +238,7 @@ class APIComponentCollection<T extends APIObject> {
   /// An object is always returned, even if no component named [name] exists.
   /// If after [APIDocumentContext.finalize] is called and no object
   /// has been registered for [name], an error is thrown.
-  T getObject(String name) {
+  T getObject(String? name) {
     final obj = _getInstanceOf();
     obj.referenceURI = Uri(path: "/components/$_typeName/$name");
     return obj;
@@ -255,8 +254,9 @@ class APIComponentCollection<T extends APIObject> {
   /// has been registered for [type], an error is thrown.
   T getObjectWithType(Type type) {
     final obj = _getInstanceOf();
-    obj.referenceURI =
-        Uri(path: "/components/$_typeName/liquidart-typeref:$type");
+    obj.referenceURI = Uri(
+        path:
+            "/components/$_typeName/liquidart-typeref:$type");
 
     if (_typeReferenceMap.containsKey(type)) {
       obj.referenceURI = _typeReferenceMap[type]!.referenceURI;
@@ -274,20 +274,13 @@ class APIComponentCollection<T extends APIObject> {
 
   T _getInstanceOf() {
     switch (T) {
-      case APISchemaObject:
-        return APISchemaObject.empty() as T;
-      case APIResponse:
-        return APIResponse.empty() as T;
-      case APIParameter:
-        return APIParameter.empty() as T;
-      case APIRequestBody:
-        return APIRequestBody.empty() as T;
-      case APIHeader:
-        return APIHeader.empty() as T;
-      case APISecurityScheme:
-        return APISecurityScheme.empty() as T;
-      case APICallback:
-        return APICallback.empty() as T;
+      case APISchemaObject: return APISchemaObject.empty() as T;
+      case APIResponse: return APIResponse.empty() as T;
+      case APIParameter: return APIParameter.empty() as T;
+      case APIRequestBody: return APIRequestBody.empty() as T;
+      case APIHeader: return APIHeader.empty() as T;
+      case APISecurityScheme: return APISecurityScheme.empty() as T;
+      case APICallback: return APICallback.empty() as T;
     }
 
     throw StateError("cannot reference API object of type $T");

@@ -10,15 +10,15 @@ import 'package:liquidart/src/dev/helpers.dart';
 
 void main() {
   HttpServer? server;
-  HttpClient? client;
+  late HttpClient client;
 
   setUp(() async {
     client = HttpClient();
   });
 
   tearDown(() async {
-    await server!.close();
-    client!.close(force: true);
+    await server?.close();
+    client.close(force: true);
   });
 
   test("Using an encoder that doesn't exist with a non-List<int> returns a 500",
@@ -127,18 +127,14 @@ void main() {
   });
 
   test("Encode with x-www-form-urlencoded", () {
-    final codec = CodecRegistry.defaultInstance.codecForContentType(
-        ContentType("application", "x-www-form-urlencoded"));
+    final codec = CodecRegistry
+      .defaultInstance
+      .codecForContentType(ContentType("application", "x-www-form-urlencoded"))!;
 
-    expect(codec!.encode(<String, dynamic>{"k": "v"}), "k=v".codeUnits);
+    expect(codec.encode(<String, dynamic>{"k": "v"}), "k=v".codeUnits);
     expect(codec.encode(<String, dynamic>{"k": "v!v"}), "k=v%21v".codeUnits);
-    expect(codec.encode(<String, dynamic>{"k1": "v1", "k2": "v2"}),
-        "k1=v1&k2=v2".codeUnits);
-    expect(
-        codec.encode(<String, dynamic>{
-          "k": ["v1", "v!"]
-        }),
-        "k=v1&k=v%21".codeUnits);
+    expect(codec.encode(<String, dynamic>{"k1": "v1", "k2": "v2"}), "k1=v1&k2=v2".codeUnits);
+    expect(codec.encode(<String, dynamic>{"k": ["v1", "v!"]}), "k=v1&k=v%21".codeUnits);
   });
 
   group("Compression", () {
@@ -150,7 +146,7 @@ void main() {
 
       var acceptEncodingHeaders = ["gzip", "gzip, deflate", "deflate,gzip"];
       for (var acceptEncoding in acceptEncodingHeaders) {
-        var req = await client!.getUrl(Uri.parse("http://localhost:8888"));
+        var req = await client.getUrl(Uri.parse("http://localhost:8888"));
         req.headers.clear();
         req.headers.add("accept-encoding", acceptEncoding);
         var resp = await req.close();
@@ -170,7 +166,7 @@ void main() {
         () async {
       server = await bindAndRespondWith(Response.ok({"a": "b"}));
 
-      var req = await client!.getUrl(Uri.parse("http://localhost:8888"));
+      var req = await client.getUrl(Uri.parse("http://localhost:8888"));
       req.headers.clear();
       var resp = await req.close();
 
@@ -188,7 +184,7 @@ void main() {
         () async {
       server = await bindAndRespondWith(Response.ok({"a": "b"}));
 
-      var req = await client!.getUrl(Uri.parse("http://localhost:8888"));
+      var req = await client.getUrl(Uri.parse("http://localhost:8888"));
       req.headers.clear();
       req.headers.add("accept-encoding", "deflate");
       var resp = await req.close();
@@ -206,7 +202,7 @@ void main() {
       var ct = ContentType("application", "1");
       server =
           await bindAndRespondWith(Response.ok([1, 2, 3, 4])..contentType = ct);
-      var req = await client!.getUrl(Uri.parse("http://localhost:8888"));
+      var req = await client.getUrl(Uri.parse("http://localhost:8888"));
       req.headers.clear();
       req.headers.add("accept-encoding", "gzip");
       var resp = await req.close();
@@ -223,7 +219,7 @@ void main() {
       CodecRegistry.defaultInstance.setAllowsCompression(ct, true);
       server =
           await bindAndRespondWith(Response.ok([1, 2, 3, 4])..contentType = ct);
-      var req = await client!.getUrl(Uri.parse("http://localhost:8888"));
+      var req = await client.getUrl(Uri.parse("http://localhost:8888"));
       req.headers.clear();
       req.headers.add("accept-encoding", "gzip");
       var resp = await req.close();
@@ -243,7 +239,7 @@ void main() {
           .add(ct, const JsonCodec(), allowCompression: false);
       server =
           await bindAndRespondWith(Response.ok({"a": "b"})..contentType = ct);
-      var req = await client!.getUrl(Uri.parse("http://localhost:8888"));
+      var req = await client.getUrl(Uri.parse("http://localhost:8888"));
       req.headers.clear();
       req.headers.add("accept-encoding", "gzip");
       var resp = await req.close();
@@ -270,13 +266,11 @@ Future<HttpServer> bindAndRespondWith(Response response) async {
   return server;
 }
 
-class ByteCodec extends Codec<dynamic, List<int>> {
+class ByteCodec extends Codec<dynamic, List<int>?> {
   @override
   Converter<dynamic, List<int>> get encoder => const ByteEncoder();
   @override
-  // Expecting a failpoint.
-  Converter<List<int>, dynamic> get decoder =>
-      null as Converter<List<int>, dynamic>;
+  Converter<List<int>, dynamic> get decoder => null  as Converter<List<int>, String>;
 }
 
 class ByteEncoder extends Converter<String, List<int>> {
@@ -289,8 +283,7 @@ class CrashingCodec extends Codec {
   @override
   Converter get encoder => const CrashingEncoder();
   @override
-  // Expecting a failpoint.
-  Converter get decoder => null as Converter<List<int>, dynamic>;
+  Converter get decoder => null as Converter<List<int>, String>;
 }
 
 class CrashingEncoder extends Converter<String, List<int>> {
@@ -303,13 +296,11 @@ class BadDataCodec extends Codec {
   @override
   Converter get encoder => const BadDataEncoder();
   @override
-  // Expecting a failpoint.
-  Converter get decoder => null as Converter<List<int>, dynamic>;
+  Converter get decoder => null  as Converter<List<int>, String>;
 }
 
 class BadDataEncoder extends Converter<String, String> {
   const BadDataEncoder();
   @override
-  // Expecting a failpoint.
   String convert(String object) => object;
 }

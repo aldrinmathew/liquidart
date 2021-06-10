@@ -26,7 +26,7 @@ class HTTPResponseMatcher extends Matcher {
     final shouldMatchHeaders = headers != null;
     final shouldMatchBody = body != null;
 
-    final TestResponse response = item;
+    final response = item;
     if (shouldMatchStatusCode) {
       if (response.statusCode != statusCode) {
         matchState["HTTPResponseMatcher.statusCode"] = response.statusCode;
@@ -87,7 +87,7 @@ class HTTPResponseMatcher extends Matcher {
       return mismatchDescription;
     }
 
-    final response = item as TestResponse;
+    final response = item as TestResponse?;
     final statusMismatch = matchState["HTTPResponseMatcher.statusCode"];
     if (statusMismatch != null) {
       mismatchDescription.add(
@@ -96,12 +96,12 @@ class HTTPResponseMatcher extends Matcher {
 
     if (matchState["HTTPResponseMatcher.didFailOnHeaders"] == true) {
       headers!.describeMismatch(
-          response.headers, mismatchDescription, matchState, verbose);
+          response!.headers, mismatchDescription, matchState, verbose);
     }
 
     if (matchState["HTTPResponseMatcher.didFailOnBody"] == true) {
       body!.describeMismatch(
-          response.body.as(), mismatchDescription, matchState, verbose);
+          response!.body.as(), mismatchDescription, matchState, verbose);
     }
 
     return mismatchDescription;

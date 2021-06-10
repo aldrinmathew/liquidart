@@ -15,10 +15,10 @@ class AuthClient {
   ///
   /// If this client supports scopes, [allowedScopes] must contain a list of scopes that tokens may request when authorized
   /// by this client.
-  AuthClient(String id, String? hashedSecret, String? salt,
+  AuthClient(String? id, String? hashedSecret, String? salt,
       {List<AuthScope>? allowedScopes})
-      : this.withRedirectURI(id, hashedSecret!, salt!, null,
-            allowedScopes: allowedScopes!);
+      : this.withRedirectURI(id, hashedSecret, salt, null,
+            allowedScopes: allowedScopes);
 
   /// Creates an instance of a public [AuthClient].
   AuthClient.public(String id, {List<AuthScope>? allowedScopes})
@@ -31,7 +31,7 @@ class AuthClient {
   AuthClient.withRedirectURI(
       this.id, this.hashedSecret, this.salt, this.redirectURI,
       {List<AuthScope>? allowedScopes}) {
-    this.allowedScopes = allowedScopes!;
+    this.allowedScopes = allowedScopes;
   }
 
   List<AuthScope>? _allowedScopes;
@@ -59,9 +59,9 @@ class AuthClient {
   /// Scoping is determined by this instance; i.e. the authorizing client determines which scopes a token
   /// has. This list contains all valid scopes for this client. If null, client does not support scopes
   /// and all access tokens have same authorization.
-  List<AuthScope>? get allowedScopes => _allowedScopes!;
+  List<AuthScope>? get allowedScopes => _allowedScopes;
   set allowedScopes(List<AuthScope>? scopes) {
-    _allowedScopes = scopes!.where((s) {
+    _allowedScopes = scopes?.where((s) {
       return !scopes.any((otherScope) =>
           s.isSubsetOrEqualTo(otherScope) && !s.isExactlyScope(otherScope));
     }).toList();
@@ -75,8 +75,9 @@ class AuthClient {
 
   /// Whether or not this client can issue tokens for the provided [scope].
   bool allowsScope(AuthScope scope) {
-    return allowedScopes!
-        .any((clientScope) => scope.isSubsetOrEqualTo(clientScope));
+    return allowedScopes
+            ?.any((clientScope) => scope.isSubsetOrEqualTo(clientScope)) ??
+        false;
   }
 
   /// Whether or not this is a public or confidential client.
@@ -143,8 +144,7 @@ class AuthToken {
     final map = {
       "access_token": accessToken,
       "token_type": type,
-      "expires_in":
-          expirationDate!.difference(DateTime.now().toUtc()).inSeconds,
+      "expires_in": expirationDate!.difference(DateTime.now().toUtc()).inSeconds,
     };
 
     if (refreshToken != null) {
@@ -177,7 +177,7 @@ class AuthCode {
   /// Authorization codes are owned by a resource owner, typically a User, Profile or Account
   /// in an application. This value is the primary key or identifying value of those
   /// instances.
-  int? resourceOwnerIdentifier;
+  int? resourceOwnerIdentifier; 
 
   /// The timestamp this authorization code was issued on.
   DateTime? issueDate;
@@ -241,7 +241,7 @@ class Authorization {
   /// to access [scope].
   bool isAuthorizedForScope(String scope) {
     final asScope = AuthScope(scope);
-    return scopes!.any(asScope.isSubsetOrEqualTo);
+    return scopes?.any(asScope.isSubsetOrEqualTo) ?? false;
   }
 }
 
@@ -331,41 +331,41 @@ class AuthScope {
   /// that scope for this method to return true. If [requiredScopes] is null, this method
   /// return true regardless of [providedScopes].
   static bool verify(
-      List<AuthScope>? requiredScopes, List<AuthScope> providedScopes) {
+      List<AuthScope>? requiredScopes, List<AuthScope>? providedScopes) {
     if (requiredScopes == null) {
       return true;
     }
 
     return requiredScopes.every((requiredScope) {
       final tokenHasValidScope = providedScopes
-          .any((tokenScope) => requiredScope.isSubsetOrEqualTo(tokenScope));
+          ?.any((tokenScope) => requiredScope.isSubsetOrEqualTo(tokenScope));
 
-      return tokenHasValidScope;
+      return tokenHasValidScope ?? false;
     });
   }
 
-  static final Map<String, AuthScope> _cache = {};
+  static final Map<String?, AuthScope> _cache = {};
 
   final String _scopeString;
 
   /// Individual segments, separated by `:` character, of this instance.
   ///
   /// Will always have a length of at least 1.
-  Iterable<String> get segments => _segments!.map((s) => s.name!);
+  Iterable<String?> get segments => _segments.map((s) => s.name);
 
   /// The modifier of this scope, if it exists.
   ///
   /// If this instance does not have a modifier, returns null.
-  String get modifier => _lastModifier!;
+  String? get modifier => _lastModifier;
 
-  final List<_AuthScopeSegment>? _segments;
+  final List<_AuthScopeSegment> _segments;
   final String? _lastModifier;
 
-  static List<_AuthScopeSegment> _parseSegments(String? scopeString) {
-    if (scopeString == null || scopeString == "") {
-      throw FormatException(
-          "Invalid AuthScope. May not be null or empty string.", scopeString);
-    }
+  static List<_AuthScopeSegment> _parseSegments(String scopeString) {
+    // if (scopeString == null || scopeString == "") {
+    //   throw FormatException(
+    //       "Invalid AuthScope. May not be null or empty string.", scopeString);
+    // }
 
     final elements =
         scopeString.split(":").map((seg) => _AuthScopeSegment(seg)).toList();
@@ -422,16 +422,16 @@ class AuthScope {
     }
 
     // If we aren't restricted by modifier, let's make sure we have access.
-    final thisIterator = _segments!.iterator;
-    for (var incomingSegment in incomingScope._segments!) {
+    final thisIterator = _segments.iterator;
+    for (var incomingSegment in incomingScope._segments) {
       thisIterator.moveNext();
-      final _AuthScopeSegment? current = thisIterator.current;
+      final current = thisIterator.current;
 
       // If the incoming scope is more restrictive than this scope,
       // then it's not allowed.
-      if (current == null) {
-        return false;
-      }
+      // if (current == null) {
+      //   return false;
+      // }
 
       // If we have a mismatch here, then we're going
       // down the wrong path.
@@ -455,13 +455,13 @@ class AuthScope {
 
   /// Whether or not two scopes are exactly the same.
   bool isExactlyScope(AuthScope scope) {
-    final incomingIterator = scope._segments!.iterator;
-    for (var segment in _segments!) {
+    final incomingIterator = scope._segments.iterator;
+    for (var segment in _segments) {
       incomingIterator.moveNext();
-      final _AuthScopeSegment? incomingSegment = incomingIterator.current;
-      if (incomingSegment == null) {
-        return false;
-      }
+      final incomingSegment = incomingIterator.current;
+      // if (incomingSegment == null) {
+      //   return false;
+      // }
 
       if (incomingSegment.name != segment.name ||
           incomingSegment.modifier != segment.modifier) {

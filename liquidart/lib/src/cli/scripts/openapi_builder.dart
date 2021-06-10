@@ -10,27 +10,28 @@ import 'package:yaml/yaml.dart';
 
 class OpenAPIBuilder extends Executable<Map<String, dynamic>> {
   OpenAPIBuilder(Map<String, dynamic> message)
-      : pubspecContents = message["pubspec"] as String,
-        configPath = message["configPath"] as String,
-        title = message["title"] as String,
-        description = message["description"] as String,
-        version = message["version"] as String,
+      : pubspecContents = message["pubspec"] as String?,
+        configPath = message["configPath"] as String?,
+        title = message["title"] as String?,
+        description = message["description"] as String?,
+        version = message["version"] as String?,
         termsOfServiceURL = message["termsOfServiceURL"] != null
             ? Uri.parse(message["termsOfServiceURL"] as String)
             : null,
-        contactEmail = message["contactEmail"] as String,
-        contactName = message["contactName"] as String,
+        contactEmail = message["contactEmail"] as String?,
+        contactName = message["contactName"] as String?,
         contactURL = message["contactURL"] != null
             ? Uri.parse(message["contactURL"] as String)
             : null,
         licenseURL = message["licenseURL"] != null
             ? Uri.parse(message["licenseURL"] as String)
             : null,
-        licenseName = message["licenseName"] as String,
-        hosts = (message["hosts"] as List<String>)
-            .map((uri) => APIServerDescription(Uri.parse(uri)))
-            .toList(),
-        resolveRelativeUrls = message["resolveRelativeUrls"] as bool,
+        licenseName = message["licenseName"] as String?,
+        hosts = (message["hosts"] as List<String>?)
+                ?.map((uri) => APIServerDescription(Uri.parse(uri)))
+                .toList() ??
+            [],
+        resolveRelativeUrls = message["resolveRelativeUrls"] as bool?,
         super(message);
 
   OpenAPIBuilder.input(Map<String, dynamic> variables) : super(variables);
@@ -46,7 +47,7 @@ class OpenAPIBuilder extends Executable<Map<String, dynamic>> {
   Uri? contactURL;
   Uri? licenseURL;
   String? licenseName;
-  List<APIServerDescription> hosts = [];
+  List<APIServerDescription>? hosts;
   bool? resolveRelativeUrls;
 
   @override
@@ -67,7 +68,7 @@ class OpenAPIBuilder extends Executable<Map<String, dynamic>> {
       var document =
           await Application.document(channels.first.channelType, config, yaml);
 
-      document.servers = hosts;
+      document.servers = hosts!;
       if (title != null) {
         document.info ??= APIInfo.empty();
         document.info!.title = title;
@@ -120,8 +121,7 @@ class OpenAPIBuilder extends Executable<Map<String, dynamic>> {
             }
             if (flow.authorizationURL != null &&
                 !flow.authorizationURL!.isAbsolute) {
-              flow.authorizationURL =
-                  baseUri.resolveUri(flow.authorizationURL!);
+              flow.authorizationURL = baseUri.resolveUri(flow.authorizationURL!);
             }
             if (flow.tokenURL != null && !flow.tokenURL!.isAbsolute) {
               flow.tokenURL = baseUri.resolveUri(flow.tokenURL!);
@@ -143,7 +143,7 @@ class OpenAPIBuilder extends Executable<Map<String, dynamic>> {
     }
   }
 
-  static List<String> importsForPackage(String packageName) => [
+  static List<String> importsForPackage(String? packageName) => [
         "package:liquidart/liquidart.dart",
         "package:$packageName/$packageName.dart",
         "package:yaml/yaml.dart",
@@ -176,7 +176,7 @@ Future<Map<String, dynamic>> documentProject(
       imports: OpenAPIBuilder.importsForPackage(project.libraryName));
 
   if (result.containsKey("error")) {
-    throw CLIException(result["error"] as String);
+    throw CLIException(result["error"] as String?);
   }
 
   return result;

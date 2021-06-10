@@ -13,7 +13,7 @@ import 'package:liquidart/src/dev/model_graph.dart';
  */
 
 void main() {
-  List<RootObject> rootObjects = [];
+  late List<RootObject> rootObjects;
   ManagedContext? ctx;
   setUpAll(() async {
     ctx = await contextWithModels([
@@ -23,7 +23,7 @@ void main() {
       ChildObject,
       GrandChildObject
     ]);
-    rootObjects = await populateModelGraph(ctx!);
+    rootObjects = await populateModelGraph(ctx);
   });
 
   tearDownAll(() async {
@@ -34,15 +34,14 @@ void main() {
     // This group ensures that the right fields are returned and turned into objects,
     // not whether or not the right objects are returned.
     test("Values are not returned from implicitly joined tables", () async {
-      var q = Query<RootObject>(ctx!)
-        ..where((o) => o.child!.cid).greaterThan(1);
+      var q = Query<RootObject>(ctx!)..where((o) => o.child!.cid).greaterThan(1);
       var results = await q.fetch();
 
       for (var r in results) {
-        expect(r.backing.contents!.containsKey("child"), false);
-        expect(r.backing.contents!.length, r.entity.defaultProperties.length);
-        for (var property in r.entity.defaultProperties) {
-          expect(r.backing.contents!.containsKey(property), true);
+        expect(r.backing.contents.containsKey("child"), false);
+        expect(r.backing.contents.length, r.entity.defaultProperties!.length);
+        for (var property in r.entity.defaultProperties!) {
+          expect(r.backing.contents.containsKey(property), true);
         }
       }
     });
@@ -53,20 +52,20 @@ void main() {
 
       for (var r in results) {
         expect(
-            r.backing.contents!.length,
-            r.entity.defaultProperties.length +
+            r.backing.contents.length,
+            r.entity.defaultProperties!.length +
                 1); // +1 is for key containing 'child'
-        for (var property in r.entity.defaultProperties) {
-          expect(r.backing.contents!.containsKey(property), true);
+        for (var property in r.entity.defaultProperties!) {
+          expect(r.backing.contents.containsKey(property), true);
         }
 
         // Child may be null, but even if it is the key must be in the map
-        expect(r.backing.contents!.containsKey("child"), true);
+        expect(r.backing.contents.containsKey("child"), true);
         if (r.child != null) {
-          expect(r.child!.backing.contents!.length,
-              r.child!.entity.defaultProperties.length);
-          for (var property in r.child!.entity.defaultProperties) {
-            expect(r.child!.backing.contents!.containsKey(property), true);
+          expect(r.child!.backing.contents.length,
+              r.child!.entity.defaultProperties!.length);
+          for (var property in r.child!.entity.defaultProperties!) {
+            expect(r.child!.backing.contents.containsKey(property), true);
           }
         }
       }
@@ -84,28 +83,28 @@ void main() {
 
       q
           .join(object: (r) => r.child!)
-          .where((o) => o.grandChild!.gid)
+          .where((o) => o.grandChild!.gid!)
           .greaterThan(1);
       var results = await q.fetch();
 
       for (var r in results) {
         expect(
-            r.backing.contents!.length,
-            r.entity.defaultProperties.length +
+            r.backing.contents.length,
+            r.entity.defaultProperties!.length +
                 1); // +1 is for key containing 'child'
-        for (var property in r.entity.defaultProperties) {
-          expect(r.backing.contents!.containsKey(property), true);
+        for (var property in r.entity.defaultProperties!) {
+          expect(r.backing.contents.containsKey(property), true);
         }
 
         // Child may be null, but even if it is the key must be in the map
-        expect(r.backing.contents!.containsKey("child"), true);
+        expect(r.backing.contents.containsKey("child"), true);
         if (r.child != null) {
-          expect(r.child!.backing.contents!.length,
-              r.child!.entity.defaultProperties.length);
-          for (var property in r.child!.entity.defaultProperties) {
-            expect(r.child!.backing.contents!.containsKey(property), true);
+          expect(r.child!.backing.contents.length,
+              r.child!.entity.defaultProperties!.length);
+          for (var property in r.child!.entity.defaultProperties!) {
+            expect(r.child!.backing.contents.containsKey(property), true);
           }
-          expect(r.child!.backing.contents!.containsKey("grandChild"), false);
+          expect(r.child!.backing.contents.containsKey("grandChild"), false);
         }
       }
     });
@@ -118,31 +117,29 @@ void main() {
       var results = await q.fetch();
       for (var r in results) {
         expect(
-            r.backing.contents!.length,
-            r.entity.defaultProperties.length +
+            r.backing.contents.length,
+            r.entity.defaultProperties!.length +
                 1); // +1 is for key containing 'child'
-        for (var property in r.entity.defaultProperties) {
-          expect(r.backing.contents!.containsKey(property), true);
+        for (var property in r.entity.defaultProperties!) {
+          expect(r.backing.contents.containsKey(property), true);
         }
 
-        expect(r.backing.contents!.containsKey("child"), true);
+        expect(r.backing.contents.containsKey("child"), true);
         if (r.child != null) {
           expect(
-              r.child!.backing.contents!.length,
-              r.child!.entity.defaultProperties.length +
+              r.child!.backing.contents.length,
+              r.child!.entity.defaultProperties!.length +
                   1); // +1 is for key containing 'grandchild
-          for (var property in r.child!.entity.defaultProperties) {
-            expect(r.child!.backing.contents!.containsKey(property), true);
+          for (var property in r.child!.entity.defaultProperties!) {
+            expect(r.child!.backing.contents.containsKey(property), true);
           }
 
-          expect(r.child!.backing.contents!.containsKey("grandChild"), true);
+          expect(r.child!.backing.contents.containsKey("grandChild"), true);
           if (r.child!.grandChild != null) {
-            expect(r.child!.grandChild!.backing.contents!.length,
-                r.child!.grandChild!.entity.defaultProperties.length);
-            for (var property
-                in r.child!.grandChild!.entity.defaultProperties) {
-              expect(
-                  r.child!.grandChild!.backing.contents!.containsKey(property),
+            expect(r.child!.grandChild!.backing.contents.length,
+                r.child!.grandChild!.entity.defaultProperties!.length);
+            for (var property in r.child!.grandChild!.entity.defaultProperties!) {
+              expect(r.child!.grandChild!.backing.contents.containsKey(property),
                   true);
             }
           }
@@ -160,13 +157,13 @@ void main() {
 
       var results = await q.fetch();
       for (var r in results) {
-        expect(r.backing.contents!.length, 2 /* id + child */);
-        expect(r.backing.contents!.containsKey("rid"), true);
-        expect(r.backing.contents!.containsKey("child"), true);
+        expect(r.backing.contents.length, 2 /* id + child */);
+        expect(r.backing.contents.containsKey("rid"), true);
+        expect(r.backing.contents.containsKey("child"), true);
 
         if (r.child != null) {
-          expect(r.child!.backing.contents!.length, 1);
-          expect(r.child!.backing.contents!.containsKey("cid"), true);
+          expect(r.child!.backing.contents.length, 1);
+          expect(r.child!.backing.contents.containsKey("cid"), true);
         }
       }
     });
@@ -183,19 +180,19 @@ void main() {
 
       var results = await q.fetch();
       for (var r in results) {
-        expect(r.backing.contents!.length, 2 /* id + child */);
-        expect(r.backing.contents!.containsKey("rid"), true);
-        expect(r.backing.contents!.containsKey("child"), true);
+        expect(r.backing.contents.length, 2 /* id + child */);
+        expect(r.backing.contents.containsKey("rid"), true);
+        expect(r.backing.contents.containsKey("child"), true);
 
         if (r.child != null) {
-          expect(r.child!.backing.contents!.length, 2 /* id + grandchild */);
-          expect(r.child!.backing.contents!.containsKey("cid"), true);
-          expect(r.child!.backing.contents!.containsKey("grandChild"), true);
+          expect(r.child!.backing.contents.length, 2 /* id + grandchild */);
+          expect(r.child!.backing.contents.containsKey("cid"), true);
+          expect(r.child!.backing.contents.containsKey("grandChild"), true);
 
           if (r.child?.grandChild != null) {
-            expect(r.child!.grandChild!.backing.contents!.length, 1);
-            expect(r.child!.grandChild!.backing.contents!.containsKey("gid"),
-                true);
+            expect(r.child!.grandChild!.backing.contents.length, 1);
+            expect(
+                r.child!.grandChild!.backing.contents.containsKey("gid"), true);
           }
         }
       }
@@ -216,7 +213,7 @@ void main() {
     test("Explicitly joining related object", () async {
       var q = Query<RootObject>(ctx!)..where((o) => o.rid).greaterThan(1);
 
-      q.join(set: (r) => r.children!).where((o) => o.cid).greaterThan(5);
+      q.join(set: (r) => r.children).where((o) => o.cid).greaterThan(5);
 
       var results = await q.fetch();
       expect(results.length, rootObjects.length - 1);
@@ -233,7 +230,7 @@ void main() {
 
     test("Explicitly joining related objects, nested implicit join", () async {
       var q = Query<RootObject>(ctx!)..where((o) => o.rid).equalTo(1);
-      q.join(set: (r) => r.children!);
+      q.join(set: (r) => r.children);
 //        .where((o) => o.grandChildren.haveAtLeastOneWhere.gid).equalTo(5);
 
       var results = await q.fetch();
@@ -247,9 +244,9 @@ void main() {
         () async {
       var q = Query<RootObject>(ctx!)..where((o) => o.rid).equalTo(1);
 
-      var cq = q.join(set: (r) => r.children!);
+      var cq = q.join(set: (r) => r.children);
 
-      cq.join(set: (c) => c.grandChildren!).where((o) => o.gid).lessThan(6);
+      cq.join(set: (c) => c.grandChildren).where((o) => o.gid).lessThan(6);
 
       var results = await q.fetch();
       expect(results.length, 1);
@@ -278,7 +275,7 @@ void main() {
 
       expect(results.length, 1);
       expect(results.first.rid, 1);
-      expect(results.first.backing.contents!.containsKey("children"), false);
+      expect(results.first.backing.contents.containsKey("children"), false);
 
       q = Query<RootObject>(ctx!);
 //        ..where((o) => o.children.haveAtLeastOneWhere.cid).equalTo(2)
@@ -327,7 +324,7 @@ void main() {
       expect(results.firstWhere((r) => r.child?.cid == 1).child, isNotNull);
       expect(
           results.where((r) => r.rid != 1).every((r) =>
-              r.backing.contents!.containsKey("child") && r.child == null),
+              r.backing.contents.containsKey("child") && r.child == null),
           true);
     });
 
@@ -335,10 +332,7 @@ void main() {
         "Implicit join on child affects child object returned, but not root objects",
         () async {
       var q = Query<RootObject>(ctx!);
-      q
-          .join(set: (r) => r.children!)
-          .where((o) => o.grandChild!.gid)
-          .equalTo(4);
+      q.join(set: (r) => r.children).where((o) => o.grandChild!.gid).equalTo(4);
       var results = await q.fetch();
 
       expect(results.length, rootObjects.length);
@@ -353,7 +347,7 @@ void main() {
         "Where clause on child + implicit join to granchild can find overly identified object",
         () async {
       var q = Query<RootObject>(ctx!);
-      q.join(set: (r) => r.children!);
+      q.join(set: (r) => r.children);
 //        ..where((o) => o.cid).equalTo(2)
 //        ..where((o) => o.grandChildren.haveAtLeastOneWhere.gid).equalTo(6);
       var results = await q.fetch();
@@ -361,8 +355,7 @@ void main() {
       expect(results.length, rootObjects.length);
       expect(results.firstWhere((r) => r.rid == 1).children!.length, 1);
       expect(results.firstWhere((r) => r.rid == 1).children!.first.cid, 2);
-      expect(
-          results.firstWhere((r) => r.rid == 1).children!.first.grandChildren,
+      expect(results.firstWhere((r) => r.rid == 1).children!.first.grandChildren,
           isNull);
       expect(results.where((r) => r.rid != 1).every((r) => r.children!.isEmpty),
           true);
@@ -372,7 +365,7 @@ void main() {
         "Where clause on child + implicit join to grandchild returns empty if conditions conflict",
         () async {
       var q = Query<RootObject>(ctx!);
-      q.join(set: (r) => r.children!);
+      q.join(set: (r) => r.children);
 //        ..where((o) => o.cid).equalTo(4)
 //        ..where((o) => o.grandChildren.haveAtLeastOneWhere.gid).equalTo(6);
       var results = await q.fetch();
@@ -393,16 +386,10 @@ void main() {
       expect(results.length, rootObjects.length);
       expect(results.firstWhere((r) => r.rid == 1).children!.length, 2);
       expect(
-          results
-              .firstWhere((r) => r.rid == 1)
-              .children!
-              .any((c) => c.cid == 2),
+          results.firstWhere((r) => r.rid == 1).children!.any((c) => c.cid == 2),
           true);
       expect(
-          results
-              .firstWhere((r) => r.rid == 1)
-              .children!
-              .any((c) => c.cid == 4),
+          results.firstWhere((r) => r.rid == 1).children!.any((c) => c.cid == 4),
           true);
       expect(results.where((r) => r.rid != 1).every((r) => r.children!.isEmpty),
           true);
@@ -414,8 +401,8 @@ void main() {
         "Explicit join on child and grandchild, retains all root objects and child objects",
         () async {
       var q = Query<RootObject>(ctx!);
-      var cq = q.join(set: (r) => r.children!);
-      cq.join(set: (c) => c.grandChildren!).where((o) => o.gid).equalTo(5);
+      var cq = q.join(set: (r) => r.children);
+      cq.join(set: (c) => c.grandChildren).where((o) => o.gid).equalTo(5);
 
       var results = await q.fetch();
 
@@ -464,13 +451,13 @@ void main() {
 
       var results = await q.fetch();
       for (var r in results) {
-        expect(r.backing.contents!.length,
-            r.entity.defaultProperties.length + 1); // +1 is for child
-        for (var property in r.entity.defaultProperties) {
-          expect(r.backing.contents!.containsKey(property), true);
+        expect(r.backing.contents.length,
+            r.entity.defaultProperties!.length + 1); // +1 is for child
+        for (var property in r.entity.defaultProperties!) {
+          expect(r.backing.contents.containsKey(property), true);
         }
-        expect(r.child!.backing.contents!.length, 1);
-        expect(r.child!.backing.contents!.containsKey("cid"), true);
+        expect(r.child!.backing.contents.length, 1);
+        expect(r.child!.backing.contents.containsKey("cid"), true);
       }
     });
 
@@ -480,24 +467,18 @@ void main() {
       var q = Query<RootObject>(ctx!);
 //        ..where((o) => o.children.haveAtLeastOneWhere.cid).greaterThan(5);
 
-      q.join(set: (r) => r.children!).where((o) => o.cid).lessThan(10);
+      q.join(set: (r) => r.children).where((o) => o.cid).lessThan(10);
 
       var results = await q.fetch();
 
       expect(results.length, 2);
       expect(results.firstWhere((r) => r.rid == 2).children!.length, 1);
       expect(
-          results
-              .firstWhere((r) => r.rid == 2)
-              .children!
-              .any((c) => c.cid == 7),
+          results.firstWhere((r) => r.rid == 2).children!.any((c) => c.cid == 7),
           true);
       expect(results.firstWhere((r) => r.rid == 4).children!.length, 1);
       expect(
-          results
-              .firstWhere((r) => r.rid == 4)
-              .children!
-              .any((c) => c.cid == 9),
+          results.firstWhere((r) => r.rid == 4).children!.any((c) => c.cid == 9),
           true);
     }, skip: "#481");
   });
@@ -512,7 +493,7 @@ void main() {
       expect(results.any((r) => r.rid == 2), true);
       expect(results.any((r) => r.rid == 4), true);
       expect(
-          results.every((r) => r.backing.contents!["children"] == null), true);
+          results.every((r) => r.backing.contents["children"] == null), true);
     });
 
     test("WhereNull on hasMany", () async {
@@ -523,7 +504,7 @@ void main() {
       expect(results.any((r) => r.rid == 3), true);
       expect(results.any((r) => r.rid == 5), true);
       expect(
-          results.every((r) => r.backing.contents!["children"] == null), true);
+          results.every((r) => r.backing.contents["children"] == null), true);
     });
 
     test("WhereNotNull on hasOne", () async {
@@ -534,7 +515,7 @@ void main() {
       expect(results.any((r) => r.rid == 1), true);
       expect(results.any((r) => r.rid == 2), true);
       expect(results.any((r) => r.rid == 3), true);
-      expect(results.every((r) => r.backing.contents!["child"] == null), true);
+      expect(results.every((r) => r.backing.contents["child"] == null), true);
     });
 
     test("WhereNull on hasOne", () async {
@@ -544,7 +525,7 @@ void main() {
       expect(results.length, 2);
       expect(results.any((r) => r.rid == 4), true);
       expect(results.any((r) => r.rid == 5), true);
-      expect(results.every((r) => r.backing.contents!["child"] == null), true);
+      expect(results.every((r) => r.backing.contents["child"] == null), true);
     });
   });
 
@@ -572,7 +553,7 @@ void main() {
     test("Join on on two properties with same entity type", () async {
       var q = Query<RootObject>(ctx!);
 
-      q.join(set: (r) => r.children!).where((o) => o.cid!).greaterThan(3);
+      q.join(set: (r) => r.children).where((o) => o.cid).greaterThan(3);
 
       q.join(object: (r) => r.child!).where((o) => o.cid).equalTo(1);
       var results = await q.fetch();
@@ -595,7 +576,7 @@ void main() {
       final result = await q.fetch();
       expect(result.length, 1);
       expect(result.first.rid, 1);
-      expect(result.first.backing.contents!.containsKey("child"), false);
+      expect(result.first.backing.contents.containsKey("child"), false);
     });
 
     test("From belongs-to-one", () async {
@@ -605,7 +586,7 @@ void main() {
       expect(result.length, 1);
       expect(result.first.gid, 1);
       expect(
-          result.first.backing.contents!["parent"].backing.contents.keys.length,
+          result.first.backing.contents["parent"].backing.contents.keys.length,
           1);
     });
 
@@ -618,7 +599,7 @@ void main() {
       expect(result.map((g) => g.gid).toList(), [5, 6, 8]);
       expect(
           result.any((g) =>
-              g.backing.contents!["parents"].backing.contents.keys.length != 1),
+              g.backing.contents["parents"].backing.contents.keys.length != 1),
           false);
     });
   });

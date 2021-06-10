@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 import 'package:liquidart/src/dev/helpers.dart';
 
 void main() {
-  ManagedContext? context;
+  late ManagedContext context;
 
   setUpAll(() {
     var ps = DefaultPersistentStore();
@@ -30,7 +30,7 @@ void main() {
   });
 
   tearDownAll(() async {
-    await context!.close();
+    await context.close();
   });
 
   test("Can set properties in constructor", () {
@@ -182,8 +182,8 @@ void main() {
     var user = User();
     user.readFromMap(wash(map));
 
-    expect(user.dateCreated!.difference(DateTime.parse(dateString)),
-        Duration.zero);
+    expect(
+        user.dateCreated!.difference(DateTime.parse(dateString)), Duration.zero);
 
     var remap = user.asMap();
     expect(remap["dateCreated"], dateString);
@@ -458,15 +458,14 @@ void main() {
     expect(m.containsKey("dateCreated"), true);
   });
 
-  test("DeepMap Transient Properties of all types can be read and returned",
-      () {
+  test("DeepMap Transient Properties of all types can be read and returned", () {
     var m = (TransientTypeTest()
-          ..readFromMap(wash({
-            "deepMap": {
-              "ok": {"ik1": 1, "ik2": 2}
-            }
-          })))
-        .asMap();
+      ..readFromMap(wash({
+        "deepMap": {
+          "ok": {"ik1": 1, "ik2": 2}
+        }
+      })))
+      .asMap();
 
     expect(m["deepMap"], {
       "ok": {"ik1": 1, "ik2": 2}
@@ -526,39 +525,42 @@ void main() {
   });
 
   test(
-      "If map type cannot be parsed into exact type, it fails with validation exception",
+    "If map type cannot be parsed into exact type, it fails with validation exception",
       () {
-    try {
-      TransientTypeTest().readFromMap({
-        "deepMap": wash({"str": 1})
-      });
-      fail('unreachable');
-      // ignore: empty_catches
-    } on ValidationException {}
 
-    try {
-      TransientTypeTest().readFromMap({
-        "deepMap": wash({
-          "key": {"str": "val", "int": 2}
-        })
-      });
-      fail('unreachable');
-      // ignore: empty_catches
-    } on ValidationException {}
+      try {
+        TransientTypeTest().readFromMap({
+          "deepMap": wash({"str": 1})
+        });
+        fail('unreachable');
+        // ignore: empty_catches
+      } on ValidationException {}
 
-    try {
-      TransientTypeTest().readFromMap({"deepMap": wash("str")});
-      fail('unreachable');
-      // ignore: empty_catches
-    } on ValidationException {}
-  });
+      try {
+        TransientTypeTest().readFromMap({
+          "deepMap": wash({
+            "key": {"str": "val", "int": 2}
+          })
+        });
+        fail('unreachable');
+        // ignore: empty_catches
+      } on ValidationException {}
+
+      try {
+        TransientTypeTest().readFromMap({"deepMap": wash("str")});
+        fail('unreachable');
+        // ignore: empty_catches
+      } on ValidationException {}
+    });
 
   test(
       "If complex type cannot be parsed into exact type, it fails with validation exception",
       () {
     try {
       TransientTypeTest().readFromMap({
-        "deepList": wash(["string"])
+        "deepList": wash([
+          "string"
+        ])
       });
       fail('unreachable');
       // ignore: empty_catches
@@ -633,10 +635,10 @@ void main() {
       }));
 
     expect(t.id, 1);
-    expect(t.middles!.first.id, 2);
-    expect(t.middles!.first.bottom!.id, 3);
-    expect(t.middles!.first.bottoms!.first.id, 4);
-    expect(t.middles!.first.bottoms!.last.id, 5);
+    expect(t.middles.first.id, 2);
+    expect(t.middles.first.bottom.id, 3);
+    expect(t.middles.first.bottoms.first.id, 4);
+    expect(t.middles.first.bottoms.last.id, 5);
   });
 
   group("Persistent enum fields", () {
@@ -678,7 +680,7 @@ void main() {
 
   group("Private fields", () {
     test("Private fields on entity", () {
-      var entity = context!.dataModel!.entityForType(PrivateField);
+      var entity = context.dataModel!.entityForType(PrivateField)!;
       expect(entity.attributes["_private"], isNotNull);
     });
 
@@ -722,7 +724,7 @@ void main() {
         "document": {"key": "value"}
       }));
 
-      expect(o.document!.data, {"key": "value"});
+      expect(o.document.data, {"key": "value"});
     });
 
     test("Can read array into document data type from list", () {
@@ -734,7 +736,7 @@ void main() {
         ]
       }));
 
-      expect(o.document!.data, [
+      expect(o.document.data, [
         {"key": "value"},
         1
       ]);
@@ -766,7 +768,7 @@ void main() {
     final dm = ManagedDataModel([DefaultConstructorHasOptionalArgs]);
     final _ = ManagedContext(dm, null);
     final instance =
-        dm.entityForType(DefaultConstructorHasOptionalArgs).instanceOf();
+        dm.entityForType(DefaultConstructorHasOptionalArgs)!.instanceOf();
     expect(instance is DefaultConstructorHasOptionalArgs, true);
   });
 }
@@ -818,15 +820,15 @@ class TransientTest extends ManagedObject<_TransientTest>
   }
 
   @Serialize(input: false, output: true)
-  String get outputOnly => text!;
+  String? get outputOnly => text;
 
-  set outputOnly(String s) {
+  set outputOnly(String? s) {
     text = s;
   }
 
   // This is intentionally invalid
   @Serialize(input: true, output: false)
-  String get invalidInput => text!;
+  String? get invalidInput => text;
 
   // This is intentionally invalid
   @Serialize(input: false, output: true)
@@ -835,9 +837,9 @@ class TransientTest extends ManagedObject<_TransientTest>
   }
 
   @Serialize()
-  String get bothButOnlyOnOne => text!;
+  String? get bothButOnlyOnOne => text;
 
-  set bothButOnlyOnOne(String s) {
+  set bothButOnlyOnOne(String? s) {
     text = s;
   }
 
@@ -851,10 +853,10 @@ class TransientTest extends ManagedObject<_TransientTest>
   int? inOut;
 
   @Serialize()
-  String get bothOverQualified => text!;
+  String? get bothOverQualified => text;
 
   @Serialize()
-  set bothOverQualified(String s) {
+  set bothOverQualified(String? s) {
     text = s;
   }
 }
@@ -869,7 +871,7 @@ class _TransientTest {
 class TransientTypeTest extends ManagedObject<_TransientTypeTest>
     implements _TransientTypeTest {
   @Serialize(input: false, output: true)
-  int get transientInt => backingInt! + 1;
+  int get transientInt => backingInt + 1;
 
   @Serialize(input: true, output: false)
   set transientInt(int i) {
@@ -877,7 +879,7 @@ class TransientTypeTest extends ManagedObject<_TransientTypeTest>
   }
 
   @Serialize(input: false, output: true)
-  int get transientBigInt => backingBigInt! ~/ 2;
+  int get transientBigInt => backingBigInt ~/ 2;
 
   @Serialize(input: true, output: false)
   set transientBigInt(int i) {
@@ -885,7 +887,7 @@ class TransientTypeTest extends ManagedObject<_TransientTypeTest>
   }
 
   @Serialize(input: false, output: true)
-  String get transientString => backingString!.toLowerCase();
+  String get transientString => backingString.toLowerCase();
 
   @Serialize(input: true, output: false)
   set transientString(String s) {
@@ -893,7 +895,7 @@ class TransientTypeTest extends ManagedObject<_TransientTypeTest>
   }
 
   @Serialize(input: false, output: true)
-  DateTime get transientDate => backingDateTime!.add(const Duration(days: 1));
+  DateTime get transientDate => backingDateTime.add(const Duration(days: 1));
 
   @Serialize(input: true, output: false)
   set transientDate(DateTime d) {
@@ -901,7 +903,7 @@ class TransientTypeTest extends ManagedObject<_TransientTypeTest>
   }
 
   @Serialize(input: false, output: true)
-  bool get transientBool => !backingBool!;
+  bool get transientBool => !backingBool;
 
   @Serialize(input: true, output: false)
   set transientBool(bool b) {
@@ -909,7 +911,7 @@ class TransientTypeTest extends ManagedObject<_TransientTypeTest>
   }
 
   @Serialize(input: false, output: true)
-  double get transientDouble => backingDouble! / 5;
+  double get transientDouble => backingDouble / 5;
 
   @Serialize(input: true, output: false)
   set transientDouble(double d) {
@@ -918,7 +920,7 @@ class TransientTypeTest extends ManagedObject<_TransientTypeTest>
 
   @Serialize(input: false, output: true)
   Map<String, String> get transientMap {
-    List<String> pairs = backingMapString!.split(",");
+    List<String> pairs = backingMapString.split(",");
 
     var returnMap = <String, String>{};
 
@@ -933,7 +935,7 @@ class TransientTypeTest extends ManagedObject<_TransientTypeTest>
   @Serialize(input: true, output: false)
   set transientMap(Map<String, String> m) {
     var pairStrings = m.keys.map((key) {
-      String value = m[key]!;
+      String? value = m[key];
       return "$key:$value";
     });
 
@@ -942,7 +944,7 @@ class TransientTypeTest extends ManagedObject<_TransientTypeTest>
 
   @Serialize(input: false, output: true)
   List<int> get transientList {
-    return backingListString!.split(",").map(int.parse).toList();
+    return backingListString.split(",").map(int.parse).toList();
   }
 
   @Serialize(input: true, output: false)
@@ -968,33 +970,33 @@ class _TransientTypeTest {
   @primaryKey
   int? id;
 
-  int? backingInt;
+  late int backingInt;
 
   @Column(databaseType: ManagedPropertyType.bigInteger)
-  int? backingBigInt;
+  late int backingBigInt;
 
-  String? backingString;
+  late String backingString;
 
-  DateTime? backingDateTime;
+  late DateTime backingDateTime;
 
-  bool? backingBool;
+  late bool backingBool;
 
-  double? backingDouble;
+  late double backingDouble;
 
-  String? backingMapString;
+  late String backingMapString;
 
-  String? backingListString;
+  late String backingListString;
 }
 
 class PrivateField extends ManagedObject<_PrivateField>
     implements _PrivateField {
   @Serialize(input: true, output: false)
-  set public(String p) {
+  set public(String? p) {
     _private = p;
   }
 
   @Serialize(input: false, output: true)
-  String get public => _private!;
+  String? get public => _private;
 }
 
 class _PrivateField {
@@ -1050,7 +1052,7 @@ class _DocumentTest {
   @primaryKey
   int? id;
 
-  Document? document;
+  late Document document;
 }
 
 class ConstructorOverride extends ManagedObject<_ConstructorOverride>
@@ -1084,7 +1086,7 @@ class _Top {
   @Column(primaryKey: true)
   int? id;
 
-  ManagedSet<Middle>? middles;
+  late ManagedSet<Middle> middles;
 }
 
 class Middle extends ManagedObject<_Middle> implements _Middle {}
@@ -1096,8 +1098,8 @@ class _Middle {
   @Relate(#middles)
   Top? top;
 
-  Bottom? bottom;
-  ManagedSet<Bottom>? bottoms;
+  late Bottom bottom;
+  late ManagedSet<Bottom> bottoms;
 }
 
 class Bottom extends ManagedObject<_Bottom> implements _Bottom {}

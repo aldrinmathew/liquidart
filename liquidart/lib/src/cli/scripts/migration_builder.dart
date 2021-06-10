@@ -9,13 +9,13 @@ class MigrationBuilderExecutable extends Executable<Map<String, dynamic>> {
   MigrationBuilderExecutable(Map<String, dynamic> message)
       : inputSchema =
             Schema.fromMap(message["inputSchema"] as Map<String, dynamic>),
-        versionTag = message["versionTag"] as int,
+        versionTag = message["versionTag"] as int?,
         super(message);
 
   MigrationBuilderExecutable.input(this.inputSchema, this.versionTag)
       : super({"inputSchema": inputSchema.asMap(), "versionTag": versionTag});
 
-  final int versionTag;
+  final int? versionTag;
   final Schema inputSchema;
 
   @override
@@ -30,7 +30,7 @@ class MigrationBuilderExecutable extends Executable<Map<String, dynamic>> {
           changeList: changeList);
       return {
         "source": source,
-        "tablesEvaluated": dataModel.entities.map((e) => e.name).toList(),
+        "tablesEvaluated": dataModel.entities.map((e) => e!.name).toList(),
         "changeList": changeList
       };
     } on SchemaException catch (e) {
@@ -40,7 +40,7 @@ class MigrationBuilderExecutable extends Executable<Map<String, dynamic>> {
     }
   }
 
-  static List<String> importsForPackage(String packageName) => [
+  static List<String> importsForPackage(String? packageName) => [
         "package:liquidart/liquidart.dart",
         "package:$packageName/$packageName.dart",
         "package:replica/replica.dart"
@@ -49,13 +49,13 @@ class MigrationBuilderExecutable extends Executable<Map<String, dynamic>> {
 
 class MigrationBuilderResult {
   MigrationBuilderResult.fromMap(Map<String, dynamic> result)
-      : source = result["source"] as String,
-        tablesEvaluated = result["tablesEvaluated"] as List<String>,
-        changeList = result["changeList"] as List<String>;
+      : source = result["source"] as String?,
+        tablesEvaluated = result["tablesEvaluated"] as List<String>?,
+        changeList = result["changeList"] as List<String>?;
 
-  final String source;
-  final List<String> tablesEvaluated;
-  final List<String> changeList;
+  final String? source;
+  final List<String>? tablesEvaluated;
+  final List<String>? changeList;
 }
 
 Future<MigrationBuilderResult> generateMigrationFileForProject(
@@ -68,7 +68,7 @@ Future<MigrationBuilderResult> generateMigrationFileForProject(
       logHandler: project.displayProgress);
 
   if (resultMap.containsKey("error")) {
-    throw CLIException(resultMap["error"] as String);
+    throw CLIException(resultMap["error"] as String?);
   }
 
   return MigrationBuilderResult.fromMap(resultMap);

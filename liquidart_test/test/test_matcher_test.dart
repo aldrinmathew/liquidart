@@ -53,10 +53,10 @@ void main() {
     final DateTime xTimestamp = DateTime.parse("1984-08-04T00:00:00Z");
     final DateTime xDate = DateTime.parse("1981-08-04T00:00:00Z");
 
-    HttpServer? server;
+    late HttpServer server;
     setUpAll(() async {
       server = await HttpServer.bind(InternetAddress.loopbackIPv4, 4000);
-      server!.listen((req) {
+      server.listen((req) {
         req.response.statusCode = 200;
 
         if (req.uri.query.contains("timestamp")) {
@@ -72,7 +72,7 @@ void main() {
     });
 
     tearDownAll(() async {
-      await server!.close(force: true);
+      await server.close(force: true);
     });
 
     test("Ensure existence of some headers", () async {
@@ -153,8 +153,16 @@ void main() {
     test("Match an integer", () async {
       final defaultTestClient = Agent.onPort(4000);
       final response = await defaultTestClient.request("/foo?num").get();
-      expect(response, hasHeaders({"x-num": greaterThan(5)}));
-      expect(response, hasHeaders({"x-num": 10}));
+      expect(
+        response,
+        hasHeaders({
+          "x-num": greaterThan(5)
+        }));
+      expect(
+        response,
+        hasHeaders({
+          "x-num": 10
+        }));
     });
 
     test("DateTime isBefore,isAfter, etc.", () async {
@@ -163,12 +171,12 @@ void main() {
       expect(
           response,
           hasHeaders({
-            "x-timestamp": isAfter(xTimestamp.subtract(const Duration(seconds: 10)))
+            "x-timestamp": isAfter(xTimestamp.subtract(Duration(seconds: 10)))
           }));
       expect(
           response,
           hasHeaders({
-            "x-timestamp": isBefore(xTimestamp.add(const Duration(seconds: 10)))
+            "x-timestamp": isBefore(xTimestamp.add(Duration(seconds: 10)))
           }));
       expect(response,
           hasHeaders({"x-timestamp": isBeforeOrSameMomentAs(xTimestamp)}));
@@ -176,7 +184,7 @@ void main() {
           response,
           hasHeaders({
             "x-timestamp":
-                isBeforeOrSameMomentAs(xTimestamp.add(const Duration(seconds: 10)))
+                isBeforeOrSameMomentAs(xTimestamp.add(Duration(seconds: 10)))
           }));
       expect(response,
           hasHeaders({"x-timestamp": isAfterOrSameMomentAs(xTimestamp)}));
@@ -184,7 +192,7 @@ void main() {
           response,
           hasHeaders({
             "x-timestamp": isAfterOrSameMomentAs(
-                xTimestamp.subtract(const Duration(seconds: 10)))
+                xTimestamp.subtract(Duration(seconds: 10)))
           }));
       expect(response, hasHeaders({"x-timestamp": isSameMomentAs(xTimestamp)}));
 
@@ -192,12 +200,12 @@ void main() {
         expect(
             response,
             hasHeaders({
-              "x-timestamp": isAfter(xTimestamp.add(const Duration(seconds: 10)))
+              "x-timestamp": isAfter(xTimestamp.add(Duration(seconds: 10)))
             }));
       },
           allOf([
             contains(
-                "must be after ${xTimestamp.add(const Duration(seconds: 10)).toIso8601String()}")
+                "must be after ${xTimestamp.add(Duration(seconds: 10)).toIso8601String()}")
           ]));
 
       expectFailureFor(() {
@@ -205,12 +213,12 @@ void main() {
             response,
             hasHeaders({
               "x-timestamp":
-                  isBefore(xTimestamp.subtract(const Duration(seconds: 10)))
+                  isBefore(xTimestamp.subtract(Duration(seconds: 10)))
             }));
       },
           allOf([
             contains(
-                "must be before ${xTimestamp.subtract(const Duration(seconds: 10)).toIso8601String()}")
+                "must be before ${xTimestamp.subtract(Duration(seconds: 10)).toIso8601String()}")
           ]));
 
       expectFailureFor(() {
@@ -218,12 +226,12 @@ void main() {
             response,
             hasHeaders({
               "x-timestamp": isBeforeOrSameMomentAs(
-                  xTimestamp.subtract(const Duration(seconds: 10)))
+                  xTimestamp.subtract(Duration(seconds: 10)))
             }));
       },
           allOf([
             contains(
-                "must be before or same moment as ${xTimestamp.subtract(const Duration(seconds: 10)).toIso8601String()}")
+                "must be before or same moment as ${xTimestamp.subtract(Duration(seconds: 10)).toIso8601String()}")
           ]));
 
       expectFailureFor(() {
@@ -231,12 +239,12 @@ void main() {
             response,
             hasHeaders({
               "x-timestamp":
-                  isAfterOrSameMomentAs(xTimestamp.add(const Duration(seconds: 10)))
+                  isAfterOrSameMomentAs(xTimestamp.add(Duration(seconds: 10)))
             }));
       },
           allOf([
             contains(
-                "must be after or same moment as ${xTimestamp.add(const Duration(seconds: 10)).toIso8601String()}")
+                "must be after or same moment as ${xTimestamp.add(Duration(seconds: 10)).toIso8601String()}")
           ]));
 
       expectFailureFor(() {
@@ -244,12 +252,12 @@ void main() {
             response,
             hasHeaders({
               "x-timestamp":
-                  isSameMomentAs(xTimestamp.add(const Duration(seconds: 10)))
+                  isSameMomentAs(xTimestamp.add(Duration(seconds: 10)))
             }));
       },
           allOf([
             contains(
-                "must be same moment as ${xTimestamp.add(const Duration(seconds: 10)).toIso8601String()}")
+                "must be same moment as ${xTimestamp.add(Duration(seconds: 10)).toIso8601String()}")
           ]));
     });
 
@@ -324,7 +332,7 @@ void main() {
             contains("Body after decoding"),
             contains("{'foo': 'notbar'}"),
             contains("body differs for the following reasons"),
-            contains("at location [\'foo\'] is \'bar\' instead of \'notbar\'"),
+            contains("was 'bar' instead of 'notbar' at location ['foo']"),
           ]));
     });
   });
@@ -352,7 +360,7 @@ void main() {
       },
           allOf([
             contains("[1, 2]"),
-            contains("at location [2] is [1, 2, 3] which longer than expected")
+            contains("longer than expected at location [2]")
           ]));
 
       expectFailureFor(() {
@@ -376,7 +384,7 @@ void main() {
       },
           allOf([
             contains("{'foo': 'notbar', 'x': 'y'}"),
-            contains("at location [\'foo\'] is \'bar\' instead of \'notbar\'")
+            contains("was 'bar' instead of 'notbar'")
           ]));
     });
 
@@ -388,16 +396,13 @@ void main() {
 
       expect(response, hasBody({"foo": isString, "x": 5}));
 
-      expectFailureFor(
-        () {
-          expect(response, hasBody({"foo": isNot(isString), "x": 5}));
-        },
-        allOf([
-          contains("{'foo': <not <Instance of \'String\'>>, 'x': 5}"),
-          contains(
-              "at location ['foo'] is 'bar' which does not match not <Instance of \'String\'>")
-        ]),
-      );
+      expectFailureFor(() {
+        expect(response, hasBody({"foo": isNot(isString), "x": 5}));
+      },
+          allOf([
+            contains("{'foo': <not <Instance of \'String\'>>, 'x': 5}"),
+            contains('does not match not <Instance of \'String\'> at location')
+          ]));
     });
 
     test("Partial match, one level", () async {

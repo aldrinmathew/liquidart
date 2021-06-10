@@ -8,7 +8,7 @@ import 'package:liquidart/liquidart.dart';
 void main() {
   ManagedContext? context;
   tearDown(() async {
-    await context!.close();
+    await context?.close();
     context = null;
   });
 

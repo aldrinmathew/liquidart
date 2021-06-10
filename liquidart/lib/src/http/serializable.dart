@@ -12,8 +12,7 @@ abstract class Serializable {
   /// The returned [APISchemaObject] will be of type [APIType.object]. By default, each instance variable
   /// of the receiver's type will be a property of the return value.
   APISchemaObject documentSchema(APIDocumentContext context) {
-    return (RuntimeContext.current[runtimeType] as SerializableRuntime)
-        .documentSchema(context);
+    return (RuntimeContext.current[runtimeType] as SerializableRuntime).documentSchema(context);
   }
 
   /// Reads values from [object].
@@ -79,7 +78,7 @@ abstract class Serializable {
   /// If a [Response.body]'s type implements this interface, this method is invoked prior to any content-type encoding
   /// performed by the [Response].  A [Response.body] may also be a [List<Serializable>], for which this method is invoked on
   /// each element in the list.
-  Map<String, dynamic>? asMap();
+  Map<String?, dynamic>? asMap();
 
   /// Whether a subclass will automatically be registered as a schema component automatically.
   ///
@@ -94,19 +93,19 @@ abstract class Serializable {
 class SerializableException implements HandlerException {
   SerializableException(this.reasons);
 
-  final List<String>? reasons;
+  final List<String> reasons;
 
   @override
   Response get response {
     return Response.badRequest(body: {
       "error": "entity validation failed",
-      "reasons": reasons ?? "undefined"
+      "reasons": reasons
     });
   }
 
   @override
   String toString() {
-    final errorString = response.body["error"] as String;
+    final errorString = response.body["error"] as String?;
     final reasons = (response.body["reasons"] as List).join(", ");
     return "$errorString $reasons";
   }

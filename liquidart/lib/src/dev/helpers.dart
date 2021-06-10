@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:liquidart/liquidart.dart';
 import 'package:liquidart/src/db/query/mixin.dart';
+import 'package:collection/collection.dart' show IterableExtension;
 export 'package:liquidart/src/dev/context_helpers.dart';
 
 void justLogEverything() {
@@ -16,7 +17,7 @@ class PassthruController extends Controller {
 }
 
 class TestUser extends ResourceOwner {
-  int get uniqueIdentifier => id!;
+  int? get uniqueIdentifier => id;
   @override
   int? id;
 }
@@ -39,22 +40,22 @@ class TestToken implements AuthToken, AuthCode {
         ..code = t.code;
     } else if (t is AuthToken) {
       this
-        ..issueDate = t.issueDate!
-        ..expirationDate = t.expirationDate!
-        ..resourceOwnerIdentifier = t.resourceOwnerIdentifier!
-        ..clientID = t.clientID!
-        ..type = t.type!
-        ..accessToken = t.accessToken!
-        ..scopes = t.scopes!
-        ..refreshToken = t.refreshToken!;
+        ..issueDate = t.issueDate
+        ..expirationDate = t.expirationDate
+        ..resourceOwnerIdentifier = t.resourceOwnerIdentifier
+        ..clientID = t.clientID
+        ..type = t.type
+        ..accessToken = t.accessToken
+        ..scopes = t.scopes
+        ..refreshToken = t.refreshToken;
     } else if (t is AuthCode) {
       this
-        ..issueDate = t.issueDate!
-        ..expirationDate = t.expirationDate!
-        ..resourceOwnerIdentifier = t.resourceOwnerIdentifier!
-        ..clientID = t.clientID!
-        ..requestedScopes = t.requestedScopes!
-        ..code = t.code!;
+        ..issueDate = t.issueDate
+        ..expirationDate = t.expirationDate
+        ..resourceOwnerIdentifier = t.resourceOwnerIdentifier
+        ..clientID = t.clientID
+        ..requestedScopes = t.requestedScopes
+        ..code = t.code;
     }
   }
 
@@ -95,8 +96,7 @@ class TestToken implements AuthToken, AuthCode {
     var map = {
       "access_token": accessToken,
       "token_type": type,
-      "expires_in":
-          expirationDate!.difference(DateTime.now().toUtc()).inSeconds,
+      "expires_in": expirationDate!.difference(DateTime.now().toUtc()).inSeconds,
     };
 
     if (refreshToken != null) {
@@ -114,10 +114,10 @@ class InMemoryAuthStorage extends AuthServerDelegate {
 
   static const String defaultPassword = "foobaraxegrind21%";
 
-  Map<String, AuthClient> clients = {};
-  Map<int, TestUser?> users = {};
-  List<TestToken?> tokens = [];
-  List<AuthScope> allowedScopes = [];
+  late Map<String?, AuthClient> clients;
+  Map<int, TestUser> users = {};
+  List<TestToken> tokens = [];
+  List<AuthScope>? allowedScopes;
 
   void createUsers(int count) {
     for (int i = 0; i < count; i++) {
@@ -177,25 +177,22 @@ class InMemoryAuthStorage extends AuthServerDelegate {
 
   @override
   void addClient(AuthServer server, AuthClient client) {
-    clients[client.id!] = client;
+    clients[client.id] = client;
   }
 
   @override
   void removeTokens(AuthServer server, dynamic resourceOwnerID) {
-    return tokens
-        .removeWhere((t) => t!.resourceOwnerIdentifier == resourceOwnerID);
+    return tokens.removeWhere((t) => t.resourceOwnerIdentifier == resourceOwnerID);
   }
 
   @override
-  FutureOr<AuthToken?> getToken(AuthServer server,
+  FutureOr<AuthToken>? getToken(AuthServer server,
       {String? byAccessToken, String? byRefreshToken}) {
     AuthToken? existing;
     if (byAccessToken != null) {
-      existing = tokens.firstWhere((t) => t!.accessToken == byAccessToken,
-          orElse: () => null);
+      existing = tokens.firstWhereOrNull((t) => t.accessToken == byAccessToken);
     } else if (byRefreshToken != null) {
-      existing = tokens.firstWhere((t) => t!.refreshToken == byRefreshToken,
-          orElse: () => null);
+      existing = tokens.firstWhereOrNull((t) => t.refreshToken == byRefreshToken);
     } else {
       throw ArgumentError(
           "byAccessToken and byRefreshToken are mutually exclusive");
@@ -208,21 +205,20 @@ class InMemoryAuthStorage extends AuthServerDelegate {
   }
 
   @override
-  FutureOr<TestUser?> getResourceOwner(AuthServer server, String username) {
+  FutureOr<TestUser>? getResourceOwner(AuthServer server, String username) {
     return users.values
-        .firstWhere((t) => t!.username == username, orElse: () => null);
+        .firstWhereOrNull((t) => t.username == username);
   }
 
   @override
   void removeToken(AuthServer server, AuthCode grantedByCode) =>
-      tokens.removeWhere((t) => t!.code == grantedByCode.code);
+      tokens.removeWhere((t) => t.code == grantedByCode.code);
 
   @override
-  FutureOr addToken(AuthServer server, AuthToken token,
-      {AuthCode? issuedFrom}) {
+  FutureOr addToken(AuthServer server, AuthToken token, {AuthCode? issuedFrom}) {
     if (issuedFrom != null) {
-      var existingIssued = tokens.firstWhere((t) => t!.code == issuedFrom.code,
-          orElse: () => null);
+      var existingIssued = tokens.firstWhereOrNull(
+          (t) => t.code == issuedFrom.code);
       var replacement = TestToken.from(token);
       replacement.code = issuedFrom.code;
       replacement.scopes = issuedFrom.requestedScopes;
@@ -239,12 +235,11 @@ class InMemoryAuthStorage extends AuthServerDelegate {
   @override
   FutureOr updateToken(
       AuthServer server,
-      String oldAccessToken,
-      String newAccessToken,
-      DateTime newIssueDate,
-      DateTime newExpirationDate) {
-    var existing = tokens.firstWhere((e) => e!.accessToken == oldAccessToken,
-        orElse: () => null);
+      String? oldAccessToken,
+      String? newAccessToken,
+      DateTime? newIssueDate,
+      DateTime? newExpirationDate) {
+    var existing = tokens.firstWhereOrNull((e) => e.accessToken == oldAccessToken);
     if (existing != null) {
       var replacement = TestToken.from(existing)
         ..expirationDate = newExpirationDate
@@ -267,9 +262,8 @@ class InMemoryAuthStorage extends AuthServerDelegate {
       tokens.add(TestToken.from(code));
 
   @override
-  FutureOr<AuthCode?> getCode(AuthServer server, String code) {
-    var existing =
-        tokens.firstWhere((t) => t!.code == code, orElse: () => null);
+  FutureOr<AuthCode>? getCode(AuthServer server, String code) {
+    var existing = tokens.firstWhereOrNull((t) => t.code == code);
     if (existing == null) {
       return null;
     }
@@ -277,26 +271,23 @@ class InMemoryAuthStorage extends AuthServerDelegate {
   }
 
   @override
-  void removeCode(AuthServer server, String code) =>
-      tokens.removeWhere((c) => c!.code == code);
+  void removeCode(AuthServer server, String? code) =>
+      tokens.removeWhere((c) => c.code == code);
 
   @override
-  FutureOr<AuthClient> getClient(AuthServer server, String clientID) =>
-      clients[clientID]!;
+  FutureOr<AuthClient>? getClient(AuthServer server, String? clientID) => clients[clientID];
 
   @override
-  FutureOr removeClient(AuthServer server, String clientID) =>
-      clients.remove(clientID);
+  FutureOr removeClient(AuthServer server, String clientID) => clients.remove(clientID);
 
   @override
-  List<AuthScope> getAllowedScopes(ResourceOwner owner) => allowedScopes;
+  List<AuthScope>? getAllowedScopes(ResourceOwner owner) => allowedScopes;
 }
 
 class DefaultPersistentStore extends PersistentStore {
   @override
   Query<T> newQuery<T extends ManagedObject>(
-      ManagedContext context, ManagedEntity entity,
-      {T? values}) {
+      ManagedContext context, ManagedEntity? entity, {T? values}) {
     final q = _MockQuery<T>.withEntity(context, entity);
     if (values != null) {
       q.values = values;
@@ -310,7 +301,7 @@ class DefaultPersistentStore extends PersistentStore {
       null;
 
   @override
-  Future<dynamic> executeQuery(String formatString, Map<String, dynamic> values,
+  Future<dynamic> executeQuery(String formatString, Map<String?, dynamic> values,
           int timeoutInSeconds,
           {PersistentStoreQueryReturnType? returnType}) async =>
       null;
@@ -348,12 +339,12 @@ class DefaultPersistentStore extends PersistentStore {
 
   @override
   List<String> renameColumn(
-          SchemaTable table, SchemaColumn column, String name) =>
+          SchemaTable table, SchemaColumn column, String? name) =>
       [];
 
   @override
   List<String> alterColumnNullability(SchemaTable table, SchemaColumn column,
-          String unencodedInitialValue) =>
+          String? unencodedInitialValue) =>
       [];
 
   @override
@@ -385,14 +376,14 @@ class DefaultPersistentStore extends PersistentStore {
   Future<int> get schemaVersion async => 0;
 
   @override
-  Future<Schema> upgrade(Schema fromSchema, List<Migration> withMigrations,
+  Future<Schema?> upgrade(Schema fromSchema, List<Migration> withMigrations,
       {bool temporary = false}) async {
-    var out = fromSchema;
+    Schema? out = fromSchema;
     for (var migration in withMigrations) {
       migration.database = SchemaBuilder(this, out);
       await migration.upgrade();
       await migration.seed();
-      out = migration.database!.schema!;
+      out = migration.database.schema;
     }
     return out;
   }
@@ -403,7 +394,7 @@ class _MockQuery<InstanceType extends ManagedObject> extends Object
     implements Query<InstanceType> {
   _MockQuery(this.context);
 
-  _MockQuery.withEntity(this.context, ManagedEntity entity) {
+  _MockQuery.withEntity(this.context, ManagedEntity? entity) {
     _entity = entity;
   }
 
@@ -411,7 +402,7 @@ class _MockQuery<InstanceType extends ManagedObject> extends Object
   ManagedContext context;
 
   @override
-  ManagedEntity get entity =>
+  ManagedEntity? get entity =>
       _entity ?? context.dataModel!.entityForType(InstanceType);
 
   ManagedEntity? _entity;

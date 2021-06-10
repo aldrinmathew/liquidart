@@ -8,7 +8,7 @@ void main() {
   ManagedContext? context;
 
   tearDown(() async {
-    await context!.close();
+    await context?.close();
     context = null;
   });
 
@@ -16,9 +16,9 @@ void main() {
       () async {
     context = await contextWithModels([TestModel]);
 
-    var q = Query<TestModel>(context!)..values!.id = 1;
+    var q = Query<TestModel>(context!)..values?.id = 1;
 
-    expect(q.values!.id, 1);
+    expect(q.values?.id, 1);
   });
 
   test("May set values to null, but the query will fail", () async {
@@ -117,20 +117,20 @@ void main() {
     context = await contextWithModels([MultiUnique]);
 
     var q = Query<MultiUnique>(context!)
-      ..values!.a = "a"
-      ..values!.b = "b";
+      ..values?.a = "a"
+      ..values?.b = "b";
 
     await q.insert();
 
     q = Query<MultiUnique>(context!)
-      ..values!.a = "a"
-      ..values!.b = "a";
+      ..values?.a = "a"
+      ..values?.b = "a";
 
     await q.insert();
 
     q = Query<MultiUnique>(context!)
-      ..values!.a = "a"
-      ..values!.b = "b";
+      ..values?.a = "a"
+      ..values?.b = "b";
     try {
       await q.insert();
       expect(true, false);
@@ -222,7 +222,7 @@ void main() {
           QueryPredicate("emailAddress = @email", {"email": "2@a.com"});
 
     result = await readReq.fetchOne();
-    expect(result!.name, "bob");
+    expect(result?.name, "bob");
   });
 
   test("Inserting an object without required key fails", () async {
@@ -283,7 +283,7 @@ void main() {
     p = await pq.insert();
 
     expect(p.id, greaterThan(0));
-    expect(p.owner!.id, greaterThan(0));
+    expect(p.owner.id, greaterThan(0));
   });
 
   test("Timestamp inserted correctly by default", () async {
@@ -296,7 +296,7 @@ void main() {
     var result = await q.insert();
 
     expect(result.dateCreated is DateTime, true);
-    expect(result.dateCreated!.difference(DateTime.now()).inSeconds <= 0, true);
+    expect(result.dateCreated.difference(DateTime.now()).inSeconds <= 0, true);
   });
 
   test("Can insert timestamp manually", () async {
@@ -312,7 +312,7 @@ void main() {
     var result = await q.insert();
 
     expect(result.dateCreated is DateTime, true);
-    expect(result.dateCreated!.difference(dt).inSeconds == 0, true);
+    expect(result.dateCreated.difference(dt).inSeconds == 0, true);
   });
 
   test("Transient values work correctly", () async {
@@ -359,7 +359,7 @@ void main() {
   test("Can use insert private properties", () async {
     context = await contextWithModels([PrivateField]);
 
-    await (Query<PrivateField>(context!)..values!.public = "abc").insert();
+    await (Query<PrivateField>(context!)..values?.public = "abc").insert();
     var q = Query<PrivateField>(context!);
     var result = await q.fetch();
     expect(result.first.public, "abc");
@@ -368,7 +368,7 @@ void main() {
   test("Can use enum to set property to be stored in db", () async {
     context = await contextWithModels([EnumObject]);
 
-    var q = Query<EnumObject>(context!)..values!.enumValues = EnumValues.efgh;
+    var q = Query<EnumObject>(context!)..values?.enumValues = EnumValues.efgh;
 
     var result = await q.insert();
     expect(result.enumValues, EnumValues.efgh);
@@ -377,7 +377,7 @@ void main() {
   test("Can insert enum value that is null", () async {
     context = await contextWithModels([EnumObject]);
 
-    var q = Query<EnumObject>(context!)..values!.enumValues = null;
+    var q = Query<EnumObject>(context!)..values?.enumValues = null;
 
     var result = await q.insert();
     expect(result.enumValues, isNull);
@@ -407,10 +407,9 @@ class _TestModel {
   @Column(nullable: true, unique: true)
   String? emailAddress;
 
-  // ignore: unused_element
-  static String tableName() {
-    return "simple";
-  }
+  // static String tableName() {
+  //   return "simple";
+  // }
 }
 
 class GenUser extends ManagedObject<_GenUser> implements _GenUser {}
@@ -431,7 +430,7 @@ class _GenPost {
   String? text;
 
   @Relate(Symbol('posts'))
-  GenUser? owner;
+  late GenUser owner;
 }
 
 class GenTime extends ManagedObject<_GenTime> implements _GenTime {}
@@ -443,7 +442,7 @@ class _GenTime {
   String? text;
 
   @Column(defaultValue: "(now() at time zone 'utc')")
-  DateTime? dateCreated;
+  late DateTime dateCreated;
 }
 
 class TransientModel extends ManagedObject<_Transient> implements _Transient {
@@ -468,11 +467,11 @@ class _BoringObject {
 
 class PrivateField extends ManagedObject<_PrivateField>
     implements _PrivateField {
-  set public(String p) {
+  set public(String? p) {
     _private = p;
   }
 
-  String get public => _private!;
+  String? get public => _private;
 }
 
 class _PrivateField {

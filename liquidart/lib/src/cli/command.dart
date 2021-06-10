@@ -6,6 +6,7 @@ import 'dart:mirrors';
 import 'package:liquidart/src/cli/metadata.dart';
 import 'package:liquidart/src/cli/running_process.dart';
 import 'package:args/args.dart' as args;
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:replica/replica.dart';
 import 'package:yaml/yaml.dart';
 import 'package:pub_semver/pub_semver.dart';
@@ -26,11 +27,8 @@ enum CLIColor { red, green, blue, boldRed, boldGreen, boldBlue, boldNone, none }
 /// A command line interface command.
 abstract class CLICommand {
   CLICommand() {
-    final arguments = reflect(this)
-        .type
-        .instanceMembers
-        .values
-        .where((m) => m.metadata.any((im) => im.type.isAssignableTo(reflectType(Argument))));
+    final arguments = reflect(this).type.instanceMembers.values.where((m) =>
+        m.metadata.any((im) => im.type.isAssignableTo(reflectType(Argument))));
 
     arguments.forEach((arg) {
       if (!arg.isGetter) {
@@ -39,29 +37,24 @@ abstract class CLICommand {
             "has CLI annotation, but is not a getter.");
       }
 
-      final Argument argType = firstMetadataOfType<Argument>(arg)!;
-      argType.addToParser(options);
+      final Argument? argType = firstMetadataOfType<Argument>(arg);
+      argType?.addToParser(options);
     });
   }
 
   /// Options for this command.
   args.ArgParser options = args.ArgParser(allowTrailingOptions: true);
 
-  args.ArgResults? _argumentValues;
+  late args.ArgResults _argumentValues;
 
-  List<String> get remainingArguments => _argumentValues!.rest;
+  List<String> get remainingArguments => _argumentValues.rest;
 
-  args.ArgResults get command => _argumentValues!.command!;
+  args.ArgResults? get command => _argumentValues.command;
 
   StoppableProcess? get runningProcess {
-    List<CLICommand> values = _commandMap.values.toList();
-    for (int i = 0; i < values.length; i++) {
-      var cmd = values[i];
-      if (cmd.runningProcess != null) {
-        return cmd.runningProcess;
-      }
-    }
-    return null;
+    return _commandMap.values
+        .firstWhereOrNull((cmd) => cmd.runningProcess != null)
+        ?.runningProcess;
   }
 
   @Flag("version", help: "Prints version of this tool", negatable: false)
@@ -73,7 +66,8 @@ abstract class CLICommand {
   @Flag("help", abbr: "h", help: "Shows this", negatable: false)
   bool get helpMeItsScary => decode("help");
 
-  @Flag("stacktrace", help: "Shows the stacktrace if an error occurs", defaultsTo: false)
+  @Flag("stacktrace",
+      help: "Shows the stacktrace if an error occurs", defaultsTo: false)
   bool get showStacktrace => decode("stacktrace");
 
   @Flag("machine",
@@ -95,19 +89,24 @@ abstract class CLICommand {
     });
   }
 
-  Version get toolVersion => _toolVersion!;
+  Version? get toolVersion => _toolVersion;
   Version? _toolVersion;
 
   static const _delimiter = "-- ";
   static const _tabs = "    ";
   static const _errorDelimiter = "*** ";
 
+
   T decode<T>(String key) {
-    final val = _argumentValues![key];
+    final val = _argumentValues[key];
     if (T == int && val is String) {
-      return int.parse(val) as T;
+      return int.tryParse(val) as T;
+    }else if(T == int && val == null){
+      return 1 as T;
+    }else{
+      return RuntimeContext.current.coerce(val);
     }
-    return RuntimeContext.current.coerce(val);
+    
   }
 
   void registerCommand(CLICommand cmd) {
@@ -125,18 +124,19 @@ abstract class CLICommand {
   /// Cleans up any resources used during this command.
   ///
   /// Delete temporary files or close down any [Stream]s.
-  Future cleanup() async {}
+  Future? cleanup() async {}
 
   /// Invoked on this instance when this command is executed from the command line.
   ///
   /// Do not override this method. This method invokes [handle] within a try-catch block
   /// and will invoke [cleanup] when complete.
-  Future<int> process(args.ArgResults results, {List<String>? commandPath}) async {
+  Future<int> process(args.ArgResults results,
+      {List<String>? commandPath}) async {
     final parentCommandNames = commandPath ?? <String>[];
 
     if (results.command != null) {
       parentCommandNames.add(name);
-      return _commandMap[results.command!.name]!
+      return _commandMap[results.command!.name!]!
           .process(results.command!, commandPath: parentCommandNames);
     }
 
@@ -163,7 +163,7 @@ abstract class CLICommand {
 
       return await handle();
     } on CLIException catch (e, st) {
-      displayError(e.message!);
+      displayError(e.message);
       e.instructions?.forEach(displayProgress);
 
       if (showStacktrace) {
@@ -181,12 +181,13 @@ abstract class CLICommand {
 
   Future determineToolVersion() async {
     try {
-      var toolLibraryFilePath =
-          (await Isolate.resolvePackageUri(currentMirrorSystem().findLibrary(#liquidart).uri))!
-              .toFilePath(windows: Platform.isWindows);
-      var liquidartDirectory =
-          Directory(FileSystemEntity.parentOf(FileSystemEntity.parentOf(toolLibraryFilePath)));
-      var toolPubspecFile = File.fromUri(liquidartDirectory.absolute.uri.resolve("pubspec.yaml"));
+      var toolLibraryFilePath = (await Isolate.resolvePackageUri(
+              currentMirrorSystem().findLibrary(#liquidart).uri))!
+          .toFilePath(windows: Platform.isWindows);
+      var liquidartDirectory = Directory(FileSystemEntity.parentOf(
+          FileSystemEntity.parentOf(toolLibraryFilePath)));
+      var toolPubspecFile =
+          File.fromUri(liquidartDirectory.absolute.uri.resolve("pubspec.yaml"));
 
       final toolPubspecContents = loadYaml(toolPubspecFile.readAsStringSync()) as Map;
       final toolVersion = toolPubspecContents["version"] as String;
@@ -198,27 +199,31 @@ abstract class CLICommand {
 
   void preProcess() {}
 
-  void displayError(String errorMessage,
+  void displayError(String? errorMessage,
       {bool showUsage = false, CLIColor color = CLIColor.boldRed}) {
-    outputSink.writeln("${colorSymbol(color)}$_errorDelimiter$errorMessage$defaultColorSymbol");
+    outputSink.writeln(
+        "${colorSymbol(color)}$_errorDelimiter$errorMessage$defaultColorSymbol");
     if (showUsage) {
       outputSink.writeln("\n${options.usage}");
     }
   }
 
   void displayInfo(String infoMessage, {CLIColor color = CLIColor.boldNone}) {
-    outputSink.writeln("${colorSymbol(color)}$_delimiter$infoMessage$defaultColorSymbol");
+    outputSink.writeln(
+        "${colorSymbol(color)}$_delimiter$infoMessage$defaultColorSymbol");
   }
 
-  void displayProgress(String progressMessage, {CLIColor color = CLIColor.none}) {
-    outputSink.writeln("${colorSymbol(color)}$_tabs$progressMessage$defaultColorSymbol");
+  void displayProgress(String progressMessage,
+      {CLIColor color = CLIColor.none}) {
+    outputSink.writeln(
+        "${colorSymbol(color)}$_tabs$progressMessage$defaultColorSymbol");
   }
 
-  String colorSymbol(CLIColor color) {
+  String? colorSymbol(CLIColor color) {
     if (!showColors) {
       return "";
     }
-    return _lookupTable[color]!;
+    return _lookupTable[color];
   }
 
   String get name;

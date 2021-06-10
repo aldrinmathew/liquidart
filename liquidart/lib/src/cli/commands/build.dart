@@ -119,9 +119,10 @@ Future _runnerFunc(List<String> args, dynamic sendPort) async {
     ..port = int.parse(values['port'] as String)
     ..address = values['address']
     ..isIpv6Only = values['ipv6-only'] == true
-    ..configurationFilePath = values['config-path'] as String
-    ..certificateFilePath = values['ssl-certificate-path'] as String
-    ..privateKeyFilePath = values['ssl-key-path'] as String;
+    ..configurationFilePath = values['config-path'] as String?
+    ..certificateFilePath = values['ssl-certificate-path'] as String?
+    ..privateKeyFilePath = values['ssl-key-path'] as String?;
+
 
   final isolateCountString = values['isolates'];
   if (isolateCountString == null) {

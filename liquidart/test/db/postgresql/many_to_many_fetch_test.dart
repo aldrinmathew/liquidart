@@ -23,8 +23,8 @@ void main() {
       Team,
       Game
     ]);
-    var _ = await populateModelGraph(ctx!);
-    await populateGameSchedule(ctx!);
+    var _ = await populateModelGraph(ctx);
+    await populateGameSchedule(ctx);
   });
 
   tearDownAll(() async {
@@ -36,7 +36,7 @@ void main() {
       var q = Query<RootObject>(ctx!)
         ..sortBy((r) => r.rid, QuerySortOrder.ascending);
 
-      q.join(set: (r) => r.join!).join(object: (r) => r.other!);
+      q.join(set: (r) => r.join).join(object: (r) => r.other!);
       var results = await q.fetch();
       expect(
           results.map((r) => r.asMap()).toList(),
@@ -75,7 +75,7 @@ void main() {
       var q = Query<OtherRootObject>(ctx!)
         ..sortBy((o) => o.id, QuerySortOrder.ascending);
 
-      q.join(set: (r) => r.join!).join(object: (r) => r.root!);
+      q.join(set: (r) => r.join).join(object: (r) => r.root!);
       var results = await q.fetch();
       expect(
           results.map((r) => r.asMap()).toList(),
@@ -216,7 +216,7 @@ void main() {
     test("Can join by one relationship", () async {
       var q = Query<Team>(ctx!)..sortBy((t) => t.id, QuerySortOrder.ascending);
 
-      q.join(set: (t) => t.awayGames!).join(object: (g) => g.homeTeam!);
+      q.join(set: (t) => t.awayGames).join(object: (g) => g.homeTeam!);
 
       var results = await q.fetch();
       expect(
@@ -262,7 +262,7 @@ void main() {
     test("Can join by other relationship", () async {
       var q = Query<Team>(ctx!)..sortBy((t) => t.id, QuerySortOrder.ascending);
 
-      q.join(set: (t) => t.homeGames!).join(object: (g) => g.awayTeam!);
+      q.join(set: (t) => t.homeGames).join(object: (g) => g.awayTeam!);
       var results = await q.fetch();
 
       expect(
@@ -345,7 +345,7 @@ void main() {
       try {
         var q = Query<Team>(ctx!);
 
-        q.join(set: (t) => t.homeGames!).join(object: (g) => g.homeTeam!);
+        q.join(set: (t) => t.homeGames).join(object: (g) => g.homeTeam!);
         expect(true, false);
       } on StateError catch (e) {
         expect(e.toString(), contains("Invalid query construction"));
@@ -376,8 +376,7 @@ void main() {
 
     test("Can implicit join from join table - one side", () async {
       // 'Games where Iowa was away'
-      var q = Query<Game>(ctx!)
-        ..where((o) => o.awayTeam!.name).contains("Iowa");
+      var q = Query<Game>(ctx!)..where((o) => o.awayTeam!.name).contains("Iowa");
       var results = await q.fetch();
       expect(
           results.map((g) => g.asMap()).toList(),
@@ -424,13 +423,13 @@ void main() {
       // 'All teams and their away games where %Minn% is away team'
       var q = Query<Team>(ctx!);
       q
-          .join(set: (t) => t.awayGames!)
+          .join(set: (t) => t.awayGames)
           .where((o) => o.awayTeam!.name)
           .contains("Minn");
       var results = await q.fetch();
       expect(results.length, 3);
-      expect(results.firstWhere((t) => t.name == "Minnesota").awayGames!.length,
-          1);
+      expect(
+          results.firstWhere((t) => t.name == "Minnesota").awayGames!.length, 1);
       expect(
           results
               .where((t) => t.name != "Minnesota")
@@ -440,7 +439,7 @@ void main() {
       // All teams and their games played at %Minn%
       q = Query<Team>(ctx!);
       q
-          .join(set: (t) => t.awayGames!)
+          .join(set: (t) => t.awayGames)
           .where((o) => o.homeTeam!.name)
           .contains("Minn");
       results = await q.fetch();
@@ -459,7 +458,7 @@ void main() {
       // 'All teams and the games they've played at Minnesota'
       var q = Query<Team>(ctx!);
       q
-          .join(set: (t) => t.awayGames!)
+          .join(set: (t) => t.awayGames)
           .where((o) => o.homeTeam!.name)
           .contains("Minn");
       var results = await q.fetch();
@@ -515,7 +514,7 @@ class _Team {
   ManagedSet<Game>? awayGames;
 }
 
-Future populateGameSchedule(ManagedContext ctx) async {
+Future populateGameSchedule(ManagedContext? ctx) async {
   var teams = [
     Team()..name = "Wisconsin",
     Team()..name = "Minnesota",
@@ -523,7 +522,7 @@ Future populateGameSchedule(ManagedContext ctx) async {
   ];
 
   for (var t in teams) {
-    var q = Query<Team>(ctx)..values = t;
+    var q = Query<Team>(ctx!)..values = t;
     t.id = (await q.insert()).id;
   }
 
@@ -546,7 +545,7 @@ Future populateGameSchedule(ManagedContext ctx) async {
   ];
 
   for (var g in games) {
-    var q = Query<Game>(ctx)..values = g;
+    var q = Query<Game>(ctx!)..values = g;
     await q.insert();
   }
 }

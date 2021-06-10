@@ -11,13 +11,13 @@ void main() {
     Application? app;
 
     tearDown(() async {
-      await app!.stop();
+      await app?.stop();
     });
 
     test("Create from app, explicit port", () async {
       app = Application<SomeChannel>()..options.port = 4111;
       await app!.startOnCurrentIsolate();
-      final client = Agent(app!);
+      final client = Agent(app);
       expect(client.baseURL, "http://localhost:4111");
     });
 
@@ -25,14 +25,14 @@ void main() {
       app = Application<SomeChannel>()..options.port = 0;
       await app!.startOnCurrentIsolate();
 
-      final client = Agent(app!);
+      final client = Agent(app);
       final response = await client.request("/").get();
       expect(response, hasStatus(200));
     });
 
     test("Create from unstarted app throws useful exception", () async {
       app = Application<SomeChannel>();
-      final tc = Agent(app!);
+      final tc = Agent(app);
       try {
         await tc.request("/").get();
         expect(true, false);
@@ -43,7 +43,7 @@ void main() {
 
     test("Create from unstarted app, start app, works OK", () async {
       app = Application<SomeChannel>()..options.port = 0;
-      final tc = Agent(app!);
+      final tc = Agent(app);
       await app!.startOnCurrentIsolate();
 
       expectResponse(await tc.request("/").get(), 200);
@@ -123,16 +123,16 @@ void main() {
 
     test("HTTP requests are issued", () async {
       final defaultTestClient = Agent.onPort(4040);
-      expect(
-          await defaultTestClient.request("/foo").get() is TestResponse, true);
-      var msg = await server.next();
-      expect(msg.path!.string, "/foo");
+      expect(await defaultTestClient.request("/foo").get() is TestResponse,
+          true);
+      Request msg = await server.next();
+      expect(msg.path.string, "/foo");
       expect(msg.method, "GET");
 
       expect(await defaultTestClient.request("/foo").delete() is TestResponse,
           true);
       msg = await server.next();
-      expect(msg.path!.string, "/foo");
+      expect(msg.path.string, "/foo");
       expect(msg.method, "DELETE");
 
       expect(
@@ -140,27 +140,27 @@ void main() {
               is TestResponse,
           true);
       msg = await server.next();
-      expect(msg.path!.string, "/foo");
+      expect(msg.path.string, "/foo");
       expect(msg.method, "POST");
-      expect(msg.body!.as(), {"foo": "bar"});
+      expect(msg.body.as(), {"foo": "bar"});
 
       expect(
-          await defaultTestClient.execute("PATCH", "/foo", body: {"foo": "bar"})
-              is TestResponse,
+          await defaultTestClient
+              .execute("PATCH", "/foo", body: {"foo": "bar"}) is TestResponse,
           true);
       msg = await server.next();
-      expect(msg.path!.string, "/foo");
+      expect(msg.path.string, "/foo");
       expect(msg.method, "PATCH");
-      expect(msg.body!.as(), {"foo": "bar"});
+      expect(msg.body.as(), {"foo": "bar"});
 
       expect(
           await defaultTestClient.put("/foo", body: {"foo": "bar"})
               is TestResponse,
           true);
       msg = await server.next();
-      expect(msg.path!.string, "/foo");
+      expect(msg.path.string, "/foo");
       expect(msg.method, "PUT");
-      expect(msg.body!.as<Map<String, dynamic>>(), {"foo": "bar"});
+      expect(msg.body.as<Map<String, dynamic>>(), {"foo": "bar"});
     });
 
     test("Default headers are added to requests", () async {
@@ -170,10 +170,10 @@ void main() {
 
       await defaultTestClient.get("/foo");
 
-      final msg = await server.next();
-      expect(msg.path!.string, "/foo");
-      expect(msg.raw!.headers.value("x-int"), "1");
-      expect(msg.raw!.headers.value("x-string"), "1");
+      final Request msg = await server.next();
+      expect(msg.path.string, "/foo");
+      expect(msg.raw.headers.value("x-int"), "1");
+      expect(msg.raw.headers.value("x-string"), "1");
     });
 
     test("Default headers can be overridden", () async {
@@ -187,9 +187,9 @@ void main() {
             })
           .get();
 
-      final msg = await server.next();
-      expect(msg.path!.string, "/foo");
-      expect(msg.raw!.headers.value("x-int"), "1, 2");
+      final Request msg = await server.next();
+      expect(msg.path.string, "/foo");
+      expect(msg.raw.headers.value("x-int"), "1, 2");
     });
 
     test("Client can expect array of JSON", () async {
@@ -213,9 +213,9 @@ void main() {
 
       await defaultTestClient.get("/foo", query: {"k": "v"});
 
-      final msg = await server.next();
-      expect(msg.path!.string, "/foo");
-      expect(msg.raw!.uri.query, "k=v");
+      final Request msg = await server.next();
+      expect(msg.path.string, "/foo");
+      expect(msg.raw.uri.query, "k=v");
     });
 
     test("Basic authorization adds header to all requests", () async {
@@ -225,10 +225,10 @@ void main() {
 
       await defaultTestClient.get("/foo");
 
-      final msg = await server.next();
-      expect(msg.path!.string, "/foo");
-      expect(msg.raw!.headers.value("k"), "v");
-      expect(msg.raw!.headers.value("authorization"),
+      final Request msg = await server.next();
+      expect(msg.path.string, "/foo");
+      expect(msg.raw.headers.value("k"), "v");
+      expect(msg.raw.headers.value("authorization"),
           "Basic ${base64.encode("username:password".codeUnits)}");
     });
 
@@ -239,23 +239,23 @@ void main() {
 
       await defaultTestClient.get("/foo");
 
-      final msg = await server.next();
-      expect(msg.path!.string, "/foo");
-      expect(msg.raw!.headers.value("k"), "v");
-      expect(msg.raw!.headers.value("authorization"), "Bearer token");
+      final Request msg = await server.next();
+      expect(msg.path.string, "/foo");
+      expect(msg.raw.headers.value("k"), "v");
+      expect(msg.raw.headers.value("authorization"), "Bearer token");
     });
   });
 
   group("Response handling", () {
-    HttpServer? server;
+    late HttpServer server;
 
     tearDown(() async {
-      await server!.close(force: true);
+      await server.close(force: true);
     });
 
     test("Responses have body", () async {
       server = await HttpServer.bind(InternetAddress.loopbackIPv4, 4000);
-      server!.listen((req) {
+      server.listen((req) {
         final resReq = Request(req);
         resReq.respond(Response.ok([
           {"a": "b"}
@@ -270,7 +270,7 @@ void main() {
 
     test("Responses with no body don't return one", () async {
       server = await HttpServer.bind(InternetAddress.loopbackIPv4, 4000);
-      server!.listen((req) {
+      server.listen((req) {
         req.response.statusCode = 200;
         req.response.close();
       });
@@ -282,14 +282,14 @@ void main() {
 
     test("Request with accept adds header", () async {
       server = await HttpServer.bind(InternetAddress.loopbackIPv4, 4000);
-      server!.listen((req) {
+      server.listen((req) {
         final resReq = Request(req);
         resReq.respond(Response.ok(
             {"ACCEPT": req.headers.value(HttpHeaders.acceptHeader)}));
       });
 
-      final client = Agent.onPort(4000);
-      final req = client.request("/foo")
+      final  client = Agent.onPort(4000);
+      final  req = client.request("/foo")
         ..accept = [ContentType.json, ContentType.text];
 
       final response = await req.post();
